@@ -1,4 +1,6 @@
+import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:classet_admin/core/services/auth_service.dart';
 
-final authServiceProvider = Provider<AuthService>((ref) => AuthService());
+final authStateProvider = StateProvider<CognitoUserSession?>((ref) {
+  return null; // Initially no session (user not logged in)
+});

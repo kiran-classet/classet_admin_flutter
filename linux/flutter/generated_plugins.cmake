@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  amplify_db_common
   flutter_secure_storage_linux
 )
 
