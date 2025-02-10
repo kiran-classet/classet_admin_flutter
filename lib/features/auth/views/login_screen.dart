@@ -1,4 +1,4 @@
-import 'package:classet_admin/config/CognitoAuthService.dart';
+import 'package:classet_admin/config/cognitoAuthService.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
