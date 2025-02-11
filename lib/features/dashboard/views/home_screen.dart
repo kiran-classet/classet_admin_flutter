@@ -8,16 +8,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  // Function to handle logout and clear SharedPreferences and provider states
   Future<void> _logout(BuildContext context, WidgetRef ref) async {
-    // Invalidate all providers to clear their states
     await MyAppProviders.invalidateAllProviders(ref);
-
-    // Clear SharedPreferences
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Clears all data stored in SharedPreferences
-
-    // Navigate back to the LoginScreen
+    String? savedEmail = prefs.getString('email');
+    String? savedPassword = prefs.getString('password');
+    await prefs.clear();
+    if (savedEmail != null) {
+      await prefs.setString('email', savedEmail);
+    }
+    if (savedPassword != null) {
+      await prefs.setString('password', savedPassword);
+    }
     context.go('/');
   }
 
