@@ -1,55 +1,60 @@
-import 'package:classet_admin/config/cognitoAuthService.dart';
+import 'package:classet_admin/features/auth/providers/login_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:classet_admin/config/cognitoAuthService.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final loginState = ref.watch(loginProvider); // Access the login state
+    final emailController = TextEditingController(text: 'aauadmin');
+    final passwordController = TextEditingController(text: "Classet@123");
+    bool _isPasswordVisible = false;
 
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController emailController =
-      TextEditingController(text: 'aauadmin');
-  final TextEditingController passwordController =
-      TextEditingController(text: "Classet@123");
-  bool isLoading = false;
-  bool _isPasswordVisible = false;
+    void _signIn() async {
+      ref.read(loginProvider.notifier).setLoading(true); // Set loading state
 
-  final CognitoAuthService authService = CognitoAuthService();
+      final authService = CognitoAuthService();
 
-  void _signIn() async {
-    setState(() => isLoading = true);
-
-    try {
-      final session = await authService.login(
-        emailController.text,
-        passwordController.text,
-      );
-
-      setState(() => isLoading = false);
-
-      if (session != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login successful!')),
+      try {
+        final session = await authService.login(
+          emailController.text,
+          passwordController.text,
         );
-        context.go('/home');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login failed. Please try again.')),
-        );
+
+        ref
+            .read(loginProvider.notifier)
+            .setLoading(false); // Reset loading state
+
+        if (session != null) {
+          // Assuming session contains idToken, refreshToken, and accessToken
+          final accessToken = session.getAccessToken().getJwtToken();
+          final refreshToken = session.getRefreshToken()?.getToken();
+          final idToken = session.getIdToken().getJwtToken();
+          ref.read(loginProvider.notifier).setSessionData(
+                idToken!, // Replace with actual data
+                refreshToken!, // Replace with actual data
+                accessToken!, // Replace with actual session data
+              );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login successful!')),
+          );
+          context.go('/home');
+        } else {
+          ref
+              .read(loginProvider.notifier)
+              .setError('Login failed. Please try again.');
+        }
+      } catch (e) {
+        ref.read(loginProvider.notifier).setLoading(false);
+        ref.read(loginProvider.notifier).setError('Error: $e');
       }
-    } catch (e) {
-      setState(() => isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
       body: Padding(
@@ -75,20 +80,28 @@ class _LoginScreenState extends State<LoginScreen> {
                         : Icons.visibility_off,
                   ),
                   onPressed: () {
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
+                    _isPasswordVisible = !_isPasswordVisible;
                   },
                 ),
               ),
             ),
             const SizedBox(height: 24),
-            isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : ElevatedButton(
-                    onPressed: _signIn,
-                    child: const Text('Login'),
+            if (loginState.isLoading)
+              const Center(child: CircularProgressIndicator())
+            else ...[
+              ElevatedButton(
+                onPressed: _signIn,
+                child: const Text('Login'),
+              ),
+              if (loginState.errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Text(
+                    loginState.errorMessage!,
+                    style: TextStyle(color: Colors.red),
                   ),
+                ),
+            ],
           ],
         ),
       ),
