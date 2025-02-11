@@ -10,8 +10,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController =
+      TextEditingController(text: 'aauadmin');
+  final TextEditingController passwordController =
+      TextEditingController(text: "Classet@123");
   bool isLoading = false;
   bool _isPasswordVisible = false;
 
@@ -32,8 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login successful!')),
         );
-        // Navigate to Home Screen
-        // Navigator.pushReplacementNamed(context, '/home');
         context.go('/home');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

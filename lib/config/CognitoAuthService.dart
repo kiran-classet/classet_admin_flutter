@@ -1,6 +1,6 @@
-import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:classet_admin/config/aws_cognito_config.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
 class CognitoAuthService {
   final userPool =
@@ -15,6 +15,9 @@ class CognitoAuthService {
 
     try {
       final session = await cognitoUser.authenticateUser(authDetails);
+      if (session != null) {
+        await _storeSession(session); // Store session in Shared Preferences
+      }
       return session;
     } catch (e) {
       print('Error during authentication: $e');
@@ -22,17 +25,24 @@ class CognitoAuthService {
     }
   }
 
-  Future<void> logout(String username) async {
-    final cognitoUser = CognitoUser(username, userPool);
-    await cognitoUser.signOut();
-  }
+  Future<void> _storeSession(CognitoUserSession session) async {
+    final prefs = await SharedPreferences.getInstance();
 
-  Future<CognitoUserSession?> getSession(String username) async {
-    final cognitoUser = CognitoUser(username, userPool);
-    return await cognitoUser.getSession();
+    // Get the tokens and ensure they are not null
+    final accessToken = session.getAccessToken().getJwtToken();
+    final refreshToken = session.getRefreshToken()?.getToken();
+    final idToken = session.getIdToken().getJwtToken();
+
+    // Store tokens only if they are not null
+    if (accessToken != null) {
+      await prefs.setString('accessToken', accessToken);
+      print(idToken);
+    }
+    if (refreshToken != null) {
+      await prefs.setString('refreshToken', refreshToken);
+    }
+    if (idToken != null) {
+      await prefs.setString('idToken', idToken);
+    }
   }
 }
-
-final cognitoAuthServiceProvider = Provider<CognitoAuthService>((ref) {
-  return CognitoAuthService();
-});
