@@ -10,19 +10,13 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  final PageController _pageController = PageController();
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-    switch (index) {
-      case 0:
-        context.go('/home');
-        break;
-      case 1:
-        context.go('/setting');
-        break;
-    }
+    _pageController.jumpToPage(index);
   }
 
   @override
@@ -44,22 +38,27 @@ class _MainScreenState extends State<MainScreen> {
             ListTile(
               title: Text('Home'),
               onTap: () {
-                context.go('/home');
+                _onItemTapped(0);
                 Navigator.pop(context); // Close the drawer
               },
             ),
             ListTile(
               title: Text('Settings'),
               onTap: () {
-                context.go('/setting');
+                _onItemTapped(1);
                 Navigator.pop(context); // Close the drawer
               },
             ),
           ],
         ),
       ),
-      body: IndexedStack(
-        index: _selectedIndex,
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
         children: <Widget>[
           HomeScreen(),
           SettingsScreen(),
