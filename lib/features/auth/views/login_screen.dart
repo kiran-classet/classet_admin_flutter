@@ -80,7 +80,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login successful!')),
         );
-        context.go('/home');
+        context.go('/mainscreen');
       } else {
         ref
             .read(loginProvider.notifier)
@@ -97,7 +97,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final loginState = ref.watch(loginProvider); // Access the login state
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -173,7 +172,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   onPressed: _signIn,
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.blue, // Text color
+                    backgroundColor:
+                        const Color.fromARGB(255, 1, 131, 238), // Text color
                     shape: RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.circular(8.0), // Rounded corners

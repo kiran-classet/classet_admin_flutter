@@ -1,8 +1,10 @@
+import 'package:classet_admin/features/dashboard/views/home_screen.dart';
+import 'package:classet_admin/features/main_screen.dart';
+import 'package:classet_admin/features/settings/views/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:classet_admin/features/auth/views/login_screen.dart';
-import 'package:classet_admin/features/dashboard/views/home_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -17,7 +19,7 @@ final GoRouter appRouter = GoRouter(
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.data == true) {
-              return const HomeScreen();
+              return MainScreen(); // Use MainScreen here
             } else {
               return const LoginScreen();
             }
@@ -27,7 +29,18 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/home',
-      builder: (context, state) => const HomeScreen(),
+      builder: (context, state) =>
+          HomeScreen(), // MainScreen handles navigation
+    ),
+    GoRoute(
+      path: '/mainscreen',
+      builder: (context, state) =>
+          MainScreen(), // MainScreen handles navigation
+    ),
+    GoRoute(
+      path: '/setting',
+      builder: (context, state) =>
+          SettingsScreen(), // MainScreen handles navigation
     ),
   ],
 );
@@ -35,9 +48,5 @@ final GoRouter appRouter = GoRouter(
 Future<bool> _checkLoginStatus() async {
   final prefs = await SharedPreferences.getInstance();
   final idToken = prefs.getString('idToken');
-  if (idToken != null) {
-    return true;
-  } else {
-    return false;
-  }
+  return idToken != null;
 }

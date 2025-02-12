@@ -4,14 +4,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
+class SettingsScreen extends ConsumerStatefulWidget {
+  const SettingsScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _SettingsScreenState createState() => _SettingsScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _logout(BuildContext context, WidgetRef ref) async {
     await MyAppProviders.invalidateAllProviders(ref);
     final prefs = await SharedPreferences.getInstance();
@@ -34,12 +34,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => _logout(context, ref),
+            onPressed: () => _logout(context, ref), // Logout on button press
           ),
         ],
       ),
       body: Center(
-        child: Text('Home screen'),
+        child: Text('settings screen'),
       ),
     );
   }
