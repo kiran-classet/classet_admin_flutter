@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:classet_admin/features/dashboard/views/home_screen.dart';
 import 'package:classet_admin/features/settings/views/settings_screen.dart';
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -26,30 +27,52 @@ class _MainScreenState extends State<MainScreen> {
         title: Text('Meluha'),
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text('Menu'),
-              decoration: BoxDecoration(
-                color: Colors.blue,
+        child: Container(
+          color: Colors.blue[50],
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                ),
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundImage: NetworkImage(
+                          'https://example.com/profile.jpg'), // Replace with your image URL
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'User  Name',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            ListTile(
-              title: Text('Home'),
-              onTap: () {
-                _onItemTapped(0);
-                Navigator.pop(context); // Close the drawer
-              },
-            ),
-            ListTile(
-              title: Text('Settings'),
-              onTap: () {
-                _onItemTapped(1);
-                Navigator.pop(context); // Close the drawer
-              },
-            ),
-          ],
+              ListTile(
+                leading: Icon(Icons.home, color: Colors.blue),
+                title: Text('Home'),
+                onTap: () {
+                  _onItemTapped(0);
+                  Navigator.pop(context); // Close the drawer
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.settings, color: Colors.blue),
+                title: Text('Settings'),
+                onTap: () {
+                  _onItemTapped(1);
+                  Navigator.pop(context); // Close the drawer
+                },
+              ),
+            ],
+          ),
         ),
       ),
       body: PageView(
@@ -76,6 +99,10 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.white,
+        elevation: 8,
         onTap: _onItemTapped,
       ),
     );
