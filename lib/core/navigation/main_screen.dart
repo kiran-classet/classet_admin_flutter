@@ -1,4 +1,5 @@
 import 'package:classet_admin/features/admissions/views/admissions_screen.dart';
+import 'package:classet_admin/features/approvals/views/approval_screen.dart';
 import 'package:classet_admin/features/attendance/views/attendance_management_screen.dart';
 import 'package:classet_admin/features/communication/views/communication_screen.dart';
 import 'package:classet_admin/features/finance/views/finance_screen.dart';
@@ -28,7 +29,8 @@ class _MainScreenState extends State<MainScreen> {
   // Separate list for bottom navigation screens
   final List<Widget> _bottomNavScreens = [
     const HomeScreen(), // Index 0 - Home
-    const SettingsScreen(), // Index 1 - Settings
+    // const SettingsScreen(), // Index 1 - Settings
+    const ApprovalScreen(),
     const ProfileScreen(), // Index 2 - Profile
   ];
 
@@ -212,60 +214,55 @@ class CustomBottomNavigationBar extends StatelessWidget {
   final Function(int) onItemTapped;
 
   const CustomBottomNavigationBar({
-    Key? key,
+    super.key,
     required this.selectedIndex,
     required this.onItemTapped,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 50.0),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      margin: const EdgeInsets.only(bottom: 16), // Reduced bottom margin
       child: Container(
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).size.height * 0.04,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 30),
+        height: 56, // Standard Material Design bottom nav height
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: const BorderRadius.all(Radius.circular(30)),
+          borderRadius: const BorderRadius.all(Radius.circular(25)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black26,
-              blurRadius: 15,
-              offset: const Offset(0, -4),
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            IconButton(
-              icon: Icon(
-                selectedIndex == 0 ? Icons.home : Icons.home_outlined,
-              ),
-              onPressed: () => onItemTapped(0),
-              iconSize: 30,
-              color: selectedIndex == 0 ? Colors.blue : Colors.grey,
-            ),
-            IconButton(
-              icon: Icon(
-                selectedIndex == 1 ? Icons.settings : Icons.settings_outlined,
-              ),
-              onPressed: () => onItemTapped(1),
-              iconSize: 30,
-              color: selectedIndex == 1 ? Colors.blue : Colors.grey,
-            ),
-            IconButton(
-              icon: Icon(
-                selectedIndex == 2 ? Icons.person : Icons.person_outline,
-              ),
-              onPressed: () => onItemTapped(2),
-              iconSize: 30,
-              color: selectedIndex == 2 ? Colors.blue : Colors.grey,
-            ),
+            _buildNavItem(
+                Icons.document_scanner, Icons.document_scanner_outlined, 1),
+            _buildNavItem(Icons.home, Icons.home_outlined, 0),
+            _buildNavItem(Icons.person, Icons.person_outline, 2),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(
+      IconData selectedIcon, IconData unselectedIcon, int index) {
+    return SizedBox(
+      height: 50, // Constrain icon button height
+      width: 50, // Constrain icon button width
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        icon: Icon(
+          selectedIndex == index ? selectedIcon : unselectedIcon,
+          size: 30, // Standard icon size
+        ),
+        onPressed: () => onItemTapped(index),
+        color: selectedIndex == index ? Colors.blue : Colors.grey,
       ),
     );
   }
