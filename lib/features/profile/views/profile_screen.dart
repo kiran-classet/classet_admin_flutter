@@ -18,7 +18,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).padding.bottom + 80.0,
+            bottom: MediaQuery.of(context).padding.bottom + 10.0,
           ),
           child: SingleChildScrollView(
             child: Column(

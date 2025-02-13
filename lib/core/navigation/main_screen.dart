@@ -223,9 +223,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      margin: const EdgeInsets.only(bottom: 16), // Reduced bottom margin
+      margin: const EdgeInsets.only(bottom: 25), // Minimal bottom margin
       child: Container(
-        height: 56, // Standard Material Design bottom nav height
+        height: 56, // Reduced navigation bar height
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.all(Radius.circular(25)),
@@ -259,7 +259,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         padding: EdgeInsets.zero,
         icon: Icon(
           selectedIndex == index ? selectedIcon : unselectedIcon,
-          size: 30, // Standard icon size
+          size: 24, // Reduced icon size
         ),
         onPressed: () => onItemTapped(index),
         color: selectedIndex == index ? Colors.blue : Colors.grey,

@@ -9,7 +9,7 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).padding.bottom + 80.0,
+            bottom: MediaQuery.of(context).padding.bottom + 10.0,
           ),
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
