@@ -17,16 +17,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final prefs = await SharedPreferences.getInstance();
       String? savedEmail = prefs.getString('email');
       String? savedPassword = prefs.getString('password');
+
+      // Invalidate the providers correctly
       await MyAppProviders.invalidateAllProviders(ref);
+
+      // Clear all preferences
       await prefs.clear();
+
+      // Save the email and password if they exist
       if (savedEmail != null) {
         await prefs.setString('email', savedEmail);
       }
       if (savedPassword != null) {
         await prefs.setString('password', savedPassword);
       }
-      context.go('/');
+
+      // Navigate to the login screen (ensure your GoRouter setup is correct)
+      context.go('/'); // Ensure this matches your login route
     } catch (e) {
+      // Handle any errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Logout failed: $e')),
       );

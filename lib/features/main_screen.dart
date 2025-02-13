@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:classet_admin/features/dashboard/views/home_screen.dart';
 import 'package:classet_admin/features/settings/views/settings_screen.dart';
 
+// Main screen
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -11,7 +12,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 1; // Start with Home in the middle
+  int _selectedIndex = 0;
   final PageController _pageController = PageController();
 
   void _onItemTapped(int index) {
@@ -27,103 +28,9 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: Text(''),
       ),
-      drawer: Drawer(
-        child: Container(
-          color: Colors.blue[50],
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundImage: NetworkImage(
-                          'https://misedu-manage.classet.in/profilew.jpg'), // Replace with your image URL
-                    ),
-                    SizedBox(width: 10), // Space between the avatar and text
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment
-                          .center, // Center the text vertically
-                      children: [
-                        Text(
-                          'User   Name',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Designation', // Replace with the actual designation
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              ListTile(
-                leading: Icon(Icons.home,
-                    color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
-                title: Text(
-                  'Home',
-                  style: TextStyle(
-                    color: _selectedIndex == 1 ? Colors.blue : Colors.black,
-                    fontWeight: _selectedIndex == 1
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                ),
-                onTap: () {
-                  _onItemTapped(1);
-                  Navigator.pop(context); // Close the drawer
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.settings,
-                    color: _selectedIndex == 0 ? Colors.blue : Colors.grey),
-                title: Text(
-                  'Settings',
-                  style: TextStyle(
-                    color: _selectedIndex == 0 ? Colors.blue : Colors.black,
-                    fontWeight: _selectedIndex == 0
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                ),
-                onTap: () {
-                  _onItemTapped(0);
-                  Navigator.pop(context); // Close the drawer
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.person,
-                    color: _selectedIndex == 2 ? Colors.blue : Colors.grey),
-                title: Text(
-                  'Profile',
-                  style: TextStyle(
-                    color: _selectedIndex == 2 ? Colors.blue : Colors.black,
-                    fontWeight: _selectedIndex == 2
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                ),
-                onTap: () {
-                  _onItemTapped(2);
-                  Navigator.pop(context); // Close the drawer
-                },
-              ),
-            ],
-          ),
-        ),
+      drawer: CustomDrawer(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
       body: PageView(
         controller: _pageController,
@@ -133,33 +40,203 @@ class _MainScreenState extends State<MainScreen> {
           });
         },
         children: <Widget>[
-          SettingsScreen(), // Settings should be first
-          HomeScreen(), // Home should be second (middle)
-          ProfileScreen(), // Profile should be third
+          SettingsScreen(),
+          HomeScreen(),
+          ProfileScreen(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
-        elevation: 8,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
+      bottomNavigationBar: CustomBottomNavigationBar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
+      ),
+    );
+  }
+}
+
+// Custom Drawer
+class CustomDrawer extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onItemTapped;
+
+  const CustomDrawer({
+    Key? key,
+    required this.selectedIndex,
+    required this.onItemTapped,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: Container(
+        color: Color.fromRGBO(7, 110, 255, 1),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(7, 110, 255, 1),
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundImage: NetworkImage(
+                        'https://misedu-manage.classet.in/profilew.jpg'),
+                  ),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Kiran Monangi',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Designation', // Replace with the actual designation
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            DrawerItem(
+              icon: Icons.home,
+              title: 'Home',
+              index: 1,
+              selectedIndex: selectedIndex,
+              onTap: onItemTapped,
+            ),
+            DrawerItem(
+              icon: Icons.settings,
+              title: 'Settings',
+              index: 0,
+              selectedIndex: selectedIndex,
+              onTap: onItemTapped,
+            ),
+            DrawerItem(
+              icon: Icons.person,
+              title: 'Profile',
+              index: 2,
+              selectedIndex: selectedIndex,
+              onTap: onItemTapped,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Drawer Item Widget
+class DrawerItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final int index;
+  final int selectedIndex;
+  final Function(int) onTap;
+
+  const DrawerItem({
+    Key? key,
+    required this.icon,
+    required this.title,
+    required this.index,
+    required this.selectedIndex,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: selectedIndex == index ? Colors.blue : Colors.white,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: selectedIndex == index ? Colors.blue : Colors.white,
+          fontWeight:
+              selectedIndex == index ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+      tileColor: Colors.white,
+      onTap: () {
+        onTap(index);
+        Navigator.pop(context); // Close the drawer
+      },
+    );
+  }
+}
+
+// Bottom Navigation Bar
+class CustomBottomNavigationBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onItemTapped;
+
+  const CustomBottomNavigationBar({
+    Key? key,
+    required this.selectedIndex,
+    required this.onItemTapped,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 50.0),
+      child: Container(
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height * 0.04,
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 30),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(30)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 15,
+              offset: Offset(0, -4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: Icon(
+                selectedIndex == 0 ? Icons.settings : Icons.settings_outlined,
+              ),
+              onPressed: () => onItemTapped(0),
+              iconSize: 30,
+              color: selectedIndex == 0 ? Colors.blue : Colors.grey,
+            ),
+            IconButton(
+              icon: Icon(
+                selectedIndex == 1 ? Icons.home : Icons.home_outlined,
+              ),
+              onPressed: () => onItemTapped(1),
+              iconSize: 30,
+              color: selectedIndex == 1 ? Colors.blue : Colors.grey,
+            ),
+            IconButton(
+              icon: Icon(
+                selectedIndex == 2 ? Icons.person : Icons.person_outline,
+              ),
+              onPressed: () => onItemTapped(2),
+              iconSize: 30,
+              color: selectedIndex == 2 ? Colors.blue : Colors.grey,
+            ),
+          ],
+        ),
       ),
     );
   }
