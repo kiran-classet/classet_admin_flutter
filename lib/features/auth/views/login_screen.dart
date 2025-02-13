@@ -16,7 +16,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool _isPasswordVisible = false;
-  bool _rememberMe = false; // State for the Remember Me checkbox
+  bool _rememberMe = false;
 
   @override
   void initState() {
@@ -24,7 +24,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _loadSavedCredentials();
   }
 
-  // Load saved credentials if available
   _loadSavedCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? savedEmail = prefs.getString('email');
@@ -37,22 +36,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  // Save credentials if Remember Me is checked
   _saveCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (_rememberMe) {
       await prefs.setString('email', emailController.text);
       await prefs.setString('password', passwordController.text);
     } else {
-      // Clear saved credentials if not remembering
       await prefs.remove('email');
       await prefs.remove('password');
     }
   }
 
   void _signIn() async {
-    ref.read(loginProvider.notifier).setLoading(true); // Set loading state
-
+    ref.read(loginProvider.notifier).setLoading(true);
     final authService = CognitoAuthService();
 
     try {
@@ -61,20 +57,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         passwordController.text,
       );
 
-      ref.read(loginProvider.notifier).setLoading(false); // Reset loading state
+      ref.read(loginProvider.notifier).setLoading(false);
 
       if (session != null) {
-        // Assuming session contains idToken, refreshToken, and accessToken
         final accessToken = session.getAccessToken().getJwtToken();
         final refreshToken = session.getRefreshToken()?.getToken();
         final idToken = session.getIdToken().getJwtToken();
         ref.read(loginProvider.notifier).setSessionData(
-              idToken!, // Replace with actual data
-              refreshToken!, // Replace with actual data
-              accessToken!, // Replace with actual session data
+              idToken!,
+              refreshToken!,
+              accessToken!,
             );
 
-        // Save credentials if Remember Me is checked
         _saveCredentials();
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -94,113 +88,139 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loginState = ref.watch(loginProvider); // Access the login state
+    final loginState = ref.watch(loginProvider);
 
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                'SIGN IN',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'please sign in with your account',
-                style: TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 24),
-              TextField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Username',
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: passwordController,
-                obscureText: !_isPasswordVisible,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Password',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isPasswordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isPasswordVisible = !_isPasswordVisible;
-                      });
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Checkbox(
-                    value: _rememberMe,
-                    onChanged: (value) {
-                      setState(() {
-                        _rememberMe = value ?? false;
-                      });
-                    },
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _rememberMe = !_rememberMe; // Toggle the checkbox state
-                      });
-                    },
-                    child: const Text('Remember Me'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              if (loginState.isLoading)
-                const Center(child: CircularProgressIndicator())
-              else ...[
-                ElevatedButton(
-                  onPressed: _signIn,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor:
-                        const Color.fromARGB(255, 1, 131, 238), // Text color
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(8.0), // Rounded corners
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 16.0), // Vertical padding
-                    minimumSize:
-                        const Size(200, 50), // Minimum width and height
-                  ),
-                  child: const Text(
-                    'Sign In',
-                    style: TextStyle(
-                      fontSize: 18, // Font size
-                      fontWeight: FontWeight.bold, // Bold text
-                    ),
-                  ),
-                ),
-                if (loginState.errorMessage != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: Text(
-                      loginState.errorMessage!,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-              ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              const Color.fromARGB(255, 185, 219, 230),
+              const Color.fromARGB(255, 106, 155, 239)
             ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      'SIGN IN',
+                      style:
+                          TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Please sign in with your account',
+                      style: TextStyle(fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        labelText: 'Username',
+                        prefixIcon: Icon(Icons.person),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: passwordController,
+                      obscureText: !_isPasswordVisible,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        labelText: 'Password',
+                        prefixIcon: Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _rememberMe,
+                          onChanged: (value) {
+                            setState(() {
+                              _rememberMe = value ?? false;
+                            });
+                          },
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _rememberMe = !_rememberMe;
+                            });
+                          },
+                          child: const Text('Remember Me'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    if (loginState.isLoading)
+                      const Center(child: CircularProgressIndicator())
+                    else ...[
+                      ElevatedButton(
+                        onPressed: _signIn,
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor:
+                              const Color.fromARGB(255, 1, 131, 238),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        ),
+                        child: const Text(
+                          'Sign In',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      if (loginState.errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: Text(
+                            loginState.errorMessage!,
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
