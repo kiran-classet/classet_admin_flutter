@@ -59,10 +59,10 @@ class CustomDrawer extends StatelessWidget {
   final Function(int) onItemTapped;
 
   const CustomDrawer({
-    Key? key,
+    super.key,
     required this.selectedIndex,
     required this.onItemTapped,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -109,16 +109,16 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
             DrawerItem(
-              icon: Icons.home,
-              title: 'Home',
-              index: 1,
+              icon: Icons.settings,
+              title: 'Settings',
+              index: 0,
               selectedIndex: selectedIndex,
               onTap: onItemTapped,
             ),
             DrawerItem(
-              icon: Icons.settings,
-              title: 'Settings',
-              index: 0,
+              icon: Icons.home,
+              title: 'Home',
+              index: 1,
               selectedIndex: selectedIndex,
               onTap: onItemTapped,
             ),
@@ -158,12 +158,12 @@ class DrawerItem extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon,
-        color: selectedIndex == index ? Colors.blue : Colors.white,
+        color: Colors.white,
       ),
       title: Text(
         title,
         style: TextStyle(
-          color: selectedIndex == index ? Colors.blue : Colors.white,
+          color: Colors.white,
           fontWeight:
               selectedIndex == index ? FontWeight.bold : FontWeight.normal,
         ),
