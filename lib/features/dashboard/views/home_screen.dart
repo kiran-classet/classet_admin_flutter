@@ -13,17 +13,23 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _logout(BuildContext context, WidgetRef ref) async {
-    await MyAppProviders.invalidateAllProviders(ref);
-    final prefs = await SharedPreferences.getInstance();
-    String? savedEmail = prefs.getString('email');
-    String? savedPassword = prefs.getString('password');
-    await prefs.clear();
-    context.go('/');
-    if (savedEmail != null) {
-      await prefs.setString('email', savedEmail);
-    }
-    if (savedPassword != null) {
-      await prefs.setString('password', savedPassword);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? savedEmail = prefs.getString('email');
+      String? savedPassword = prefs.getString('password');
+      await MyAppProviders.invalidateAllProviders(ref);
+      await prefs.clear();
+      if (savedEmail != null) {
+        await prefs.setString('email', savedEmail);
+      }
+      if (savedPassword != null) {
+        await prefs.setString('password', savedPassword);
+      }
+      context.go('/');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Logout failed: $e')),
+      );
     }
   }
 
