@@ -274,7 +274,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildKeyMetrics(BuildContext context) {
     return Container(
-      height: 200,
+      height: 250,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
