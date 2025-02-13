@@ -39,11 +39,7 @@ class _MainScreenState extends State<MainScreen> {
             _selectedIndex = index;
           });
         },
-        children: <Widget>[
-          SettingsScreen(),
-          HomeScreen(),
-          ProfileScreen(),
-        ],
+        children: <Widget>[],
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
         selectedIndex: _selectedIndex,
@@ -97,7 +93,7 @@ class CustomDrawer extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Designation', // Replace with the actual designation
+                        'Designation',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -109,23 +105,58 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
             DrawerItem(
-              icon: Icons.settings,
-              title: 'Settings',
+              icon: Icons.school,
+              title: 'Admissions',
               index: 0,
               selectedIndex: selectedIndex,
               onTap: onItemTapped,
             ),
             DrawerItem(
-              icon: Icons.home,
-              title: 'Home',
+              icon: Icons.person,
+              title: 'Student Info',
               index: 1,
               selectedIndex: selectedIndex,
               onTap: onItemTapped,
             ),
             DrawerItem(
-              icon: Icons.person,
-              title: 'Profile',
+              icon: Icons.account_balance_wallet,
+              title: 'Finance',
               index: 2,
+              selectedIndex: selectedIndex,
+              onTap: onItemTapped,
+            ),
+            DrawerItem(
+              icon: Icons.directions_bus,
+              title: 'Transport',
+              index: 3,
+              selectedIndex: selectedIndex,
+              onTap: onItemTapped,
+            ),
+            DrawerItem(
+              icon: Icons.message,
+              title: 'Communication',
+              index: 4,
+              selectedIndex: selectedIndex,
+              onTap: onItemTapped,
+            ),
+            DrawerItem(
+              icon: Icons.calendar_today,
+              title: 'Timetable',
+              index: 5,
+              selectedIndex: selectedIndex,
+              onTap: onItemTapped,
+            ),
+            DrawerItem(
+              icon: Icons.fact_check,
+              title: 'Attendance Management',
+              index: 6,
+              selectedIndex: selectedIndex,
+              onTap: onItemTapped,
+            ),
+            DrawerItem(
+              icon: Icons.book,
+              title: 'Teacher Diaries',
+              index: 7,
               selectedIndex: selectedIndex,
               onTap: onItemTapped,
             ),
