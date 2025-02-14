@@ -4,8 +4,10 @@ import 'package:classet_admin/features/attendance/views/attendance_management_sc
 import 'package:classet_admin/features/communication/views/communication_screen.dart';
 import 'package:classet_admin/features/finance/views/finance_screen.dart';
 import 'package:classet_admin/features/profile/views/profile_screen.dart';
+import 'package:classet_admin/features/settings/views/settings_screen.dart';
 import 'package:classet_admin/features/student_info/views/student_info_screen.dart';
 import 'package:classet_admin/features/teacher_diaries/views/teacher_diarie_screen.dart';
+import 'package:classet_admin/features/help_center/views/help_center_screen.dart';
 import 'package:classet_admin/features/timetable/views/timetable_screen.dart';
 import 'package:classet_admin/features/transport/views/transport_screen.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +30,6 @@ class _MainScreenState extends State<MainScreen> {
   // Separate list for bottom navigation screens
   final List<Widget> _bottomNavScreens = [
     const HomeScreen(), // Index 0 - Home
-    // const SettingsScreen(), // Index 1 - Settings
     const ApprovalScreen(),
     const ProfileScreen(), // Index 2 - Profile
   ];
@@ -43,6 +44,8 @@ class _MainScreenState extends State<MainScreen> {
     const TimetableScreen(),
     const AttendanceManagementScreen(),
     const TeacherDiariesScreen(),
+    const SettingsScreen(),
+    const HelpCenterScreen(),
   ];
 
   void _onBottomNavTapped(int index) {
@@ -90,7 +93,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-// Update CustomDrawer
+// CustomDrawer with Settings and Help Center
 class CustomDrawer extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onItemTapped;
@@ -118,7 +121,7 @@ class CustomDrawer extends StatelessWidget {
                   const CircleAvatar(
                     radius: 40,
                     backgroundImage: NetworkImage(
-                        'https://misedu-manage.classet.in/profilew.jpg'),
+                        'https://classet-profiles-old.s3.ap-south-1.amazonaws.com/uploads/1739512678367kiran.jpg'),
                   ),
                   const SizedBox(width: 10),
                   Column(
@@ -198,6 +201,25 @@ class CustomDrawer extends StatelessWidget {
               icon: Icons.book,
               title: 'Teacher Diaries',
               index: 7,
+              selectedIndex: selectedIndex,
+              onTap: onItemTapped,
+            ),
+            const Divider(
+              color: Colors.white70,
+              thickness: 1,
+              height: 1,
+            ),
+            DrawerItem(
+              icon: Icons.settings,
+              title: 'Settings',
+              index: 8,
+              selectedIndex: selectedIndex,
+              onTap: onItemTapped,
+            ),
+            DrawerItem(
+              icon: Icons.help_center,
+              title: 'Help Center', 
+              index: 9,
               selectedIndex: selectedIndex,
               onTap: onItemTapped,
             ),
