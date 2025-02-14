@@ -201,7 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
 
       // Navigate to the login screen (ensure your GoRouter setup is correct)
-      context.go('/'); // Ensure this matches your login route
+      context.go('/login'); // Ensure this matches your login route
     } catch (e) {
       // Handle any errors
       ScaffoldMessenger.of(context).showSnackBar(

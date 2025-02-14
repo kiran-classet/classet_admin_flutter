@@ -42,6 +42,11 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) =>
           SettingsScreen(), // MainScreen handles navigation
     ),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) =>
+          LoginScreen(), // MainScreen handles navigation
+    ),
   ],
 );
 
