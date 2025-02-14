@@ -71,10 +71,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
         _saveCredentials();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login successful!')),
-        );
-        context.go('/mainscreen');
+        if (mounted) {
+          // Add this check
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Welcome to Classet'),
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              dismissDirection: DismissDirection.horizontal,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              action: SnackBarAction(
+                label: 'Dismiss',
+                onPressed: () {
+                  if (mounted) {
+                    // Add this check
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  }
+                },
+              ),
+            ),
+          );
+
+          context.go('/mainscreen');
+        }
       } else {
         ref
             .read(loginProvider.notifier)
@@ -95,8 +116,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              const Color.fromARGB(255, 185, 219, 230),
-              const Color.fromARGB(255, 106, 155, 239)
+              const Color.fromARGB(255, 246, 247, 248),
+              const Color.fromARGB(255, 246, 247, 249)
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,

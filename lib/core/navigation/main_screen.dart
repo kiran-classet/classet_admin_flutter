@@ -10,7 +10,6 @@ import 'package:classet_admin/features/timetable/views/timetable_screen.dart';
 import 'package:classet_admin/features/transport/views/transport_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:classet_admin/features/dashboard/views/home_screen.dart';
-import 'package:classet_admin/features/settings/views/settings_screen.dart';
 
 // Main screen
 
@@ -190,7 +189,7 @@ class CustomDrawer extends StatelessWidget {
             ),
             DrawerItem(
               icon: Icons.fact_check,
-              title: 'Attendance Management',
+              title: 'Attendance',
               index: 6,
               selectedIndex: selectedIndex,
               onTap: onItemTapped,
@@ -288,20 +287,26 @@ class DrawerItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      dense: true, // Makes the ListTile more compact
+      visualDensity: VisualDensity(vertical: -4), // Reduces vertical spacing
       leading: Icon(
         icon,
         color: Colors.white,
+        size: 22, // Slightly smaller icon
       ),
       title: Text(
         title,
         style: TextStyle(
           color: Colors.white,
+          fontSize: 19, // Slightly smaller text
           fontWeight:
               selectedIndex == index ? FontWeight.bold : FontWeight.normal,
         ),
       ),
       selected: selectedIndex == index,
       onTap: () => onTap(index),
+      contentPadding:
+          EdgeInsets.symmetric(horizontal: 16, vertical: 0), // Adjust padding
     );
   }
 }
