@@ -1,0 +1,147 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+class ApiService {
+  static const String baseUrl =
+      'https://8bzo5ffosh.execute-api.ap-south-1.amazonaws.com/sasdev/v1/data';
+
+  // Generic GET request
+  Future<dynamic> get(String endpoint) async {
+    try {
+      final token = await _getIdToken();
+      final response = await http.get(
+        Uri.parse('$baseUrl/$endpoint'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      return _handleResponse(response);
+    } catch (e) {
+      return _handleError(e);
+    }
+  }
+
+  // Generic POST request
+  Future<dynamic> post(String endpoint, dynamic body) async {
+    try {
+      final token = await _getIdToken();
+      final response = await http.post(
+        Uri.parse('$baseUrl/$endpoint'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(body),
+      );
+
+      return _handleResponse(response);
+    } catch (e) {
+      return _handleError(e);
+    }
+  }
+
+  // Generic PUT request
+  Future<dynamic> put(String endpoint, dynamic body) async {
+    try {
+      final token = await _getIdToken();
+      final response = await http.put(
+        Uri.parse('$baseUrl/$endpoint'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(body),
+      );
+
+      return _handleResponse(response);
+    } catch (e) {
+      return _handleError(e);
+    }
+  }
+
+  // Generic DELETE request
+  Future<dynamic> delete(String endpoint) async {
+    try {
+      final token = await _getIdToken();
+      final response = await http.delete(
+        Uri.parse('$baseUrl/$endpoint'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      return _handleResponse(response);
+    } catch (e) {
+      return _handleError(e);
+    }
+  }
+
+  // Handle API response
+  dynamic _handleResponse(http.Response response) {
+    switch (response.statusCode) {
+      case 200:
+      case 201:
+        return json.decode(response.body);
+      case 400:
+        throw BadRequestException(response.body);
+      case 401:
+        throw UnauthorizedException(response.body);
+      case 403:
+        throw ForbiddenException(response.body);
+      case 404:
+        throw NotFoundException(response.body);
+      case 500:
+        throw ServerException(response.body);
+      default:
+        throw Exception('An unexpected error occurred');
+    }
+  }
+
+  // Handle general errors
+  dynamic _handleError(dynamic error) {
+    if (error is ApiException) {
+      throw error;
+    }
+    throw Exception('An unexpected error occurred: ${error.toString()}');
+  }
+
+  // Get ID token from SharedPreferences
+  Future<String?> _getIdToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('idToken');
+    if (token == null) {
+      throw UnauthorizedException('No authentication token found');
+    }
+    return token;
+  }
+}
+
+// Custom exceptions
+class ApiException implements Exception {
+  final String message;
+  ApiException(this.message);
+}
+
+class BadRequestException extends ApiException {
+  BadRequestException(super.message);
+}
+
+class UnauthorizedException extends ApiException {
+  UnauthorizedException(super.message);
+}
+
+class ForbiddenException extends ApiException {
+  ForbiddenException(super.message);
+}
+
+class NotFoundException extends ApiException {
+  NotFoundException(super.message);
+}
+
+class ServerException extends ApiException {
+  ServerException(super.message);
+}
