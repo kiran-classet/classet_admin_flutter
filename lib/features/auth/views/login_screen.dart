@@ -1,4 +1,5 @@
 import 'package:classet_admin/features/auth/providers/login_state.dart';
+import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -60,6 +61,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ref.read(loginProvider.notifier).setLoading(false);
 
       if (session != null) {
+        final String username = session.getIdToken().payload['cognito:username'] as String;
         final accessToken = session.getAccessToken().getJwtToken();
         final refreshToken = session.getRefreshToken()?.getToken();
         final idToken = session.getIdToken().getJwtToken();
@@ -69,6 +71,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               accessToken!,
             );
 
+        // Fetch user roles and permissions
+        await ref.read(adminUserProvider.notifier).fetchUserRolesPermissions(username);
+        
         _saveCredentials();
 
         if (mounted) {
@@ -208,7 +213,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 24),
                     if (loginState.isLoading)
-                      const Center(child: CircularProgressIndicator())
+                      Container(
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 1, 131, 238),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              strokeWidth: 2.5,
+                            ),
+                          ),
+                        ),
+                      )
                     else ...[
                       ElevatedButton(
                         onPressed: _signIn,
