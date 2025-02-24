@@ -58,10 +58,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         passwordController.text,
       );
 
-      ref.read(loginProvider.notifier).setLoading(false);
-
       if (session != null) {
-        final String username = session.getIdToken().payload['cognito:username'] as String;
+        final String username =
+            session.getIdToken().payload['cognito:username'] as String;
         final accessToken = session.getAccessToken().getJwtToken();
         final refreshToken = session.getRefreshToken()?.getToken();
         final idToken = session.getIdToken().getJwtToken();
@@ -72,12 +71,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             );
 
         // Fetch user roles and permissions
-        await ref.read(adminUserProvider.notifier).fetchUserRolesPermissions(username);
-        
+
         _saveCredentials();
 
         if (mounted) {
           // Add this check
+          await ref
+              .read(adminUserProvider.notifier)
+              .fetchUserRolesPermissions(username);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Welcome to Classet'),
@@ -98,6 +99,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ),
           );
+
+          ref.read(loginProvider.notifier).setLoading(false);
 
           context.go('/mainscreen');
         }
@@ -224,7 +227,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             width: 24,
                             height: 24,
                             child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
                               strokeWidth: 2.5,
                             ),
                           ),
