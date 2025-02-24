@@ -3,6 +3,7 @@ import 'package:classet_admin/features/approvals/views/approval_screen.dart';
 import 'package:classet_admin/features/attendance/views/attendance_management_screen.dart';
 import 'package:classet_admin/features/communication/views/communication_screen.dart';
 import 'package:classet_admin/features/finance/views/finance_screen.dart';
+import 'package:classet_admin/features/notifications/views/notifications_screen.dart';
 import 'package:classet_admin/features/profile/views/profile_screen.dart';
 import 'package:classet_admin/features/settings/views/settings_screen.dart';
 import 'package:classet_admin/features/student_info/views/student_info_screen.dart';
@@ -25,6 +26,8 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   int _selectedDrawerIndex = 0;
+  int _notificationCount = 0; // Add this variable
+
   final PageController _pageController = PageController();
 
   // Separate list for bottom navigation screens
@@ -47,6 +50,15 @@ class _MainScreenState extends State<MainScreen> {
     const SettingsScreen(),
     const HelpCenterScreen(),
   ];
+  void _handleNotificationTap() {
+    // Navigate to notifications screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NotificationsScreen(), // Create this screen
+      ),
+    );
+  }
 
   void _onBottomNavTapped(int index) {
     setState(() {
@@ -71,6 +83,45 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(''),
+        actions: [
+          // Notification Icon with Badge
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(
+                  Icons.notifications_outlined,
+                  size: 30, // Increased icon size
+                ),
+                onPressed: _handleNotificationTap,
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 14,
+                    minHeight: 14,
+                  ),
+                  child: const Text(
+                    '2', // Replace with your actual notification count
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 8), // Add some spacing between icons
+        ],
       ),
       drawer: CustomDrawer(
         selectedIndex: _selectedDrawerIndex,
@@ -218,7 +269,7 @@ class CustomDrawer extends StatelessWidget {
             ),
             DrawerItem(
               icon: Icons.help_center,
-              title: 'Help Center', 
+              title: 'Help Center',
               index: 9,
               selectedIndex: selectedIndex,
               onTap: onItemTapped,
