@@ -70,39 +70,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               accessToken!,
             );
 
-        // Fetch user roles and permissions
-
         _saveCredentials();
 
         if (mounted) {
-          // Add this check
           await ref
               .read(adminUserProvider.notifier)
               .fetchUserRolesPermissions(username);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Welcome to Classet'),
-              duration: const Duration(seconds: 3),
-              behavior: SnackBarBehavior.floating,
-              dismissDirection: DismissDirection.horizontal,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              action: SnackBarAction(
-                label: 'Dismiss',
-                onPressed: () {
-                  if (mounted) {
-                    // Add this check
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  }
-                },
-              ),
-            ),
-          );
 
-          ref.read(loginProvider.notifier).setLoading(false);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Welcome to Classet'),
+                duration: const Duration(seconds: 3),
+                behavior: SnackBarBehavior.floating,
+                dismissDirection: DismissDirection.horizontal,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                action: SnackBarAction(
+                  label: 'Dismiss',
+                  onPressed: () {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    }
+                  },
+                ),
+              ),
+            );
 
-          context.go('/mainscreen');
+            ref.read(loginProvider.notifier).setLoading(false);
+
+            context.go('/mainscreen');
+          }
         }
       } else {
         ref
@@ -118,6 +117,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final loginState = ref.watch(loginProvider);
+    final adminUserState = ref.watch(adminUserProvider);
 
     return Scaffold(
       body: Container(
@@ -215,7 +215,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    if (loginState.isLoading)
+                    if (loginState.isLoading || adminUserState.isLoading)
                       Container(
                         height: 56,
                         decoration: BoxDecoration(
