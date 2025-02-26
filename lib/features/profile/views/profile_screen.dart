@@ -12,14 +12,18 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-  String? _selectedAcademicYear;
-
   @override
   void initState() {
     super.initState();
     final academicYears = ref.read(academicYearProvider).academicYears;
     if (academicYears.isNotEmpty) {
-      _selectedAcademicYear = academicYears.first['_id'];
+      final selectedAcademicYear =
+          ref.read(academicYearProvider).selectedAcademicYear;
+      if (selectedAcademicYear == null) {
+        ref
+            .read(academicYearProvider.notifier)
+            .setSelectedAcademicYear(academicYears.first['_id']);
+      }
     }
   }
 
@@ -43,7 +47,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 _buildQuickStats(),
                 const SizedBox(height: 20),
                 _buildProfileDetails(),
-                const SizedBox(height: 20),
                 const SizedBox(height: 20),
                 _buildActionButtons(),
               ],
@@ -276,7 +279,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const SizedBox(height: 8),
               DropdownButton<String>(
                 isExpanded: true,
-                value: _selectedAcademicYear,
+                value: academicYearState.selectedAcademicYear,
                 items: academicYearState.academicYears.map((year) {
                   return DropdownMenuItem<String>(
                     value: year['_id'],
@@ -284,9 +287,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   );
                 }).toList(),
                 onChanged: (value) {
-                  setState(() {
-                    _selectedAcademicYear = value;
-                  });
+                  if (value != null) {
+                    ref
+                        .read(academicYearProvider.notifier)
+                        .setSelectedAcademicYear(value);
+                  }
                 },
               ),
             ],
