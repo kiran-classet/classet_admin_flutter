@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final adminUserState = ref.watch(adminUserProvider);
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -18,22 +23,49 @@ class HomeScreen extends StatelessWidget {
               children: [
                 _buildHeader(context),
                 const SizedBox(height: 20),
-                _buildQuickStats(context),
+                adminUserState.isLoading
+                    ? _buildShimmerEffect()
+                    : _buildQuickStats(context),
                 const SizedBox(height: 20),
-                _buildSectionTitle(context, 'Quick Actions'),
+                adminUserState.isLoading
+                    ? _buildShimmerEffect()
+                    : _buildSectionTitle(context, 'Quick Actions'),
                 const SizedBox(height: 10),
-                _buildQuickActions(context),
+                adminUserState.isLoading
+                    ? _buildShimmerEffect()
+                    : _buildQuickActions(context),
                 const SizedBox(height: 20),
                 _buildSectionTitle(context, 'Recent Activities'),
                 const SizedBox(height: 10),
-                _buildRecentActivities(context),
+                adminUserState.isLoading
+                    ? _buildShimmerEffect()
+                    : _buildRecentActivities(context),
                 const SizedBox(height: 20),
-                _buildSectionTitle(context, 'Key Metrics'),
+                adminUserState.isLoading
+                    ? _buildShimmerEffect()
+                    : _buildSectionTitle(context, 'Key Metrics'),
                 const SizedBox(height: 10),
-                _buildKeyMetrics(context),
+                adminUserState.isLoading
+                    ? _buildShimmerEffect()
+                    : _buildKeyMetrics(context),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerEffect() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        height: 100,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
     );

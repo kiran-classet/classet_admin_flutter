@@ -134,42 +134,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
               });
             },
           ),
-          ListTile(
-            title: const Text('Text Size'),
-            subtitle: Slider(
-              value: _textSize,
-              min: 12.0,
-              max: 24.0,
-              divisions: 4,
-              label: _textSize.round().toString(),
-              onChanged: (double value) {
-                setState(() {
-                  _textSize = value;
-                });
-              },
-            ),
-          ),
-          ListTile(
-            title: const Text('Language'),
-            subtitle: DropdownButton<String>(
-              value: _selectedLanguage,
-              isExpanded: true,
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    _selectedLanguage = newValue;
-                  });
-                }
-              },
-              items: <String>['English', 'Hindi', 'Spanish', 'French']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-          ),
+          // ListTile(
+          //   title: const Text('Text Size'),
+          //   subtitle: Slider(
+          //     value: _textSize,
+          //     min: 12.0,
+          //     max: 24.0,
+          //     divisions: 4,
+          //     label: _textSize.round().toString(),
+          //     onChanged: (double value) {
+          //       setState(() {
+          //         _textSize = value;
+          //       });
+          //     },
+          //   ),
+          // ),
+          // ListTile(
+          //   title: const Text('Language'),
+          //   subtitle: DropdownButton<String>(
+          //     value: _selectedLanguage,
+          //     isExpanded: true,
+          //     onChanged: (String? newValue) {
+          //       if (newValue != null) {
+          //         setState(() {
+          //           _selectedLanguage = newValue;
+          //         });
+          //       }
+          //     },
+          //     items: <String>['English', 'Hindi', 'Spanish', 'French']
+          //         .map<DropdownMenuItem<String>>((String value) {
+          //       return DropdownMenuItem<String>(
+          //         value: value,
+          //         child: Text(value),
+          //       );
+          //     }).toList(),
+          //   ),
+          // ),
         ],
       ),
     );

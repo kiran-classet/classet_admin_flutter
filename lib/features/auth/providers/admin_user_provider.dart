@@ -37,7 +37,8 @@ class AdminUserNotifier extends StateNotifier<AdminUserState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final response = await _apiService.get('authorize/getAdminUserRolesPermissions/$username');
+      final response = await _apiService
+          .get('authorize/getAdminUserRolesPermissions/$username');
       state = state.copyWith(
         userRolesPermissions: response,
         isLoading: false,
@@ -52,7 +53,8 @@ class AdminUserNotifier extends StateNotifier<AdminUserState> {
 }
 
 // Provider definition
-final adminUserProvider = StateNotifierProvider<AdminUserNotifier, AdminUserState>((ref) {
+final adminUserProvider =
+    StateNotifierProvider<AdminUserNotifier, AdminUserState>((ref) {
   final apiService = ApiService();
   return AdminUserNotifier(apiService);
 });
