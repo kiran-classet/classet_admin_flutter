@@ -15,8 +15,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final emailController = TextEditingController(text: 'zaaadminuser');
+  final passwordController = TextEditingController(text: 'Classet@123');
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
 

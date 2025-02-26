@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:classet_admin/core/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+import 'package:classet_admin/core/navigation/navigation_service.dart';
 
 class AcademicYearState {
   final List<Map<String, dynamic>> academicYears;
@@ -31,9 +33,11 @@ class AcademicYearState {
 }
 
 class AcademicYearNotifier extends StateNotifier<AcademicYearState> {
-  AcademicYearNotifier(this._apiService) : super(AcademicYearState());
+  AcademicYearNotifier(this._apiService, this._navigationService)
+      : super(AcademicYearState());
 
   final ApiService _apiService;
+  final NavigationService _navigationService;
 
   Future<void> fetchAcademicYears() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -55,6 +59,7 @@ class AcademicYearNotifier extends StateNotifier<AcademicYearState> {
         isLoading: false,
         error: e.toString(),
       );
+      _navigationService.navigateTo('/something-went-wrong');
     }
   }
 
@@ -68,5 +73,6 @@ class AcademicYearNotifier extends StateNotifier<AcademicYearState> {
 final academicYearProvider =
     StateNotifierProvider<AcademicYearNotifier, AcademicYearState>((ref) {
   final apiService = ApiService();
-  return AcademicYearNotifier(apiService);
+  final navigationService = NavigationService();
+  return AcademicYearNotifier(apiService, navigationService);
 });
