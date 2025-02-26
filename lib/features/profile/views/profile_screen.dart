@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:classet_admin/features/academic/providers/academic_year_provider.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  String? _selectedAcademicYear;
+
+  @override
+  void initState() {
+    super.initState();
+    final academicYears = ref.read(academicYearProvider).academicYears;
+    if (academicYears.isNotEmpty) {
+      _selectedAcademicYear = academicYears.first['_id'];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final academicYearState = ref.watch(academicYearProvider);
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -23,9 +38,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 _buildProfileHeader(),
                 const SizedBox(height: 20),
+                _buildAcademicYearDropdown(academicYearState),
+                const SizedBox(height: 20),
                 _buildQuickStats(),
                 const SizedBox(height: 20),
                 _buildProfileDetails(),
+                const SizedBox(height: 20),
                 const SizedBox(height: 20),
                 _buildActionButtons(),
               ],
@@ -232,6 +250,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
           actionLabel,
           style: TextStyle(
             color: Theme.of(context).primaryColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAcademicYearDropdown(AcademicYearState academicYearState) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Card(
+        elevation: 2,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Select Academic Year',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 8),
+              DropdownButton<String>(
+                isExpanded: true,
+                value: _selectedAcademicYear,
+                items: academicYearState.academicYears.map((year) {
+                  return DropdownMenuItem<String>(
+                    value: year['_id'],
+                    child: Text(year['academicCode']),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedAcademicYear = value;
+                  });
+                },
+              ),
+            ],
           ),
         ),
       ),

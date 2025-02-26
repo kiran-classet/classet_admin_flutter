@@ -1,0 +1,22 @@
+1. create a api service file so that every api call is to be travel into hat file. if any error or exception came from the api that will also be handled here.
+
+2. base url of the app is : https://8bzo5ffosh.execute-api.ap-south-1.amazonaws.com/sasdev/v1/data/
+
+3. In api call need to send the idtoken as bearer token.
+
+
+
+
+
+4. After logging in to the app , call api and store data in riverpod. so that i can access through out the app.
+
+5. api call 1 -> https://8bzo5ffosh.execute-api.ap-south-1.amazonaws.com/sasdev/v1/data/authorize/getAdminUserRolesPermissions/{cognito.getUserName()}
+ get api 
+6. In above api call send cognito username as path parameter.
+
+----------------------------------------
+
+7. now integrate shimmer effect for after login apis.
+ 
+
+

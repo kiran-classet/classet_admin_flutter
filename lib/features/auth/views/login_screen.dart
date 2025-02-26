@@ -1,3 +1,4 @@
+import 'package:classet_admin/features/academic/providers/academic_year_provider.dart';
 import 'package:classet_admin/features/auth/providers/login_state.dart';
 import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +77,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           await ref
               .read(adminUserProvider.notifier)
               .fetchUserRolesPermissions(username);
+
+          await ref.read(academicYearProvider.notifier).fetchAcademicYears();
 
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
