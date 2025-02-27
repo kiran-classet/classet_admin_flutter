@@ -14,9 +14,33 @@
  get api 
 6. In above api call send cognito username as path parameter.
 
-----------------------------------------
 
 7. now integrate shimmer effect for after login apis.
  
+--------------------------------------------------------------------------------
+----------------------------------------
+----------------------------------------
+----------------------------------------completed till above
+
+a. implement complete profile page based on login.
+b. bottom tab not to be moved.
+
+
+
+----------------------------------------
+----------------------------------------
+
+
+8. need an api to get admins assigned academic years for profile dropdown.
+9. Need an api to get admins assigned boards and branches heirarchy. (send sections also based on if teacher loggs in.)
+10. Pull down in home screen to call above apis.
+
+
+11. Integrate heirarchy filters in rbsheet filter in every page
+12. store rbsheet filter values in riverpod for next page reviews.
+13. 
+
+
+
 
 

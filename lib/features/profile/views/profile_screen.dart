@@ -27,29 +27,36 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
+  Future<void> _refreshAcademicYears() async {
+    await ref.read(academicYearProvider.notifier).fetchAcademicYears();
+  }
+
   @override
   Widget build(BuildContext context) {
     final academicYearState = ref.watch(academicYearProvider);
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).padding.bottom + 10.0,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildProfileHeader(),
-                const SizedBox(height: 20),
-                _buildAcademicYearDropdown(academicYearState),
-                const SizedBox(height: 20),
-                _buildQuickStats(),
-                const SizedBox(height: 20),
-                _buildProfileDetails(),
-                const SizedBox(height: 20),
-                _buildActionButtons(),
-              ],
+        child: RefreshIndicator(
+          onRefresh: _refreshAcademicYears,
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).padding.bottom + 10.0,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildProfileHeader(),
+                  const SizedBox(height: 20),
+                  _buildAcademicYearDropdown(academicYearState),
+                  const SizedBox(height: 20),
+                  _buildQuickStats(),
+                  const SizedBox(height: 20),
+                  _buildProfileDetails(),
+                  const SizedBox(height: 20),
+                  _buildActionButtons(),
+                ],
+              ),
             ),
           ),
         ),

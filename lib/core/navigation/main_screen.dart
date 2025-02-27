@@ -134,6 +134,7 @@ class _MainScreenState extends State<MainScreen> {
             _selectedIndex = index;
           });
         },
+        physics: const NeverScrollableScrollPhysics(),
         children: _bottomNavScreens,
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
