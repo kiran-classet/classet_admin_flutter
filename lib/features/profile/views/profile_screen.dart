@@ -12,10 +12,18 @@ class ProfileScreen extends ConsumerStatefulWidget {
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..forward();
+
     final academicYears = ref.read(academicYearProvider).academicYears;
     if (academicYears.isNotEmpty) {
       final selectedAcademicYear =
@@ -54,6 +62,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     width: 100,
                     height: 100,
                     fit: BoxFit.fill,
+                    animate: false, // Disable automatic animation
+                    controller:
+                        _animationController, // Manually control the animation
                   ),
                   _buildProfileHeader(),
                   const SizedBox(height: 20),
