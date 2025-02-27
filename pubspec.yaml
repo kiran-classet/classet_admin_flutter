@@ -76,6 +76,7 @@ flutter:
     - assets/fonts/
     - assets/lottie/
     - assets/translations/
+    - assets/animations/refresh_animation.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

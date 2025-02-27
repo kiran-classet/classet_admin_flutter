@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:classet_admin/features/academic/providers/academic_year_provider.dart';
+import 'package:lottie/lottie.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -39,13 +40,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _refreshAcademicYears,
+          displacement: 100,
           child: Padding(
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).padding.bottom + 10.0,
             ),
             child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
                 children: [
+                  Lottie.asset(
+                    'assets/animations/refresh_animation.json',
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.fill,
+                  ),
                   _buildProfileHeader(),
                   const SizedBox(height: 20),
                   _buildAcademicYearDropdown(academicYearState),
