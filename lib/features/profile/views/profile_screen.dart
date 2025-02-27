@@ -238,20 +238,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
         elevation: 2,
         child: Column(
           children: [
-            _buildDetailItem(Icons.email, 'Email', 'kiran.monangi@classet.com',
-                'Update Email'),
+            _buildDetailItem(
+                Icons.email, 'Email', 'kiran.monangi@classet.com', ''),
+            const Divider(),
+            _buildDetailItem(Icons.phone, 'Phone', '+91 9876543210', ''),
             const Divider(),
             _buildDetailItem(
-                Icons.phone, 'Phone', '+91 9876543210', 'Update Phone'),
+                Icons.location_on, 'Address', 'Hyderabad, Telangana', ''),
             const Divider(),
-            _buildDetailItem(Icons.location_on, 'Address',
-                'Hyderabad, Telangana', 'Update Address'),
+            _buildDetailItem(Icons.school, 'Education', 'M.Tech', ''),
             const Divider(),
             _buildDetailItem(
-                Icons.school, 'Education', 'M.Tech', 'Update Education'),
-            const Divider(),
-            _buildDetailItem(Icons.work, 'Specialization',
-                'School Administration', 'Update Specialization'),
+                Icons.work, 'Specialization', 'School Administration', ''),
           ],
         ),
       ),

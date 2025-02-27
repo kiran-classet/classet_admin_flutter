@@ -22,10 +22,8 @@
 ----------------------------------------
 ----------------------------------------completed till above
 
+b. bottom tab not to be moved. -- done
 a. implement complete profile page based on login.
-b. bottom tab not to be moved.
-
-
 
 ----------------------------------------
 ----------------------------------------
@@ -36,9 +34,30 @@ b. bottom tab not to be moved.
 10. Pull down in home screen to call above apis.
 
 
-11. Integrate heirarchy filters in rbsheet filter in every page
-12. store rbsheet filter values in riverpod for next page reviews.
-13. 
+--------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Need a single get api after login in mobile and pull to refresh at home screen.
+1. get admin user info
+2. assigned academic years
+3. assigned boards , branches (If type teacher send assigned sections).
+(Save all above data in the db after fetching the api for future cache......)
+
+4. then build the bottom rb sheet based on heirarchy.
+
+For approvals tab click calling apis and pull to refresh:
+1. get approval types assigned to user dont show all approval types (Like if user dont have access for fee concession dont show this in dropdown).
+2. Asssinged approval types and his assinged branches (at settings approval heirarchy) need to send at once.
+
+
+check approval conditoins in backend :
+0. No assinged persions can handle approvals
+1. No, 2 same level approvals happen (then refresh show error message)
+2. If senior appoval done then reject the low level (then refresh show error message)
+3. 
+
 
 
 
