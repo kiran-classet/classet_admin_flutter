@@ -15,14 +15,19 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  bool _showInitialAnimation = true;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1),
-    )..forward();
+      duration: const Duration(seconds: 2),
+    )..forward().then((_) {
+        setState(() {
+          _showInitialAnimation = false;
+        });
+      });
 
     final academicYears = ref.read(academicYearProvider).academicYears;
     if (academicYears.isNotEmpty) {
@@ -36,7 +41,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     }
   }
 
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   Future<void> _refreshAcademicYears() async {
+    setState(() {
+      _showInitialAnimation = true;
+    });
+    _animationController.reset();
+    _animationController.forward().then((_) {
+      setState(() {
+        _showInitialAnimation = false;
+      });
+    });
     await ref.read(academicYearProvider.notifier).fetchAcademicYears();
   }
 
@@ -46,36 +66,48 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
 
     return Scaffold(
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _refreshAcademicYears,
-          displacement: 100,
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).padding.bottom + 10.0,
-            ),
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  Lottie.asset(
-                    'assets/animations/refresh_animation.json',
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.fill,
-                    animate: false, // Disable automatic animation
-                    controller:
-                        _animationController, // Manually control the animation
-                  ),
-                  _buildProfileHeader(),
-                  const SizedBox(height: 20),
-                  _buildAcademicYearDropdown(academicYearState),
-                  const SizedBox(height: 20),
-                  _buildQuickStats(),
-                  const SizedBox(height: 20),
-                  _buildProfileDetails(),
-                  const SizedBox(height: 20),
-                  _buildActionButtons(),
-                ],
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification notification) {
+            if (notification is OverscrollNotification) {
+              // Adjust the animation controller based on the overscroll amount
+              _animationController.value =
+                  (_animationController.value - notification.overscroll / 100)
+                      .clamp(0.0, 1.0);
+            }
+            return false;
+          },
+          child: RefreshIndicator(
+            onRefresh: _refreshAcademicYears,
+            displacement: 100,
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom + 10.0,
+              ),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    if (_showInitialAnimation)
+                      Lottie.asset(
+                        'assets/animations/refresh_animation.json',
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.fill,
+                        controller: _animationController,
+                      ),
+                    if (!_showInitialAnimation)
+                      SizedBox(height: 0), // Remove the padding after animation
+                    _buildProfileHeader(),
+                    const SizedBox(height: 20),
+                    _buildAcademicYearDropdown(academicYearState),
+                    const SizedBox(height: 20),
+                    _buildQuickStats(),
+                    const SizedBox(height: 20),
+                    _buildProfileDetails(),
+                    const SizedBox(height: 20),
+                    _buildActionButtons(),
+                  ],
+                ),
               ),
             ),
           ),
