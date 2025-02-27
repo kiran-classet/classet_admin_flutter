@@ -1,7 +1,7 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:classet_admin/core/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart';
 import 'package:classet_admin/core/navigation/navigation_service.dart';
 
 class AcademicYearState {
@@ -34,7 +34,9 @@ class AcademicYearState {
 
 class AcademicYearNotifier extends StateNotifier<AcademicYearState> {
   AcademicYearNotifier(this._apiService, this._navigationService)
-      : super(AcademicYearState());
+      : super(AcademicYearState()) {
+    _loadFromPrefs();
+  }
 
   final ApiService _apiService;
   final NavigationService _navigationService;
@@ -54,6 +56,7 @@ class AcademicYearNotifier extends StateNotifier<AcademicYearState> {
         isLoading: false,
         selectedAcademicYear: selectedAcademicYear,
       );
+      _saveToPrefs(academicYears, selectedAcademicYear);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -67,6 +70,27 @@ class AcademicYearNotifier extends StateNotifier<AcademicYearState> {
     state = state.copyWith(selectedAcademicYear: academicYearId);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('selectedAcademicYear', academicYearId);
+  }
+
+  Future<void> _saveToPrefs(List<Map<String, dynamic>> academicYears,
+      String selectedAcademicYear) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('academicYears', jsonEncode(academicYears));
+    await prefs.setString('selectedAcademicYear', selectedAcademicYear);
+  }
+
+  Future<void> _loadFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final academicYearsData = prefs.getString('academicYears');
+    final selectedAcademicYear = prefs.getString('selectedAcademicYear');
+    if (academicYearsData != null) {
+      final academicYears =
+          List<Map<String, dynamic>>.from(jsonDecode(academicYearsData));
+      state = state.copyWith(
+        academicYears: academicYears,
+        selectedAcademicYear: selectedAcademicYear,
+      );
+    }
   }
 }
 

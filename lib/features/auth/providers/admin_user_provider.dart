@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:classet_admin/core/services/api_service.dart';
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:flutter/material.dart';
 import 'package:classet_admin/core/navigation/navigation_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // State class to hold admin user data
 class AdminUserState {
@@ -24,7 +27,7 @@ class AdminUserState {
     return AdminUserState(
       userRolesPermissions: userRolesPermissions ?? this.userRolesPermissions,
       isLoading: isLoading ?? this.isLoading,
-      error: error,
+      error: error ?? this.error,
     );
   }
 }
@@ -32,7 +35,9 @@ class AdminUserState {
 // Notifier class to manage admin user state
 class AdminUserNotifier extends StateNotifier<AdminUserState> {
   AdminUserNotifier(this._apiService, this._navigationService)
-      : super(AdminUserState());
+      : super(AdminUserState()) {
+    _loadFromPrefs();
+  }
 
   final ApiService _apiService;
   final NavigationService _navigationService;
@@ -47,12 +52,28 @@ class AdminUserNotifier extends StateNotifier<AdminUserState> {
         userRolesPermissions: response,
         isLoading: false,
       );
+      _saveToPrefs(response);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: e.toString(),
       );
       _navigationService.navigateTo('/something-went-wrong');
+    }
+  }
+
+  Future<void> _saveToPrefs(Map<String, dynamic> data) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userRolesPermissions', jsonEncode(data));
+  }
+
+  Future<void> _loadFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString('userRolesPermissions');
+    if (data != null) {
+      state = state.copyWith(
+        userRolesPermissions: jsonDecode(data),
+      );
     }
   }
 }
