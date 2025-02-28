@@ -3,6 +3,51 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 
+// Filter data structure
+class FilterOptions {
+  static const Map<String, List<String>> boardsByBranch = {
+    'Meluha': ['CBSE', 'ICSE'],
+    'Kshetra': ['State Board'],
+    'Sri Gayatri': ['CBSE', 'State Board'],
+  };
+
+  static const Map<String, List<String>> gradesByBoard = {
+    'CBSE': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+    'ICSE': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+    'State Board': [
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '10',
+      '11',
+      '12'
+    ],
+  };
+
+  static const Map<String, List<String>> sectionsByGrade = {
+    '1': ['A', 'B'],
+    '2': ['A', 'B', 'C'],
+    '3': ['A', 'B', 'C'],
+    '4': ['A', 'B'],
+    '5': ['A', 'B', 'C'],
+    '6': ['A', 'B'],
+    '7': ['A', 'B', 'C'],
+    '8': ['A', 'B'],
+    '9': ['A', 'B', 'C'],
+    '10': ['A', 'B'],
+    '11': ['A', 'B', 'C'],
+    '12': ['A', 'B'],
+  };
+
+  static const List<String> branches = ['Meluha', 'Kshetra', 'Sri Gayatri'];
+}
+
 // Filter provider
 final filterProvider = StateProvider<Map<String, String?>>((ref) => {
       'branch': null,
@@ -469,66 +514,76 @@ class HomeScreen extends ConsumerWidget {
                       children: [
                         _buildFilterSection(
                           title: 'Branch',
-                          items: ['Main Branch', 'East Branch', 'West Branch'],
+                          items: FilterOptions.branches,
                           selectedItem: filters['branch'],
                           onSelected: (value) {
+                            final newValue =
+                                value == filters['branch'] ? null : value;
                             dialogRef.read(filterProvider.notifier).state = {
-                              ...filters,
-                              'branch':
-                                  value == filters['branch'] ? null : value,
+                              'branch': newValue,
+                              'board': null, // Reset dependent filters
+                              'grade': null,
+                              'section': null,
                             };
                           },
                         ),
-                        const SizedBox(height: 24),
-                        _buildFilterSection(
-                          title: 'Board',
-                          items: ['CBSE', 'ICSE', 'State Board'],
-                          selectedItem: filters['board'],
-                          onSelected: (value) {
-                            dialogRef.read(filterProvider.notifier).state = {
-                              ...filters,
-                              'board': value == filters['board'] ? null : value,
-                            };
-                          },
-                        ),
-                        const SizedBox(height: 24),
-                        _buildFilterSection(
-                          title: 'Grade',
-                          items: [
-                            '1',
-                            '2',
-                            '3',
-                            '4',
-                            '5',
-                            '6',
-                            '7',
-                            '8',
-                            '9',
-                            '10',
-                            '11',
-                            '12'
-                          ],
-                          selectedItem: filters['grade'],
-                          onSelected: (value) {
-                            dialogRef.read(filterProvider.notifier).state = {
-                              ...filters,
-                              'grade': value == filters['grade'] ? null : value,
-                            };
-                          },
-                        ),
-                        const SizedBox(height: 24),
-                        _buildFilterSection(
-                          title: 'Section',
-                          items: ['A', 'B', 'C', 'D'],
-                          selectedItem: filters['section'],
-                          onSelected: (value) {
-                            dialogRef.read(filterProvider.notifier).state = {
-                              ...filters,
-                              'section':
-                                  value == filters['section'] ? null : value,
-                            };
-                          },
-                        ),
+                        if (filters['branch'] != null) ...[
+                          const SizedBox(height: 24),
+                          _buildFilterSection(
+                            title: 'Board',
+                            items: FilterOptions
+                                    .boardsByBranch[filters['branch']] ??
+                                [],
+                            selectedItem: filters['board'],
+                            onSelected: (value) {
+                              final newValue =
+                                  value == filters['board'] ? null : value;
+                              dialogRef.read(filterProvider.notifier).state = {
+                                ...filters,
+                                'board': newValue,
+                                'grade': null, // Reset dependent filters
+                                'section': null,
+                              };
+                            },
+                          ),
+                        ],
+                        if (filters['board'] != null) ...[
+                          const SizedBox(height: 24),
+                          _buildFilterSection(
+                            title: 'Grade',
+                            items:
+                                FilterOptions.gradesByBoard[filters['board']] ??
+                                    [],
+                            selectedItem: filters['grade'],
+                            onSelected: (value) {
+                              final newValue =
+                                  value == filters['grade'] ? null : value;
+                              dialogRef.read(filterProvider.notifier).state = {
+                                ...filters,
+                                'grade': newValue,
+                                'section': null, // Reset dependent filters
+                              };
+                            },
+                          ),
+                        ],
+                        if (filters['grade'] != null) ...[
+                          const SizedBox(height: 24),
+                          _buildFilterSection(
+                            title: 'Section',
+                            items: FilterOptions
+                                    .sectionsByGrade[filters['grade']] ??
+                                [],
+                            selectedItem: filters['section'],
+                            onSelected: (value) {
+                              final newValue =
+                                  value == filters['section'] ? null : value;
+                              dialogRef.read(filterProvider.notifier).state = {
+                                ...filters,
+                                'section': newValue,
+                              };
+                            },
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -588,23 +643,26 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: items.map((item) {
-            final isSelected = selectedItem == item;
-            return FilterChip(
-              label: Text(item),
-              selected: isSelected,
-              onSelected: (_) => onSelected(item),
-              selectedColor: Colors.blue.withOpacity(0.2),
-              checkmarkColor: Colors.blue,
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.blue : Colors.black,
-              ),
-            );
-          }).toList(),
-        ),
+        if (items.isEmpty)
+          const Text('No options available')
+        else
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: items.map((item) {
+              final isSelected = selectedItem == item;
+              return FilterChip(
+                label: Text(item),
+                selected: isSelected,
+                onSelected: (_) => onSelected(item),
+                selectedColor: Colors.blue.withOpacity(0.2),
+                checkmarkColor: Colors.blue,
+                labelStyle: TextStyle(
+                  color: isSelected ? Colors.blue : Colors.black,
+                ),
+              );
+            }).toList(),
+          ),
       ],
     );
   }
