@@ -2,51 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
-
-// Filter data structure
-class FilterOptions {
-  static const Map<String, List<String>> boardsByBranch = {
-    'Meluha': ['CBSE', 'ICSE'],
-    'Kshetra': ['State Board'],
-    'Sri Gayatri': ['CBSE', 'State Board'],
-  };
-
-  static const Map<String, List<String>> gradesByBoard = {
-    'CBSE': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
-    'ICSE': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-    'State Board': [
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      '10',
-      '11',
-      '12'
-    ],
-  };
-
-  static const Map<String, List<String>> sectionsByGrade = {
-    '1': ['A', 'B'],
-    '2': ['A', 'B', 'C'],
-    '3': ['A', 'B', 'C'],
-    '4': ['A', 'B'],
-    '5': ['A', 'B', 'C'],
-    '6': ['A', 'B'],
-    '7': ['A', 'B', 'C'],
-    '8': ['A', 'B'],
-    '9': ['A', 'B', 'C'],
-    '10': ['A', 'B'],
-    '11': ['A', 'B', 'C'],
-    '12': ['A', 'B'],
-  };
-
-  static const List<String> branches = ['Meluha', 'Kshetra', 'Sri Gayatri'];
-}
+import 'dart:convert';
 
 // Filter provider
 final filterProvider = StateProvider<Map<String, String?>>((ref) => {
@@ -55,6 +11,72 @@ final filterProvider = StateProvider<Map<String, String?>>((ref) => {
       'grade': null,
       'section': null,
     });
+
+// Mock JSON data (in a real app, this would come from an API)
+const String branchesJson = '''
+[
+  {
+    "key": "5527df8c-57e4-4dd9-be2f-3f8b0b05b29a",
+    "name": "Madhapur",
+    "isActive": true,
+    "branchCode": "MAD",
+    "academicYear": "676b941d2827d6817ae41df9"
+  },
+  {
+    "key": "107dadea-3271-4434-8af9-83970247ae15",
+    "name": "Gandipet",
+    "isActive": true,
+    "branchCode": "sr1",
+    "academicYear": "676b941d2827d6817ae41df9"
+  }
+]
+''';
+
+const String boardsJson = '''
+[
+  {
+    "boardName": "CBSE",
+    "boardCode": "CBSE",
+    "assignedBranches": [
+      "5527df8c-57e4-4dd9-be2f-3f8b0b05b29a",
+      "107dadea-3271-4434-8af9-83970247ae15"
+    ],
+    "boardId": "20a4ba9b-4d1f-4477-bf20-9f1f68f93964",
+    "boardActivity": true,
+    "classes": [
+      {
+        "classId": "23947e2a-e1a8-4196-8ee8-5f31fb8a8936",
+        "className": "Grade 1",
+        "classCode": "223",
+        "sections": [
+          {
+            "sectionId": "4f16afca-cbaf-4104-b2bb-cc2db3ce70b2",
+            "branchId": "5527df8c-57e4-4dd9-be2f-3f8b0b05b29a",
+            "sectionCode": "ga1",
+            "sectionName": "Section1"
+          },
+          {
+            "sectionId": "aac01555-5a36-4ed3-b916-42745d4cab0e",
+            "branchId": "107dadea-3271-4434-8af9-83970247ae15",
+            "sectionCode": "ga1",
+            "sectionName": "gladiators"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "boardName": "b22",
+    "boardCode": "b26",
+    "assignedBranches": [
+      "5527df8c-57e4-4dd9-be2f-3f8b0b05b29a"
+    ],
+    "boardId": "533310e5-c48a-4c8f-9a77-78e2f74570c0",
+    "boardActivity": true,
+    "classes": []
+  }
+]
+''';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -475,6 +497,9 @@ class HomeScreen extends ConsumerWidget {
   }
 
   void _showFilterBottomSheet(BuildContext context, WidgetRef ref) {
+    final branches = jsonDecode(branchesJson) as List<dynamic>;
+    final boards = jsonDecode(boardsJson) as List<dynamic>;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -484,6 +509,33 @@ class HomeScreen extends ConsumerWidget {
       builder: (context) => Consumer(
         builder: (context, dialogRef, child) {
           final filters = dialogRef.watch(filterProvider);
+
+          // Get boards for selected branch
+          List<dynamic> availableBoards = filters['branch'] != null
+              ? boards
+                  .where((board) => (board['assignedBranches'] as List)
+                      .contains(filters['branch']))
+                  .toList()
+              : [];
+
+          // Get classes (grades) for selected board
+          List<dynamic> availableClasses = filters['board'] != null
+              ? (boards.firstWhere(
+                      (board) => board['boardId'] == filters['board'],
+                      orElse: () => {'classes': []})['classes'] as List)
+                  .toList()
+              : [];
+
+          // Get sections for selected grade and branch
+          List<dynamic> availableSections = filters['grade'] != null &&
+                  filters['branch'] != null
+              ? (availableClasses.firstWhere(
+                      (cls) => cls['classId'] == filters['grade'],
+                      orElse: () => {'sections': []})['sections'] as List)
+                  .where((section) => section['branchId'] == filters['branch'])
+                  .toList()
+              : [];
+
           return Container(
             height: MediaQuery.of(context).size.height * 0.8,
             padding: const EdgeInsets.all(16),
@@ -514,14 +566,17 @@ class HomeScreen extends ConsumerWidget {
                       children: [
                         _buildFilterSection(
                           title: 'Branch',
-                          items: FilterOptions.branches,
+                          items:
+                              branches.map((b) => b['key'] as String).toList(),
+                          displayItems:
+                              branches.map((b) => b['name'] as String).toList(),
                           selectedItem: filters['branch'],
                           onSelected: (value) {
                             final newValue =
                                 value == filters['branch'] ? null : value;
                             dialogRef.read(filterProvider.notifier).state = {
                               'branch': newValue,
-                              'board': null, // Reset dependent filters
+                              'board': null,
                               'grade': null,
                               'section': null,
                             };
@@ -531,9 +586,12 @@ class HomeScreen extends ConsumerWidget {
                           const SizedBox(height: 24),
                           _buildFilterSection(
                             title: 'Board',
-                            items: FilterOptions
-                                    .boardsByBranch[filters['branch']] ??
-                                [],
+                            items: availableBoards
+                                .map((b) => b['boardId'] as String)
+                                .toList(),
+                            displayItems: availableBoards
+                                .map((b) => b['boardName'] as String)
+                                .toList(),
                             selectedItem: filters['board'],
                             onSelected: (value) {
                               final newValue =
@@ -541,7 +599,7 @@ class HomeScreen extends ConsumerWidget {
                               dialogRef.read(filterProvider.notifier).state = {
                                 ...filters,
                                 'board': newValue,
-                                'grade': null, // Reset dependent filters
+                                'grade': null,
                                 'section': null,
                               };
                             },
@@ -551,9 +609,12 @@ class HomeScreen extends ConsumerWidget {
                           const SizedBox(height: 24),
                           _buildFilterSection(
                             title: 'Grade',
-                            items:
-                                FilterOptions.gradesByBoard[filters['board']] ??
-                                    [],
+                            items: availableClasses
+                                .map((c) => c['classId'] as String)
+                                .toList(),
+                            displayItems: availableClasses
+                                .map((c) => c['className'] as String)
+                                .toList(),
                             selectedItem: filters['grade'],
                             onSelected: (value) {
                               final newValue =
@@ -561,7 +622,7 @@ class HomeScreen extends ConsumerWidget {
                               dialogRef.read(filterProvider.notifier).state = {
                                 ...filters,
                                 'grade': newValue,
-                                'section': null, // Reset dependent filters
+                                'section': null,
                               };
                             },
                           ),
@@ -570,9 +631,12 @@ class HomeScreen extends ConsumerWidget {
                           const SizedBox(height: 24),
                           _buildFilterSection(
                             title: 'Section',
-                            items: FilterOptions
-                                    .sectionsByGrade[filters['grade']] ??
-                                [],
+                            items: availableSections
+                                .map((s) => s['sectionId'] as String)
+                                .toList(),
+                            displayItems: availableSections
+                                .map((s) => s['sectionName'] as String)
+                                .toList(),
                             selectedItem: filters['section'],
                             onSelected: (value) {
                               final newValue =
@@ -629,6 +693,7 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildFilterSection({
     required String title,
     required List<String> items,
+    required List<String> displayItems,
     required String? selectedItem,
     required void Function(String) onSelected,
   }) {
@@ -649,10 +714,13 @@ class HomeScreen extends ConsumerWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: items.map((item) {
+            children: items.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              final displayName = displayItems[index];
               final isSelected = selectedItem == item;
               return FilterChip(
-                label: Text(item),
+                label: Text(displayName),
                 selected: isSelected,
                 onSelected: (_) => onSelected(item),
                 selectedColor: Colors.blue.withOpacity(0.2),
