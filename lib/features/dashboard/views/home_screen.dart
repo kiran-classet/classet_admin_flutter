@@ -3,6 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 
+// Filter provider
+final filterProvider = StateProvider<Map<String, String?>>((ref) => {
+      'branch': null,
+      'board': null,
+      'grade': null,
+      'section': null,
+    });
+
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -52,6 +60,11 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showFilterBottomSheet(context, ref),
+        child: const Icon(Icons.filter_list),
+        tooltip: 'Filter',
       ),
     );
   }
@@ -184,9 +197,7 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildActionItem(
       BuildContext context, String label, IconData icon, Color color) {
     return InkWell(
-      onTap: () {
-        // TODO: Navigate to respective screen
-      },
+      onTap: () {},
       child: Container(
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
@@ -223,10 +234,7 @@ class HomeScreen extends ConsumerWidget {
         physics: const NeverScrollableScrollPhysics(),
         itemCount: 5,
         itemBuilder: (context, index) {
-          return _buildActivityItem(
-            context,
-            _getActivityData(index),
-          );
+          return _buildActivityItem(context, _getActivityData(index));
         },
       ),
     );
@@ -418,6 +426,186 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showFilterBottomSheet(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Consumer(
+        builder: (context, dialogRef, child) {
+          final filters = dialogRef.watch(filterProvider);
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.8,
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Filters',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildFilterSection(
+                          title: 'Branch',
+                          items: ['Main Branch', 'East Branch', 'West Branch'],
+                          selectedItem: filters['branch'],
+                          onSelected: (value) {
+                            dialogRef.read(filterProvider.notifier).state = {
+                              ...filters,
+                              'branch':
+                                  value == filters['branch'] ? null : value,
+                            };
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        _buildFilterSection(
+                          title: 'Board',
+                          items: ['CBSE', 'ICSE', 'State Board'],
+                          selectedItem: filters['board'],
+                          onSelected: (value) {
+                            dialogRef.read(filterProvider.notifier).state = {
+                              ...filters,
+                              'board': value == filters['board'] ? null : value,
+                            };
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        _buildFilterSection(
+                          title: 'Grade',
+                          items: [
+                            '1',
+                            '2',
+                            '3',
+                            '4',
+                            '5',
+                            '6',
+                            '7',
+                            '8',
+                            '9',
+                            '10',
+                            '11',
+                            '12'
+                          ],
+                          selectedItem: filters['grade'],
+                          onSelected: (value) {
+                            dialogRef.read(filterProvider.notifier).state = {
+                              ...filters,
+                              'grade': value == filters['grade'] ? null : value,
+                            };
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        _buildFilterSection(
+                          title: 'Section',
+                          items: ['A', 'B', 'C', 'D'],
+                          selectedItem: filters['section'],
+                          onSelected: (value) {
+                            dialogRef.read(filterProvider.notifier).state = {
+                              ...filters,
+                              'section':
+                                  value == filters['section'] ? null : value,
+                            };
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          dialogRef.read(filterProvider.notifier).state = {
+                            'branch': null,
+                            'board': null,
+                            'grade': null,
+                            'section': null,
+                          };
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Reset'),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final currentFilters = ref.read(filterProvider);
+                          print('Applied filters: $currentFilters');
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Apply'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildFilterSection({
+    required String title,
+    required List<String> items,
+    required String? selectedItem,
+    required void Function(String) onSelected,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: items.map((item) {
+            final isSelected = selectedItem == item;
+            return FilterChip(
+              label: Text(item),
+              selected: isSelected,
+              onSelected: (_) => onSelected(item),
+              selectedColor: Colors.blue.withOpacity(0.2),
+              checkmarkColor: Colors.blue,
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.blue : Colors.black,
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }
