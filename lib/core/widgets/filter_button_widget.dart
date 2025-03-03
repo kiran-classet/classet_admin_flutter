@@ -35,6 +35,10 @@ class FilterButtonWidget extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      transitionAnimationController: AnimationController(
+        vsync: Navigator.of(context),
+        duration: const Duration(milliseconds: 400),
+      ),
       builder: (context) => FilterBottomSheet(
         branches: branches,
         boards: boards,
@@ -45,7 +49,7 @@ class FilterButtonWidget extends ConsumerWidget {
   }
 }
 
-class FilterBottomSheet extends ConsumerWidget {
+class FilterBottomSheet extends ConsumerStatefulWidget {
   final List<dynamic> branches;
   final List<dynamic> boards;
   final VoidCallback? onFilterApplied;
@@ -60,123 +64,223 @@ class FilterBottomSheet extends ConsumerWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final filterState = ref.watch(filterStateProvider);
+  ConsumerState<FilterBottomSheet> createState() => _FilterBottomSheetState();
+}
 
-    final availableBoards = filterState.branch != null
-        ? boards
-            .where((board) => (board['assignedBranches'] as List)
-                .contains(filterState.branch))
-            .toList()
-        : [];
+class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
 
-    final availableClasses = filterState.board != null
-        ? (boards.firstWhere((board) => board['boardId'] == filterState.board,
-                orElse: () => {'classes': []})['classes'] as List)
-            .toList()
-        : [];
+  // Local state for temporary filter selections
+  String? _tempBranch;
+  String? _tempBoard;
+  String? _tempGrade;
+  List<String> _tempSections = [];
 
-    final availableSections =
-        filterState.grade != null && filterState.branch != null
-            ? (availableClasses.firstWhere(
-                    (cls) => cls['classId'] == filterState.grade,
-                    orElse: () => {'sections': []})['sections'] as List)
-                .where((section) => section['branchId'] == filterState.branch)
-                .toList()
-            : [];
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    // Initialize temporary state with current filter values after loading
+    _controller.forward();
+  }
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.8,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            spreadRadius: 2,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          _buildHeader(context),
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _applyFilters(WidgetRef ref) {
+    // Update the provider with temporary values
+    ref.read(filterStateProvider.notifier).updateBranch(_tempBranch);
+    ref.read(filterStateProvider.notifier).updateBoard(_tempBoard);
+    ref.read(filterStateProvider.notifier).updateGrade(_tempGrade);
+    ref.read(filterStateProvider.notifier).updateSections(_tempSections);
+  }
+
+  void _resetFilters() {
+    setState(() {
+      _tempBranch = null;
+      _tempBoard = null;
+      _tempGrade = null;
+      _tempSections.clear();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ref.watch(filterStateFutureProvider).when(
+          data: (initialState) {
+            // Set initial temp values only once after state is loaded
+            if (_tempBranch == null &&
+                _tempBoard == null &&
+                _tempGrade == null &&
+                _tempSections.isEmpty) {
+              _tempBranch = initialState.branch;
+              _tempBoard = initialState.board;
+              _tempGrade = initialState.grade;
+              _tempSections = List.from(initialState.section);
+            }
+
+            final availableBoards = _tempBranch != null
+                ? widget.boards
+                    .where((board) => (board['assignedBranches'] as List)
+                        .contains(_tempBranch))
+                    .toList()
+                : [];
+
+            final availableClasses = _tempBoard != null
+                ? (widget.boards.firstWhere(
+                        (board) => board['boardId'] == _tempBoard,
+                        orElse: () => {'classes': []})['classes'] as List)
+                    .toList()
+                : [];
+
+            final availableSections = _tempGrade != null && _tempBranch != null
+                ? (availableClasses.firstWhere(
+                        (cls) => cls['classId'] == _tempGrade,
+                        orElse: () => {'sections': []})['sections'] as List)
+                    .where((section) => section['branchId'] == _tempBranch)
+                    .toList()
+                : [];
+
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.8,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    spreadRadius: 2,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: FadeTransition(
+                opacity: _fadeAnimation,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildFilterSection(
-                      context: context,
-                      ref: ref,
-                      title: 'Branch',
-                      items: branches,
-                      valueKey: 'key',
-                      displayKey: 'name',
-                      selectedValue: filterState.branch,
-                      onSelected: (value) => ref
-                          .read(filterStateProvider.notifier)
-                          .updateBranch(value),
+                    _buildHeader(context),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildFilterSection(
+                                context: context,
+                                ref: ref,
+                                title: 'Branch',
+                                items: widget.branches,
+                                valueKey: 'key',
+                                displayKey: 'name',
+                                selectedValue: _tempBranch,
+                                onSelected: (value) => setState(() {
+                                  _tempBranch = value;
+                                  _tempBoard = null;
+                                  _tempGrade = null;
+                                  _tempSections.clear();
+                                }),
+                              ),
+                              AnimatedSize(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                                child: _tempBranch != null
+                                    ? Column(
+                                        children: [
+                                          const SizedBox(height: 24),
+                                          _buildFilterSection(
+                                            context: context,
+                                            ref: ref,
+                                            title: 'Board',
+                                            items: availableBoards,
+                                            valueKey: 'boardId',
+                                            displayKey: 'boardName',
+                                            selectedValue: _tempBoard,
+                                            onSelected: (value) => setState(() {
+                                              _tempBoard = value;
+                                              _tempGrade = null;
+                                              _tempSections.clear();
+                                            }),
+                                          ),
+                                        ],
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                              AnimatedSize(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                                child: _tempBoard != null
+                                    ? Column(
+                                        children: [
+                                          const SizedBox(height: 24),
+                                          _buildFilterSection(
+                                            context: context,
+                                            ref: ref,
+                                            title: 'Grade',
+                                            items: availableClasses,
+                                            valueKey: 'classId',
+                                            displayKey: 'className',
+                                            selectedValue: _tempGrade,
+                                            onSelected: (value) => setState(() {
+                                              _tempGrade = value;
+                                              _tempSections.clear();
+                                            }),
+                                          ),
+                                        ],
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                              AnimatedSize(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                                child: _tempGrade != null
+                                    ? Column(
+                                        children: [
+                                          const SizedBox(height: 24),
+                                          _buildFilterSection(
+                                            context: context,
+                                            ref: ref,
+                                            title: 'Section',
+                                            items: availableSections,
+                                            valueKey: 'sectionId',
+                                            displayKey: 'sectionName',
+                                            selectedValues: _tempSections,
+                                            onSelected: (values) => setState(
+                                                () => _tempSections = values),
+                                            isMultiSelect: true,
+                                          ),
+                                        ],
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                    if (filterState.branch != null) ...[
-                      const SizedBox(height: 24),
-                      _buildFilterSection(
-                        context: context,
-                        ref: ref,
-                        title: 'Board',
-                        items: availableBoards,
-                        valueKey: 'boardId',
-                        displayKey: 'boardName',
-                        selectedValue: filterState.board,
-                        onSelected: (value) => ref
-                            .read(filterStateProvider.notifier)
-                            .updateBoard(value),
-                      ),
-                    ],
-                    if (filterState.board != null) ...[
-                      const SizedBox(height: 24),
-                      _buildFilterSection(
-                        context: context,
-                        ref: ref,
-                        title: 'Grade',
-                        items: availableClasses,
-                        valueKey: 'classId',
-                        displayKey: 'className',
-                        selectedValue: filterState.grade,
-                        onSelected: (value) => ref
-                            .read(filterStateProvider.notifier)
-                            .updateGrade(value),
-                      ),
-                    ],
-                    if (filterState.grade != null) ...[
-                      const SizedBox(height: 24),
-                      _buildFilterSection(
-                        context: context,
-                        ref: ref,
-                        title: 'Section',
-                        items: availableSections,
-                        valueKey: 'sectionId',
-                        displayKey: 'sectionName',
-                        selectedValues: filterState.section,
-                        onSelected: (values) => ref
-                            .read(filterStateProvider.notifier)
-                            .updateSections(values),
-                        isMultiSelect: true,
-                      ),
-                    ],
+                    _buildActionButtons(context, ref),
                   ],
                 ),
               ),
-            ),
-          ),
-          _buildActionButtons(context, ref),
-        ],
-      ),
-    );
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(child: Text('Error: $error')),
+        );
   }
 
   Widget _buildHeader(BuildContext context) {
@@ -266,46 +370,51 @@ class FilterBottomSheet extends ConsumerWidget {
                   ? selectedValues.contains(value)
                   : selectedValue == value;
 
-              return FilterChip(
-                label: Text(
-                  display,
-                  style: TextStyle(
-                    color: isSelected ? Colors.blue[700] : Colors.grey[800],
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
+              return AnimatedScale(
+                scale: isSelected ? 1.02 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                child: FilterChip(
+                  label: Text(
+                    display,
+                    style: TextStyle(
+                      color: isSelected ? Colors.blue[700] : Colors.grey[800],
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
                   ),
-                ),
-                selected: isSelected,
-                onSelected: (_) {
-                  if (isMultiSelect) {
-                    final newSelection = List<String>.from(selectedValues);
-                    if (isSelected) {
-                      newSelection.remove(value);
+                  selected: isSelected,
+                  onSelected: (_) {
+                    if (isMultiSelect) {
+                      final newSelection = List<String>.from(selectedValues);
+                      if (isSelected) {
+                        newSelection.remove(value);
+                      } else {
+                        newSelection.add(value);
+                      }
+                      onSelected(newSelection);
                     } else {
-                      newSelection.add(value);
+                      onSelected(isSelected ? null : value);
                     }
-                    onSelected(newSelection);
-                  } else {
-                    onSelected(isSelected ? null : value);
-                  }
-                },
-                selectedColor: Colors.blue[50],
-                backgroundColor: Colors.grey[100],
-                checkmarkColor: Colors.blue[700],
-                elevation: isSelected ? 2 : 0,
-                pressElevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
-                    color: isSelected ? Colors.blue[200]! : Colors.grey[300]!,
-                    width: 1,
+                  },
+                  selectedColor: Colors.blue[50],
+                  backgroundColor: Colors.grey[100],
+                  checkmarkColor: Colors.blue[700],
+                  elevation: isSelected ? 2 : 0,
+                  pressElevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                      color: isSelected ? Colors.blue[200]! : Colors.grey[300]!,
+                      width: 1,
+                    ),
                   ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               );
             }).toList(),
           ),
@@ -326,11 +435,10 @@ class FilterBottomSheet extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
-    final filterState = ref.watch(filterStateProvider);
-    final hasActiveFilters = filterState.branch != null ||
-        filterState.board != null ||
-        filterState.grade != null ||
-        filterState.section.isNotEmpty;
+    final hasActiveFilters = _tempBranch != null ||
+        _tempBoard != null ||
+        _tempGrade != null ||
+        _tempSections.isNotEmpty;
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -368,7 +476,7 @@ class FilterBottomSheet extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      _getActiveFiltersText(filterState),
+                      _getActiveFiltersText(),
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.blue[800],
@@ -385,59 +493,70 @@ class FilterBottomSheet extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
-                  onPressed: hasActiveFilters
-                      ? () => _showResetConfirmation(context, ref)
-                      : null,
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: BorderSide(
-                      color: hasActiveFilters
-                          ? Colors.blue[600]!
-                          : Colors.grey[400]!,
-                      width: 1.5,
+                child: AnimatedScale(
+                  duration: const Duration(milliseconds: 200),
+                  scale: hasActiveFilters ? 1.0 : 0.95,
+                  child: OutlinedButton(
+                    onPressed: hasActiveFilters
+                        ? () => _showResetConfirmation(context, ref)
+                        : null,
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      side: BorderSide(
+                        color: hasActiveFilters
+                            ? Colors.blue[600]!
+                            : Colors.grey[400]!,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      foregroundColor: hasActiveFilters
+                          ? Colors.blue[600]
+                          : Colors.grey[400],
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    foregroundColor:
-                        hasActiveFilters ? Colors.blue[600] : Colors.grey[400],
-                  ),
-                  child: const Text(
-                    'Reset',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                    child: const Text(
+                      'Reset',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: ElevatedButton(
-                  onPressed: hasActiveFilters
-                      ? () {
-                          if (onFilterApplied != null) {
-                            onFilterApplied!();
+                child: AnimatedScale(
+                  duration: const Duration(milliseconds: 200),
+                  scale: hasActiveFilters ? 1.0 : 0.95,
+                  child: ElevatedButton(
+                    onPressed: hasActiveFilters
+                        ? () {
+                            _applyFilters(ref);
+                            if (widget.onFilterApplied != null) {
+                              widget.onFilterApplied!();
+                            }
+                            Navigator.pop(context);
                           }
-                          Navigator.pop(context);
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor:
-                        hasActiveFilters ? Colors.blue[600] : Colors.grey[400],
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      backgroundColor: hasActiveFilters
+                          ? Colors.blue[600]
+                          : Colors.grey[400],
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: hasActiveFilters ? 3 : 0,
                     ),
-                    elevation: hasActiveFilters ? 3 : 0,
-                  ),
-                  child: const Text(
-                    'Apply',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                    child: const Text(
+                      'Apply',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -449,15 +568,15 @@ class FilterBottomSheet extends ConsumerWidget {
     );
   }
 
-  String _getActiveFiltersText(FilterState state) {
+  String _getActiveFiltersText() {
     final List<String> activeFilters = [];
 
-    if (state.branch != null) activeFilters.add('Branch');
-    if (state.board != null) activeFilters.add('Board');
-    if (state.grade != null) activeFilters.add('Grade');
-    if (state.section.isNotEmpty) {
+    if (_tempBranch != null) activeFilters.add('Branch');
+    if (_tempBoard != null) activeFilters.add('Board');
+    if (_tempGrade != null) activeFilters.add('Grade');
+    if (_tempSections.isNotEmpty) {
       activeFilters.add(
-          '${state.section.length} Section${state.section.length > 1 ? 's' : ''}');
+          '${_tempSections.length} Section${_tempSections.length > 1 ? 's' : ''}');
     }
 
     if (activeFilters.isEmpty) return 'No filters applied';
@@ -488,9 +607,10 @@ class FilterBottomSheet extends ConsumerWidget {
     );
 
     if (confirmed == true) {
+      _resetFilters();
       ref.read(filterStateProvider.notifier).resetFilters();
-      if (onFilterReset != null) {
-        onFilterReset!();
+      if (widget.onFilterReset != null) {
+        widget.onFilterReset!();
       }
       Navigator.pop(context);
     }
