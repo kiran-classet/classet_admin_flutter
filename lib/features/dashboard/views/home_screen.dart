@@ -6,11 +6,11 @@ import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 import 'dart:convert';
 
 // Filter provider
-final filterProvider = StateProvider<Map<String, String?>>((ref) => {
+final filterProvider = StateProvider<Map<String, dynamic>>((ref) => {
       'branch': null,
       'board': null,
       'grade': null,
-      'section': null,
+      'section': <String>[], // Explicitly typed as List<String>
     });
 
 // Mock JSON data (in a real app, this would come from an API)
@@ -447,7 +447,6 @@ class HomeScreen extends ConsumerWidget {
         builder: (context, dialogRef, child) {
           final filters = dialogRef.watch(filterProvider);
 
-          // Get boards for selected branch
           List<dynamic> availableBoards = filters['branch'] != null
               ? boards
                   .where((board) => (board['assignedBranches'] as List)
@@ -455,7 +454,6 @@ class HomeScreen extends ConsumerWidget {
                   .toList()
               : [];
 
-          // Get classes (grades) for selected board
           List<dynamic> availableClasses = filters['board'] != null
               ? (boards.firstWhere(
                       (board) => board['boardId'] == filters['board'],
@@ -463,7 +461,6 @@ class HomeScreen extends ConsumerWidget {
                   .toList()
               : [];
 
-          // Get sections for selected grade and branch
           List<dynamic> availableSections = filters['grade'] != null &&
                   filters['branch'] != null
               ? (availableClasses.firstWhere(
@@ -479,6 +476,7 @@ class HomeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // ... (Header remains the same)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -501,26 +499,29 @@ class HomeScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Branch filter (single select)
                         _buildFilterSection(
                           title: 'Branch',
                           items:
                               branches.map((b) => b['key'] as String).toList(),
                           displayItems:
                               branches.map((b) => b['name'] as String).toList(),
-                          selectedItem: filters['branch'],
+                          selectedItem: filters['branch'] as String?,
+                          selectedItems: const [],
                           onSelected: (value) {
-                            final newValue =
-                                value == filters['branch'] ? null : value;
                             dialogRef.read(filterProvider.notifier).state = {
-                              'branch': newValue,
+                              'branch':
+                                  value == filters['branch'] ? null : value,
                               'board': null,
                               'grade': null,
-                              'section': null,
+                              'section': <String>[],
                             };
                           },
+                          isMultiSelect: false,
                         ),
                         if (filters['branch'] != null) ...[
                           const SizedBox(height: 24),
+                          // Board filter (single select)
                           _buildFilterSection(
                             title: 'Board',
                             items: availableBoards
@@ -529,21 +530,23 @@ class HomeScreen extends ConsumerWidget {
                             displayItems: availableBoards
                                 .map((b) => b['boardName'] as String)
                                 .toList(),
-                            selectedItem: filters['board'],
+                            selectedItem: filters['board'] as String?,
+                            selectedItems: const [],
                             onSelected: (value) {
-                              final newValue =
-                                  value == filters['board'] ? null : value;
                               dialogRef.read(filterProvider.notifier).state = {
                                 ...filters,
-                                'board': newValue,
+                                'board':
+                                    value == filters['board'] ? null : value,
                                 'grade': null,
-                                'section': null,
+                                'section': <String>[],
                               };
                             },
+                            isMultiSelect: false,
                           ),
                         ],
                         if (filters['board'] != null) ...[
                           const SizedBox(height: 24),
+                          // Grade filter (single select)
                           _buildFilterSection(
                             title: 'Grade',
                             items: availableClasses
@@ -552,20 +555,22 @@ class HomeScreen extends ConsumerWidget {
                             displayItems: availableClasses
                                 .map((c) => c['className'] as String)
                                 .toList(),
-                            selectedItem: filters['grade'],
+                            selectedItem: filters['grade'] as String?,
+                            selectedItems: const [],
                             onSelected: (value) {
-                              final newValue =
-                                  value == filters['grade'] ? null : value;
                               dialogRef.read(filterProvider.notifier).state = {
                                 ...filters,
-                                'grade': newValue,
-                                'section': null,
+                                'grade':
+                                    value == filters['grade'] ? null : value,
+                                'section': <String>[],
                               };
                             },
+                            isMultiSelect: false,
                           ),
                         ],
                         if (filters['grade'] != null) ...[
                           const SizedBox(height: 24),
+                          // Section filter (multi select)
                           _buildFilterSection(
                             title: 'Section',
                             items: availableSections
@@ -574,21 +579,31 @@ class HomeScreen extends ConsumerWidget {
                             displayItems: availableSections
                                 .map((s) => s['sectionName'] as String)
                                 .toList(),
-                            selectedItem: filters['section'],
+                            selectedItem: null,
+                            selectedItems: filters['section'] as List<String>,
                             onSelected: (value) {
-                              final newValue =
-                                  value == filters['section'] ? null : value;
+                              final currentSections =
+                                  List<String>.from(filters['section']);
+                              if (currentSections.contains(value)) {
+                                currentSections.remove(value);
+                              } else {
+                                currentSections.add(value);
+                              }
+                              print(
+                                  'New sections: $currentSections'); // Add this
                               dialogRef.read(filterProvider.notifier).state = {
                                 ...filters,
-                                'section': newValue,
+                                'section': currentSections,
                               };
                             },
+                            isMultiSelect: true,
                           ),
                         ],
                       ],
                     ),
                   ),
                 ),
+                // ... (Buttons remain the same)
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -599,7 +614,7 @@ class HomeScreen extends ConsumerWidget {
                             'branch': null,
                             'board': null,
                             'grade': null,
-                            'section': null,
+                            'section': <String>[],
                           };
                           Navigator.pop(context);
                         },
@@ -631,8 +646,10 @@ class HomeScreen extends ConsumerWidget {
     required String title,
     required List<String> items,
     required List<String> displayItems,
-    required String? selectedItem,
-    required void Function(String) onSelected,
+    String? selectedItem,
+    required List<String> selectedItems,
+    required Function(String) onSelected,
+    required bool isMultiSelect,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -655,7 +672,10 @@ class HomeScreen extends ConsumerWidget {
               final index = entry.key;
               final item = entry.value;
               final displayName = displayItems[index];
-              final isSelected = selectedItem == item;
+              final isSelected = isMultiSelect
+                  ? selectedItems.contains(item)
+                  : selectedItem == item;
+
               return FilterChip(
                 label: Text(displayName),
                 selected: isSelected,
