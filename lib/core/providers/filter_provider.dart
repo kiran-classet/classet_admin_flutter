@@ -2,90 +2,187 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
-// Provider to store and retrieve filter preferences
-final filterPersistenceProvider = Provider<FilterPersistence>((ref) {
-  return FilterPersistence();
-});
+class FilterState {
+  final String? branch;
+  final String? board;
+  final String? grade;
+  final List<String> section;
 
-// Provider for the actual filter state
-final filterProvider =
-    StateNotifierProvider<FilterNotifier, Map<String, dynamic>>((ref) {
-  return FilterNotifier(ref);
-});
+  const FilterState({
+    this.branch,
+    this.board,
+    this.grade,
+    this.section = const [],
+  });
 
-class FilterPersistence {
-  static const String _filterKey = 'app_filters';
-
-  Future<void> saveFilters(Map<String, dynamic> filters) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_filterKey, jsonEncode(filters));
+  Map<String, dynamic> toJson() {
+    return {
+      'branch': branch,
+      'board': board,
+      'grade': grade,
+      'section': section,
+    };
   }
 
-  Future<Map<String, dynamic>> loadFilters() async {
-    final prefs = await SharedPreferences.getInstance();
-    final filterString = prefs.getString(_filterKey);
-    if (filterString == null) {
-      return {
-        'branch': null,
-        'board': null,
-        'grade': null,
-        'section': <String>[],
-      };
-    }
-
+  factory FilterState.fromJson(Map<String, dynamic> json) {
     try {
-      final Map<String, dynamic> decodedFilters = jsonDecode(filterString);
-      // Ensure section is always a List<String>
-      if (decodedFilters['section'] != null) {
-        decodedFilters['section'] =
-            List<String>.from(decodedFilters['section']);
-      } else {
-        decodedFilters['section'] = <String>[];
-      }
-      return decodedFilters;
+      return FilterState(
+        branch: json['branch'] as String?,
+        board: json['board'] as String?,
+        grade: json['grade'] as String?,
+        section:
+            (json['section'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      );
     } catch (e) {
-      return {
-        'branch': null,
-        'board': null,
-        'grade': null,
-        'section': <String>[],
-      };
+      // If there's any error in parsing, return empty state
+      return const FilterState();
     }
+  }
+
+  FilterState copyWith({
+    String? branch,
+    String? board,
+    String? grade,
+    List<String>? section,
+    bool clearBoard = false,
+    bool clearGrade = false,
+    bool clearSection = false,
+  }) {
+    return FilterState(
+      branch: branch ?? this.branch,
+      board: clearBoard ? null : (board ?? this.board),
+      grade: clearGrade ? null : (grade ?? this.grade),
+      section: clearSection ? [] : (section ?? this.section),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is FilterState &&
+        other.branch == branch &&
+        other.board == board &&
+        other.grade == grade &&
+        _listEquals(other.section, section);
+  }
+
+  bool _listEquals<T>(List<T>? a, List<T>? b) {
+    if (a == null) return b == null;
+    if (b == null || a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode =>
+      branch.hashCode ^ board.hashCode ^ grade.hashCode ^ section.hashCode;
+
+  @override
+  String toString() {
+    return 'FilterState(branch: $branch, board: $board, grade: $grade, section: $section)';
   }
 }
 
-class FilterNotifier extends StateNotifier<Map<String, dynamic>> {
-  final Ref _ref;
+final filterStateProvider =
+    StateNotifierProvider<FilterStateNotifier, FilterState>((ref) {
+  return FilterStateNotifier();
+});
 
-  FilterNotifier(this._ref)
-      : super({
-          'branch': null,
-          'board': null,
-          'grade': null,
-          'section': <String>[],
-        }) {
-    _loadSavedFilters();
+class FilterStateNotifier extends StateNotifier<FilterState> {
+  static const String _storageKey = 'filter_state';
+  bool _isInitialized = false;
+
+  FilterStateNotifier() : super(const FilterState()) {
+    _loadSavedState();
   }
 
-  Future<void> _loadSavedFilters() async {
-    final savedFilters =
-        await _ref.read(filterPersistenceProvider).loadFilters();
-    state = savedFilters;
+  Future<void> _loadSavedState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedState = prefs.getString(_storageKey);
+      if (savedState != null) {
+        final decodedState = jsonDecode(savedState);
+        if (decodedState is Map<String, dynamic>) {
+          state = FilterState.fromJson(decodedState);
+        }
+      }
+    } catch (e) {
+      // If there's any error loading the state, keep the default empty state
+      print('Error loading filter state: $e');
+    } finally {
+      _isInitialized = true;
+    }
   }
 
-  Future<void> updateFilters(Map<String, dynamic> newFilters) async {
-    state = newFilters;
-    await _ref.read(filterPersistenceProvider).saveFilters(newFilters);
+  Future<void> _saveState() async {
+    if (!_isInitialized) return; // Don't save until initial load is complete
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_storageKey, jsonEncode(state.toJson()));
+    } catch (e) {
+      print('Error saving filter state: $e');
+    }
   }
 
-  Future<void> resetFilters() async {
-    final emptyFilters = {
-      'branch': null,
-      'board': null,
-      'grade': null,
-      'section': <String>[],
-    };
-    state = emptyFilters;
-    await _ref.read(filterPersistenceProvider).saveFilters(emptyFilters);
+  void updateBranch(String? branch) {
+    if (branch != state.branch) {
+      state = state.copyWith(
+        branch: branch,
+        clearBoard: true, // Reset board
+        clearGrade: true, // Reset grade
+        clearSection: true, // Reset sections
+      );
+      _saveState();
+    }
+  }
+
+  void updateBoard(String? board) {
+    if (board != state.board) {
+      state = state.copyWith(
+        board: board,
+        clearGrade: true, // Reset grade
+        clearSection: true, // Reset sections
+      );
+      _saveState();
+    }
+  }
+
+  void updateGrade(String? grade) {
+    if (grade != state.grade) {
+      state = state.copyWith(
+        grade: grade,
+        clearSection: true, // Reset sections
+      );
+      _saveState();
+    }
+  }
+
+  void updateSections(List<String> sections) {
+    if (!_listEquals(sections, state.section)) {
+      state = state.copyWith(section: sections);
+      _saveState();
+    }
+  }
+
+  void resetFilters() {
+    state = const FilterState();
+    _saveState();
+  }
+
+  bool _listEquals<T>(List<T>? a, List<T>? b) {
+    if (a == null) return b == null;
+    if (b == null || a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  @override
+  void dispose() {
+    _saveState(); // Save state when disposing
+    super.dispose();
   }
 }
