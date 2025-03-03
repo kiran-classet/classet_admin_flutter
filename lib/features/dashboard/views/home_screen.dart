@@ -1,4 +1,5 @@
 import 'package:classet_admin/core/constants/constants.dart';
+import 'package:classet_admin/core/widgets/filter_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
@@ -65,10 +66,10 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showFilterBottomSheet(context, ref),
-        child: const Icon(Icons.filter_list),
-        tooltip: 'Filter',
+      floatingActionButton: FilterButtonWidget(
+        onFilterApplied: () {
+          _showFilterBottomSheet(context, ref);
+        },
       ),
     );
   }
