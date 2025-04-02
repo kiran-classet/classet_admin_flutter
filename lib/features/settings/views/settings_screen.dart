@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -12,8 +12,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _emailNotifications = true;
   bool _smsNotifications = true;
   bool _darkMode = false;
-  String _selectedLanguage = 'English';
-  double _textSize = 16.0;
+  final String _selectedLanguage = 'English';
+  final double _textSize = 16.0;
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,7 @@ import 'package:classet_admin/features/academic/providers/academic_year_provider
 import 'package:lottie/lottie.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ApprovalScreen extends StatefulWidget {
-  const ApprovalScreen({Key? key}) : super(key: key);
+  const ApprovalScreen({super.key});
 
   @override
   State<ApprovalScreen> createState() => _ApprovalScreenState();
@@ -66,8 +66,8 @@ class _ApprovalScreenState extends State<ApprovalScreen>
         onPressed: () {
           // TODO: Handle creating new approval request
         },
-        child: const Icon(Icons.add),
         tooltip: 'Create New Request',
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -162,18 +162,18 @@ class _ApprovalCard extends StatelessWidget {
                 children: [
                   TextButton(
                     onPressed: onReject,
-                    child: const Text('Reject'),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.red,
                     ),
+                    child: const Text('Reject'),
                   ),
                   const SizedBox(width: 16),
                   ElevatedButton(
                     onPressed: onApprove,
-                    child: const Text('Approve'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                     ),
+                    child: const Text('Approve'),
                   ),
                 ],
               ),

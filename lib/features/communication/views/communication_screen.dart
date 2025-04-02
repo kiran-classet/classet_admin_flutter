@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CommunicationScreen extends StatelessWidget {
-  const CommunicationScreen({Key? key}) : super(key: key);
+  const CommunicationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -91,8 +91,8 @@ class CommunicationScreen extends StatelessWidget {
         onPressed: () {
           // TODO: Handle new communication
         },
-        child: const Icon(Icons.message),
         tooltip: 'New Message',
+        child: const Icon(Icons.message),
       ),
     );
   }

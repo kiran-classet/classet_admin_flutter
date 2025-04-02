@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class FinanceScreen extends StatelessWidget {
-  const FinanceScreen({Key? key}) : super(key: key);
+  const FinanceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +89,8 @@ class FinanceScreen extends StatelessWidget {
         onPressed: () {
           // TODO: Handle new transaction
         },
-        child: const Icon(Icons.add),
         tooltip: 'Add New Transaction',
+        child: const Icon(Icons.add),
       ),
     );
   }

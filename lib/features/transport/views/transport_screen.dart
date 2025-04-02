@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TransportScreen extends StatelessWidget {
-  const TransportScreen({Key? key}) : super(key: key);
+  const TransportScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -91,8 +91,8 @@ class TransportScreen extends StatelessWidget {
         onPressed: () {
           // TODO: Handle add new transport related item
         },
-        child: const Icon(Icons.add),
         tooltip: 'Add New',
+        child: const Icon(Icons.add),
       ),
     );
   }

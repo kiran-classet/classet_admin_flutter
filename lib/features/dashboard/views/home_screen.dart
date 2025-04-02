@@ -17,7 +17,7 @@ final filterProvider = StateProvider<Map<String, dynamic>>((ref) => {
 // Mock JSON data (in a real app, this would come from an API)
 
 class HomeScreen extends ConsumerWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

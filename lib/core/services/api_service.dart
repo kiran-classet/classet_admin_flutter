@@ -1,10 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl =
+  static const String productionBaseUrl =
       'https://8bzo5ffosh.execute-api.ap-south-1.amazonaws.com/sasdev/v1/data';
+
+  static const String localhostBaseUrl = 'http://192.168.0.114:4000/v1/data/';
+
+  static const String baseUrl =
+      localhostBaseUrl; // Switch to productionBaseUrl for production.
 
   // Generic GET request
   Future<dynamic> get(String endpoint) async {
@@ -105,6 +111,10 @@ class ApiService {
   dynamic _handleError(dynamic error) {
     if (error is ApiException) {
       throw error;
+    }
+    if (error is SocketException) {
+      throw Exception(
+          'Connection refused. Please check if the server is running and accessible: ${error.toString()}');
     }
     throw Exception('An unexpected error occurred: ${error.toString()}');
   }

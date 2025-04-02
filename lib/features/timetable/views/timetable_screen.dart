@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TimetableScreen extends StatefulWidget {
-  const TimetableScreen({Key? key}) : super(key: key);
+  const TimetableScreen({super.key});
 
   @override
   State<TimetableScreen> createState() => _TimetableScreenState();
@@ -52,8 +52,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
         onPressed: () {
           // TODO: Handle add new timetable entry
         },
-        child: const Icon(Icons.add),
         tooltip: 'Add New Entry',
+        child: const Icon(Icons.add),
       ),
     );
   }

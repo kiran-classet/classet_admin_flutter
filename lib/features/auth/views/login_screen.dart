@@ -15,7 +15,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final emailController = TextEditingController(text: 'zaaflutter1');
+  final emailController = TextEditingController(text: 'aauadmin');
   final passwordController = TextEditingController(text: 'Classet@123');
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
@@ -74,11 +74,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _saveCredentials();
 
         if (mounted) {
-          await ref
-              .read(adminUserProvider.notifier)
-              .fetchUserRolesPermissions(username);
+          await ref.read(adminUserProvider.notifier).fetchUserDetails(username);
 
-          await ref.read(academicYearProvider.notifier).fetchAcademicYears();
+          // await ref.read(academicYearProvider.notifier).fetchAcademicYears();
 
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(

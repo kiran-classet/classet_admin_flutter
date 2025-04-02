@@ -9,19 +9,19 @@ class FilterButtonWidget extends ConsumerWidget {
   final VoidCallback? onFilterReset;
 
   const FilterButtonWidget({
-    Key? key,
+    super.key,
     this.onFilterApplied,
     this.onFilterReset,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return FloatingActionButton(
       onPressed: () => _showFilterBottomSheet(context, ref),
-      child: const Icon(Icons.filter_list),
       tooltip: 'Filter',
       backgroundColor: Colors.blue[600],
       foregroundColor: Colors.white,
+      child: const Icon(Icons.filter_list),
     );
   }
 
@@ -52,12 +52,12 @@ class FilterBottomSheet extends ConsumerWidget {
   final VoidCallback? onFilterReset;
 
   const FilterBottomSheet({
-    Key? key,
+    super.key,
     required this.branches,
     required this.boards,
     this.onFilterApplied,
     this.onFilterReset,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

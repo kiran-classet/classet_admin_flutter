@@ -26,7 +26,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   int _selectedDrawerIndex = 0;
-  int _notificationCount = 0; // Add this variable
+  final int _notificationCount = 0; // Add this variable
 
   final PageController _pageController = PageController();
 
@@ -350,13 +350,13 @@ class DrawerItem extends StatelessWidget {
   final Function(int) onTap;
 
   const DrawerItem({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     required this.index,
     required this.selectedIndex,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

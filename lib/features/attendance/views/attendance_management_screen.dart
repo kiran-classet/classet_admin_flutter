@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AttendanceManagementScreen extends StatefulWidget {
-  const AttendanceManagementScreen({Key? key}) : super(key: key);
+  const AttendanceManagementScreen({super.key});
 
   @override
   State<AttendanceManagementScreen> createState() =>

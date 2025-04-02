@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AdmissionsScreen extends StatelessWidget {
-  const AdmissionsScreen({Key? key}) : super(key: key);
+  const AdmissionsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

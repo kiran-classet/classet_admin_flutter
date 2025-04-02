@@ -2,30 +2,28 @@ import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:classet_admin/core/services/api_service.dart';
-import 'package:amazon_cognito_identity_dart_2/cognito.dart';
-import 'package:flutter/material.dart';
 import 'package:classet_admin/core/navigation/navigation_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // State class to hold admin user data
 class AdminUserState {
-  final Map<String, dynamic>? userRolesPermissions;
+  final Map<String, dynamic>? userDetails;
   final bool isLoading;
   final String? error;
 
   AdminUserState({
-    this.userRolesPermissions,
+    this.userDetails,
     this.isLoading = false,
     this.error,
   });
 
   AdminUserState copyWith({
-    Map<String, dynamic>? userRolesPermissions,
+    Map<String, dynamic>? userDetails,
     bool? isLoading,
     String? error,
   }) {
     return AdminUserState(
-      userRolesPermissions: userRolesPermissions ?? this.userRolesPermissions,
+      userDetails: userDetails ?? this.userDetails,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
     );
@@ -42,14 +40,13 @@ class AdminUserNotifier extends StateNotifier<AdminUserState> {
   final ApiService _apiService;
   final NavigationService _navigationService;
 
-  Future<void> fetchUserRolesPermissions(String username) async {
+  Future<void> fetchUserDetails(String username) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final response = await _apiService
-          .get('authorize/getAdminUserRolesPermissions/$username');
+      final response = await _apiService.get('user/details/$username');
       state = state.copyWith(
-        userRolesPermissions: response,
+        userDetails: response,
         isLoading: false,
       );
       _saveToPrefs(response);
@@ -64,15 +61,15 @@ class AdminUserNotifier extends StateNotifier<AdminUserState> {
 
   Future<void> _saveToPrefs(Map<String, dynamic> data) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('userRolesPermissions', jsonEncode(data));
+    await prefs.setString('userDetails', jsonEncode(data));
   }
 
   Future<void> _loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    final data = prefs.getString('userRolesPermissions');
+    final data = prefs.getString('userDetails');
     if (data != null) {
       state = state.copyWith(
-        userRolesPermissions: jsonDecode(data),
+        userDetails: jsonDecode(data),
       );
     }
   }
