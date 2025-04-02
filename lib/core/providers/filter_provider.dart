@@ -25,18 +25,13 @@ class FilterState {
   }
 
   factory FilterState.fromJson(Map<String, dynamic> json) {
-    try {
-      return FilterState(
-        branch: json['branch'] as String?,
-        board: json['board'] as String?,
-        grade: json['grade'] as String?,
-        section:
-            (json['section'] as List?)?.map((e) => e.toString()).toList() ?? [],
-      );
-    } catch (e) {
-      // If there's any error in parsing, return empty state
-      return const FilterState();
-    }
+    return FilterState(
+      branch: json['branch'] as String?,
+      board: json['board'] as String?,
+      grade: json['grade'] as String?,
+      section:
+          (json['section'] as List?)?.map((e) => e.toString()).toList() ?? [],
+    );
   }
 
   FilterState copyWith({
@@ -130,9 +125,9 @@ class FilterStateNotifier extends StateNotifier<FilterState> {
     if (branch != state.branch) {
       state = state.copyWith(
         branch: branch,
-        clearBoard: true, // Reset board
-        clearGrade: true, // Reset grade
-        clearSection: true, // Reset sections
+        clearBoard: true,
+        clearGrade: true,
+        clearSection: true,
       );
       _saveState();
     }
@@ -142,8 +137,8 @@ class FilterStateNotifier extends StateNotifier<FilterState> {
     if (board != state.board) {
       state = state.copyWith(
         board: board,
-        clearGrade: true, // Reset grade
-        clearSection: true, // Reset sections
+        clearGrade: true,
+        clearSection: true,
       );
       _saveState();
     }
@@ -153,7 +148,7 @@ class FilterStateNotifier extends StateNotifier<FilterState> {
     if (grade != state.grade) {
       state = state.copyWith(
         grade: grade,
-        clearSection: true, // Reset sections
+        clearSection: true,
       );
       _saveState();
     }

@@ -1,810 +1,408 @@
 import 'dart:convert';
 
-const String branchesJson = '''
-[
-  {
-    "key": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-    "name": "Meluha International School",
-    "isActive": true,
-    "branchCode": "MIS",
-    "academicYear": "67a3391af6e827bc71c7befa"
-  },
-  {
-    "key": "107dadea-3271-4434-8af9-83970247ae15",
-    "name": "Gandipet",
-    "isActive": true,
-    "branchCode": "sr1",
-    "academicYear": "67a3391af6e827bc71c7befa"
-  }
-]
-''';
-const String boardsJson = '''
-[
-        {
-            "boardName": "Central Board of Secondary Education",
-            "boardCode": "CBSE",
-            "assignedBranches": [
-                "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84"
-            ],
-            "description": "Central Board of Secondary Education",
-            "academicCode": "67a3391af6e827bc71c7befa",
-            "academicYear": "2024-2025",
-            "boardId": "533d1812-02bd-48be-a89b-c9ca5e585301",
-            "boardActivity": true,
-            "classes": [
-                {
-                    "classId": "d59354b1-e288-45fb-829b-5acad553ea56",
-                    "className": "Grade XII",
-                    "classCode": "012",
-                    "description": "Grade XII",
-                    "priority": "12",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "71ccf958-990d-41c3-a8d5-a4122c3b9255",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67a45112c1d575ae8257d567",
-                            "sectionId": "0c2e979e-70ed-465e-87e1-9da761b8bc73",
-                            "autoCreate": true,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XII-A",
-                            "isActive": true,
-                            "maxStrength": "100",
-                            "priority": 1,
-                            "sectionCode": "012",
-                            "sectionName": "XII-A",
-                            "assginedStrength": 63
-                        },
-                        {
-                            "_id": "67aad9725bf1f0cbc879736a",
-                            "sectionId": "e962d3f9-2554-4fb1-b179-1a8712a46a94",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XII-B",
-                            "isActive": true,
-                            "maxStrength": "50",
-                            "priority": 2,
-                            "sectionCode": "012",
-                            "sectionName": "XII-B",
-                            "assginedStrength": 44
-                        },
-                        {
-                            "_id": "67aad97f5bf1f0cbc879736b",
-                            "sectionId": "b5ddc7c0-7c20-4362-9bca-5de8e4c5cad2",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XII-C",
-                            "isActive": true,
-                            "maxStrength": "50",
-                            "priority": 3,
-                            "sectionCode": "012",
-                            "sectionName": "XII-C",
-                            "assginedStrength": 33
-                        },
-                        {
-                            "_id": "67aad98f5bf1f0cbc879736c",
-                            "sectionId": "519ec65d-a56b-4c53-8cfb-7b8da17fc9ca",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XII-D",
-                            "isActive": true,
-                            "maxStrength": 50,
-                            "priority": 4,
-                            "sectionCode": "012",
-                            "sectionName": "XII-D"
-                        },
-                        {
-                            "_id": "67aad9a95bf1f0cbc879736d",
-                            "sectionId": "5b56651b-4e15-4cf4-b7c7-64d3d8015117",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XII-E",
-                            "isActive": true,
-                            "maxStrength": 50,
-                            "priority": 5,
-                            "sectionCode": "012",
-                            "sectionName": "XII-E",
-                            "assginedStrength": 22
-                        },
-                        {
-                            "_id": "67aad9b55bf1f0cbc879736e",
-                            "sectionId": "9750643a-38a8-4dec-8a88-e37aef8ba96f",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XII-F",
-                            "isActive": true,
-                            "maxStrength": 50,
-                            "priority": 6,
-                            "sectionCode": "012",
-                            "sectionName": "XII-F",
-                            "assginedStrength": 13
-                        },
-                        {
-                            "_id": "67aad9c35bf1f0cbc879736f",
-                            "sectionId": "7be224c5-6c14-4088-8dd6-f777b607f299",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XII-G",
-                            "isActive": true,
-                            "maxStrength": 50,
-                            "priority": 7,
-                            "sectionCode": "012",
-                            "sectionName": "XII-G",
-                            "assginedStrength": 9
-                        },
-                        {
-                            "_id": "67aad9cf5bf1f0cbc8797370",
-                            "sectionId": "0d4e829e-cfdf-4eda-a792-98ba0798a058",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XII-H",
-                            "isActive": true,
-                            "maxStrength": 50,
-                            "priority": 8,
-                            "sectionCode": "012",
-                            "sectionName": "XII-H",
-                            "assginedStrength": 14
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                },
-                {
-                    "classId": "573852a8-7e2a-4b0f-8ad3-a06f1592fda7",
-                    "className": "Grade XI",
-                    "classCode": "011",
-                    "description": "Grade XI",
-                    "priority": "11",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "5c0f0bd9-2e9c-4f3f-9389-e0cb4657717d",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67a450e5c1d575ae8257d566",
-                            "sectionId": "f4acfa76-14b1-4106-8342-d03e05e2e36f",
-                            "autoCreate": true,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XI-A",
-                            "isActive": true,
-                            "maxStrength": "100",
-                            "priority": 1,
-                            "sectionCode": "011",
-                            "sectionName": "XI-A",
-                            "assginedStrength": 42
-                        },
-                        {
-                            "_id": "67aad8b05bf1f0cbc8797363",
-                            "sectionId": "eaa3f0d3-e293-47a1-b4a4-57a7b481ae1d",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XI-B",
-                            "isActive": true,
-                            "maxStrength": "100",
-                            "priority": "2",
-                            "sectionCode": "011",
-                            "sectionName": "XI-B",
-                            "assginedStrength": 44
-                        },
-                        {
-                            "_id": "67aad8bb5bf1f0cbc8797364",
-                            "sectionId": "58c4af4d-3b23-4ea6-9165-5eaae1c5c2cf",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XI-C",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 3,
-                            "sectionCode": "011",
-                            "sectionName": "XI-C",
-                            "assginedStrength": 33
-                        },
-                        {
-                            "_id": "67aad8cb5bf1f0cbc8797365",
-                            "sectionId": "bee68a0d-d0cf-4087-9e14-53d6cd3bfb2a",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XI-D",
-                            "isActive": true,
-                            "maxStrength": 50,
-                            "priority": "4",
-                            "sectionCode": "011",
-                            "sectionName": "XI-D"
-                        },
-                        {
-                            "_id": "67aad8f65bf1f0cbc8797366",
-                            "sectionId": "ccfec0c0-a53c-45ac-b7f0-fc06857f23ca",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XI-E",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 5,
-                            "sectionCode": "011",
-                            "sectionName": "XI-E",
-                            "assginedStrength": 29
-                        },
-                        {
-                            "_id": "67aad9255bf1f0cbc8797367",
-                            "sectionId": "ae98b617-0b44-4694-a1b0-be7d870f9f62",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XI-F",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 6,
-                            "sectionCode": "011",
-                            "sectionName": "XI-F",
-                            "assginedStrength": 33
-                        },
-                        {
-                            "_id": "67aad9315bf1f0cbc8797368",
-                            "sectionId": "71004fe8-a796-4dda-9bc7-31351515a782",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XI-G",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 7,
-                            "sectionCode": "011",
-                            "sectionName": "XI-G",
-                            "assginedStrength": 16
-                        },
-                        {
-                            "_id": "67aad94f5bf1f0cbc8797369",
-                            "sectionId": "f8d5a9ec-f22c-4952-9d57-e225b2cc34b4",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "XI-H",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 8,
-                            "sectionCode": "011",
-                            "sectionName": "XI-H",
-                            "assginedStrength": 3
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                },
-                {
-                    "classId": "d451f630-f2a2-4f4f-9c90-b6519e82b8ef",
-                    "className": "Grade X",
-                    "classCode": "010",
-                    "description": "Grade X",
-                    "priority": "10",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "e7246465-fe19-4667-9af3-73007dcfbd5a",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67aad8515bf1f0cbc8797361",
-                            "sectionId": "59ebc72b-fe19-409e-8c78-0f7f1f621eb0",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "X-B",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 2,
-                            "sectionCode": "010",
-                            "sectionName": "X-B",
-                            "assginedStrength": 25
-                        },
-                        {
-                            "_id": "67aad8695bf1f0cbc8797362",
-                            "sectionId": "7fa2acab-ec73-428f-8efa-c4d6535c52a4",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "X-A",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 1,
-                            "sectionCode": "010",
-                            "sectionName": "X-A",
-                            "assginedStrength": 24
-                        },
-                        {
-                            "_id": "67af022f775aff71c753902e",
-                            "sectionId": "b50ab0f2-d032-4b59-b9b0-2b4da708d54e",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "X-C",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 40,
-                            "sectionCode": "10C",
-                            "sectionName": "X-C",
-                            "assginedStrength": 26
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                },
-                {
-                    "classId": "43d64508-4d5e-4739-ac86-4ea1b18fa591",
-                    "className": "Grade IX",
-                    "classCode": "009",
-                    "description": "Grade IX",
-                    "priority": "9",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "e1d85347-35a4-4495-8ef4-16a83ce4aeee",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67aad7fe5bf1f0cbc879735d",
-                            "sectionId": "d4a458bc-aa37-4adf-9b95-9870ecbf2191",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "IX-A",
-                            "isActive": true,
-                            "maxStrength": "60",
-                            "priority": 1,
-                            "sectionCode": "009",
-                            "sectionName": "IX-A",
-                            "assginedStrength": 34
-                        },
-                        {
-                            "_id": "67aad8405bf1f0cbc8797360",
-                            "sectionId": "bc3179fa-9c57-4897-9a95-ec649de92822",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "IX-B",
-                            "isActive": true,
-                            "maxStrength": "60",
-                            "priority": 2,
-                            "sectionCode": "009",
-                            "sectionName": "IX-B",
-                            "assginedStrength": 34
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                },
-                {
-                    "classId": "0b0e425c-bf1a-496b-ac2c-46b6ab0b1c97",
-                    "className": "Grade VIII",
-                    "classCode": "008",
-                    "description": "Grade VIII",
-                    "priority": "8",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "d15f3f4e-e9a0-4719-845f-557ae7caa79b",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67aad7ee5bf1f0cbc879735c",
-                            "sectionId": "516af6c3-2fb5-4576-9f48-e69db322aa89",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "VIII-A",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 1,
-                            "sectionCode": "008",
-                            "sectionName": "VIII-A",
-                            "assginedStrength": 26
-                        },
-                        {
-                            "_id": "67aad8355bf1f0cbc879735f",
-                            "sectionId": "885c7acb-b1d8-420f-90c2-a6cb3f4ce2f7",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "VIII-B",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 2,
-                            "sectionCode": "008",
-                            "sectionName": "VIII-B",
-                            "assginedStrength": 24
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                },
-                {
-                    "classId": "13c975e7-0210-4c35-a93c-2facd990fa01",
-                    "className": "Grade VII",
-                    "classCode": "007",
-                    "description": "Grade VII",
-                    "priority": "7",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "21f7870e-6b8c-459c-9a3c-2c6fd3f9a353",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67aad7df5bf1f0cbc879735b",
-                            "sectionId": "9bdec2f0-a9b7-4c40-bcd7-4d718a10301b",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "VII-A",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 1,
-                            "sectionCode": "007",
-                            "sectionName": "VII-A",
-                            "assginedStrength": 20
-                        },
-                        {
-                            "_id": "67aad8165bf1f0cbc879735e",
-                            "sectionId": "266a268c-0a2b-42a4-af94-5c429cf13ac9",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "VII-B",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 2,
-                            "sectionCode": "007",
-                            "sectionName": "VII-B",
-                            "assginedStrength": 20
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                },
-                {
-                    "classId": "e0993f4d-9595-4887-a987-6d14af0616a0",
-                    "className": "Grade VI",
-                    "classCode": "006",
-                    "description": "Grade VI",
-                    "priority": "6",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "0467d3eb-fc55-4079-b5dc-5d56c9ce71ae",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67aad7d35bf1f0cbc879735a",
-                            "sectionId": "daf7c9bf-bd95-45eb-827a-b98cde9341ef",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "VI-A",
-                            "isActive": true,
-                            "maxStrength": "60",
-                            "priority": 1,
-                            "sectionCode": "006",
-                            "sectionName": "VI-A",
-                            "assginedStrength": 21
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                },
-                {
-                    "classId": "5bebb212-3da7-41c5-93ce-d927f3228c06",
-                    "className": "Grade V",
-                    "classCode": "005",
-                    "description": "Grade V",
-                    "priority": "5",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "8385b733-07f0-486f-b444-dc886b5fd861",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67aad7885bf1f0cbc8797359",
-                            "sectionId": "26ea9391-55f2-4f33-8769-ee531a8d4af8",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "V-A",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 1,
-                            "sectionCode": "005",
-                            "sectionName": "V-A",
-                            "assginedStrength": 4
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                },
-                {
-                    "classId": "17741752-76fa-4776-959d-4bb46c95a5e7",
-                    "className": "Grade IV",
-                    "classCode": "004",
-                    "description": "Grade IV",
-                    "priority": "4",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "12368d8b-ee0d-4bbd-bff2-2cae2197ec5e",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67aad7765bf1f0cbc8797358",
-                            "sectionId": "2d98bec5-32f0-4c6a-8413-fd88d1a93a75",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "IV-A",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 1,
-                            "sectionCode": "004",
-                            "sectionName": "IV-A",
-                            "assginedStrength": 2
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                },
-                {
-                    "classId": "7b0bf47b-ff23-419b-8e61-2b1c66a6dd57",
-                    "className": "Grade III",
-                    "classCode": "003",
-                    "description": "Grade III",
-                    "priority": "3",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "1e781f00-d258-4b4c-a7c8-30b7f5a4d093",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67aad7665bf1f0cbc8797357",
-                            "sectionId": "389b5511-ff2e-4bb7-81cc-8202321113cf",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "III-A",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 1,
-                            "sectionCode": "003",
-                            "sectionName": "III-A",
-                            "assginedStrength": 3
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                },
-                {
-                    "classId": "4daefa7d-8987-460d-80ee-18e53c67b00e",
-                    "className": "Grade II",
-                    "classCode": "002",
-                    "description": "Grade II",
-                    "priority": "2",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "acfae67e-48c5-4b31-b618-cabb97f1fb4b",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67aad7585bf1f0cbc8797356",
-                            "sectionId": "77a3408b-5594-4abb-b6b5-b263963ae276",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "II-A",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 1,
-                            "sectionCode": "002",
-                            "sectionName": "II-A"
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                },
-                {
-                    "classId": "cfc0d07e-bd86-4b55-959b-e1db2c633851",
-                    "className": "Grade I",
-                    "classCode": "001",
-                    "description": "Grade I",
-                    "priority": "1",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "f67b3214-efa6-4b0c-943f-e6b41adaa1e5",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67aad7385bf1f0cbc8797355",
-                            "sectionId": "bbc80b4c-be93-4d61-a1f6-59ce86cac31a",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "I-A",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 1,
-                            "sectionCode": "I-A",
-                            "sectionName": "I-A",
-                            "assginedStrength": 3
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                }
-            ],
-            "startDate": "2024-05-31T18:30:00.000Z",
-            "endDate": "2025-05-30T18:30:00.000Z"
-        },
-        {
-            "boardName": "International Baccalaureate",
-            "boardCode": "IB",
-            "assignedBranches": [
-                "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84"
-            ],
-            "description": "International Baccalaureate",
-            "academicCode": "67a3391af6e827bc71c7befa",
-            "academicYear": "2024-2025",
-            "boardId": "8fae8765-518c-4deb-8d35-2f2c5c554720",
-            "boardActivity": true,
-            "classes": [
-                {
-                    "classId": "3883ec51-8846-4abe-a54c-6b2055111015",
-                    "className": "IBCP-AI",
-                    "classCode": "IAI",
-                    "description": "IBCP-AI",
-                    "priority": "1",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "5aa8d0b8-4cd2-4232-ba01-ff05436e739a",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67aada935bf1f0cbc8797371",
-                            "sectionId": "b4279186-51a2-4d46-a52d-b243d39dc462",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "AI-A",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 1,
-                            "sectionCode": "011",
-                            "sectionName": "AI-A"
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                },
-                {
-                    "classId": "d3d28f4e-bb1b-41d0-996d-7188a263b0fb",
-                    "className": "IBCP-BA",
-                    "classCode": "IBA",
-                    "description": "IBCP-BA",
-                    "priority": "2",
-                    "isActivity": true,
-                    "groups": [
-                        {
-                            "groupId": "57deb2c7-0005-474e-94b4-b018883427bb",
-                            "groupName": "NO_GROUP",
-                            "isGroupActivity": true
-                        }
-                    ],
-                    "sections": [
-                        {
-                            "_id": "67aadaa85bf1f0cbc8797372",
-                            "sectionId": "a4e28f5f-8088-47ed-ac4a-2f5a559df0a2",
-                            "autoCreate": false,
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "description": "BA-A",
-                            "isActive": true,
-                            "maxStrength": 40,
-                            "priority": 1,
-                            "sectionCode": "011",
-                            "sectionName": "BA-A"
-                        }
-                    ],
-                    "branches": [
-                        {
-                            "branchId": "8c3e5ac6-0ec1-41d6-8b64-f368036f3a84",
-                            "branchName": "MELUHA INTERNATIONAL SCHOOL"
-                        }
-                    ]
-                }
-            ],
-            "startDate": "2024-05-31T18:30:00.000Z",
-            "endDate": "2025-05-30T18:30:00.000Z"
-        }
-    ]
+const String branchToSectionsJson = '''
+ {
+                "orgId": "675d109151233718e9b76de8",
+                "orgName": "Testing Organization ",
+                "branches": [
+                    {
+                        "branchId": "03788c5e-41a6-44be-a7e9-76f58bf61690",
+                        "branchName": "Branch 1",
+                        "boards": [
+                            {
+                                "boardId": "8ae27b15-a7c9-4c38-8220-a892cd7ae748",
+                                "boardName": "Board 1",
+                                "classes": [
+                                    {
+                                        "classId": "a513e79f-f5b5-485f-9ff3-072a69bbe795",
+                                        "className": "Grade 1",
+                                        "sections": [
+                                            {
+                                                "sectionId": "c8e11add-1285-4b7a-b1e0-fc41604b5de7",
+                                                "sectionName": "Section 1"
+                                            },
+                                            {
+                                                "sectionId": "8c70c3eb-2789-4042-a5c7-47c6b620ada6",
+                                                "sectionName": "SECTION 2"
+                                            },
+                                            {
+                                                "sectionId": "2bbea4ec-0978-4961-8af6-5f58f94afbeb",
+                                                "sectionName": "Section3"
+                                            },
+                                            {
+                                                "sectionId": "9a994151-7613-4063-ab1d-0f7a81ed3eda",
+                                                "sectionName": "Section4"
+                                            },
+                                            {
+                                                "sectionId": "ee8a3e48-76f0-4a40-9ae2-9e42764ea8ed",
+                                                "sectionName": "Section5"
+                                            },
+                                            {
+                                                "sectionId": "5fbba41b-36f3-43ec-80f3-255e0ee0bb78",
+                                                "sectionName": "Section6"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "classId": "3bd41ce2-cb4c-4ac4-86e7-f42ad73a4c4f",
+                                        "className": "Grade2",
+                                        "sections": [
+                                            {
+                                                "sectionId": "38758141-43ba-4afd-8206-553c25c7db48",
+                                                "sectionName": "SECTION 1"
+                                            },
+                                            {
+                                                "sectionId": "c6966f18-b20b-4d61-8eac-be94520a34c1",
+                                                "sectionName": "SEction@2"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "classId": "41e48c86-bd22-48b1-8a9b-566c5f57d8ad",
+                                        "className": "grade 3",
+                                        "sections": []
+                                    }
+                                ]
+                            },
+                            {
+                                "boardId": "27484d28-66a8-4bb7-b907-56161ca22d9d",
+                                "boardName": "Board4",
+                                "classes": [
+                                    {
+                                        "classId": "a0eccc2a-a475-4681-be11-d9d9d19910da",
+                                        "className": "GradeB4",
+                                        "sections": []
+                                    }
+                                ]
+                            },
+                            {
+                                "boardId": "77b33ebe-bc89-4772-84d1-d27185635393",
+                                "boardName": "Board7",
+                                "classes": [
+                                    {
+                                        "classId": "797a9dbe-75c6-408f-85d7-c8425b4245d8",
+                                        "className": "B7Grade",
+                                        "sections": [
+                                            {
+                                                "sectionId": "d84d67e9-0ba6-4808-8692-125c35471799",
+                                                "sectionName": "section1"
+                                            },
+                                            {
+                                                "sectionId": "b274451f-4d2d-4c32-920a-29c014024a05",
+                                                "sectionName": "section2 b7"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "boardId": "220e6a0e-aafb-40c0-bdc5-c041e697ca75",
+                                "boardName": "Board8",
+                                "classes": [
+                                    {
+                                        "classId": "44857f07-d007-4297-9593-e1db4041263d",
+                                        "className": "GradeB8",
+                                        "sections": [
+                                            {
+                                                "sectionId": "3f390196-b88a-4270-bc17-656f0cd34889",
+                                                "sectionName": "SEctkion 1"
+                                            },
+                                            {
+                                                "sectionId": "9f1b9edd-ef51-4e22-95c1-fa7d623a7b14",
+                                                "sectionName": "Section2"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "boardId": "4f09336c-cdde-41db-816c-8e03251cdd52",
+                                "boardName": "Board9",
+                                "classes": [
+                                    {
+                                        "classId": "a8a790bd-7089-4373-bdb0-2373c6caeee1",
+                                        "className": "GinB9",
+                                        "sections": []
+                                    }
+                                ]
+                            },
+                            {
+                                "boardId": "8cedbd8b-4ce2-4817-8fbf-0ba13dd3ecbe",
+                                "boardName": "Board10",
+                                "classes": [
+                                    {
+                                        "classId": "29ed71ce-dc9a-4b33-ad3c-08de91351967",
+                                        "className": "GrB10",
+                                        "sections": [
+                                            {
+                                                "sectionId": "72200b6c-27c9-4f67-ac11-749e245830c0",
+                                                "sectionName": "Section1"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "boardId": "d71f8871-2e67-4cbb-8279-9a42e7709e16",
+                                "boardName": "IB Board",
+                                "classes": [
+                                    {
+                                        "classId": "531d28af-db62-44f0-9b27-51c37c0caa65",
+                                        "className": "IB Grade1",
+                                        "sections": [
+                                            {
+                                                "sectionId": "bef97638-f0bb-41b3-8426-c379482dccbb",
+                                                "sectionName": "IBG1 Section1"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "classId": "67827bdb-690e-4f1a-b8c0-77d3360f7f3d",
+                                        "className": "IB Grade2",
+                                        "sections": [
+                                            {
+                                                "sectionId": "09baf7bd-2a79-422f-82d6-2ec54e550769",
+                                                "sectionName": "IBG2 Section1"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "branchId": "4f4115a6-49c5-4301-8abc-f376050786cf",
+                        "branchName": "Branch2",
+                        "boards": [
+                            {
+                                "boardId": "2a15f240-764a-4d55-ad69-48ffccdc41a9",
+                                "boardName": "Board2",
+                                "classes": [
+                                    {
+                                        "classId": "9143ea99-b889-47cb-ab78-09c9163bc1ed",
+                                        "className": "Grade1-br2",
+                                        "sections": [
+                                            {
+                                                "sectionId": "74d5abeb-48b5-4226-84aa-0522b7eaec46",
+                                                "sectionName": "s2frombr2"
+                                            },
+                                            {
+                                                "sectionId": "9509ecd7-fb57-44f2-a192-93b54af79aad",
+                                                "sectionName": "Section2"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "boardId": "3ed5c2ce-d1ec-46ee-9a60-0f3bdf022c42",
+                                "boardName": "Board3",
+                                "classes": [
+                                    {
+                                        "classId": "a55caa86-158a-431a-9c16-72331f35a081",
+                                        "className": "Grade1",
+                                        "sections": [
+                                            {
+                                                "sectionId": "cd3c1016-4e61-4fde-a583-731355078337",
+                                                "sectionName": "section1"
+                                            },
+                                            {
+                                                "sectionId": "dc80273a-b9d3-4dee-b12a-386173c82fde",
+                                                "sectionName": "Section2"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "boardId": "6dcbdeff-a2f1-4aba-8bd3-f8878d7b8424",
+                                "boardName": "Board5",
+                                "classes": [
+                                    {
+                                        "classId": "30f5b1ca-5d58-4732-a589-b97b584d801b",
+                                        "className": "Grade1",
+                                        "sections": [
+                                            {
+                                                "sectionId": "cea4f0f4-810d-4c01-be16-76058bfd4516",
+                                                "sectionName": "Section 1"
+                                            },
+                                            {
+                                                "sectionId": "63267179-5d51-4c11-a14f-224c6804785e",
+                                                "sectionName": "Section2"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "boardId": "60ffed57-4a87-4a6d-8bbd-f8e5891adbea",
+                                "boardName": "Board6",
+                                "classes": [
+                                    {
+                                        "classId": "a4f428d9-90c0-46e4-b607-544c37ff801f",
+                                        "className": "GradeB6",
+                                        "sections": [
+                                            {
+                                                "sectionId": "44bb01f0-5270-4022-a533-77c6dd36ad23",
+                                                "sectionName": "Section 1"
+                                            },
+                                            {
+                                                "sectionId": "8dcb156a-2dd5-4fe8-8e8b-50893d41be4e",
+                                                "sectionName": "Section2"
+                                            },
+                                            {
+                                                "sectionId": "10e64cef-6b87-4e31-a5ad-1bb3beec87e0",
+                                                "sectionName": "Section3"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "boardId": "d71f8871-2e67-4cbb-8279-9a42e7709e16",
+                                "boardName": "IB Board",
+                                "classes": [
+                                    {
+                                        "classId": "531d28af-db62-44f0-9b27-51c37c0caa65",
+                                        "className": "IB Grade1",
+                                        "sections": []
+                                    },
+                                    {
+                                        "classId": "67827bdb-690e-4f1a-b8c0-77d3360f7f3d",
+                                        "className": "IB Grade2",
+                                        "sections": []
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "branchId": "95b6a356-a72b-4f30-9de7-8801b796f586",
+                        "branchName": "Branch4",
+                        "boards": [
+                            {
+                                "boardId": "8ae27b15-a7c9-4c38-8220-a892cd7ae748",
+                                "boardName": "Board 1",
+                                "classes": [
+                                    {
+                                        "classId": "a513e79f-f5b5-485f-9ff3-072a69bbe795",
+                                        "className": "Grade 1",
+                                        "sections": []
+                                    },
+                                    {
+                                        "classId": "3bd41ce2-cb4c-4ac4-86e7-f42ad73a4c4f",
+                                        "className": "Grade2",
+                                        "sections": []
+                                    },
+                                    {
+                                        "classId": "41e48c86-bd22-48b1-8a9b-566c5f57d8ad",
+                                        "className": "grade 3",
+                                        "sections": []
+                                    }
+                                ]
+                            },
+                            {
+                                "boardId": "2a15f240-764a-4d55-ad69-48ffccdc41a9",
+                                "boardName": "Board2",
+                                "classes": [
+                                    {
+                                        "classId": "9143ea99-b889-47cb-ab78-09c9163bc1ed",
+                                        "className": "Grade1-br2",
+                                        "sections": []
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "branchId": "b8a7ad5c-80c6-4cac-b247-54983ace4aeb",
+                        "branchName": "Branch 710",
+                        "boards": [
+                            {
+                                "boardId": "92c060f8-96d6-4c2b-9bc9-bac123c3fef2",
+                                "boardName": "BoardTest",
+                                "classes": [
+                                    {
+                                        "classId": "9d5c99d5-5fee-4e4e-908d-eef7e0ee6935",
+                                        "className": "GradeTest",
+                                        "sections": [
+                                            {
+                                                "sectionId": "295c73bb-059c-4920-81ec-183b2641853d",
+                                                "sectionName": "SectionTest1"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "branchId": "beafe20e-df5c-44ba-bfe1-eeb37f177b16",
+                        "branchName": "Demo branch",
+                        "boards": [
+                            {
+                                "boardId": "76fc6e90-9a30-4e24-8857-8ae901c7edd0",
+                                "boardName": "CBSE",
+                                "classes": [
+                                    {
+                                        "classId": "927ad2ad-194a-42cc-9744-40c041c693d7",
+                                        "className": "Grade1",
+                                        "sections": [
+                                            {
+                                                "sectionId": "e4af0678-3065-4d74-a29b-aea26d365720",
+                                                "sectionName": "section1"
+                                            },
+                                            {
+                                                "sectionId": "49dbb344-f21f-429f-97d9-c408cce5bdde",
+                                                "sectionName": "section2"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "classId": "6363cd7f-b00d-49ce-b236-7311692876d1",
+                                        "className": "Grade2",
+                                        "sections": [
+                                            {
+                                                "sectionId": "68a807c1-ed7d-47db-983f-c25528d12016",
+                                                "sectionName": "section1"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
 ''';
 
 List<Map<String, dynamic>> getBranches() {
-  return List<Map<String, dynamic>>.from(json.decode(branchesJson));
+  final data = json.decode(branchToSectionsJson);
+  return List<Map<String, dynamic>>.from(data['branches']);
 }
 
-List<Map<String, dynamic>> getBoards() {
-  return List<Map<String, dynamic>>.from(json.decode(boardsJson));
+List<Map<String, dynamic>> getBoards(String branchId) {
+  final branches = getBranches();
+  final branch =
+      branches.firstWhere((b) => b['branchId'] == branchId, orElse: () => {});
+  return branch != null
+      ? List<Map<String, dynamic>>.from(branch['boards'])
+      : [];
+}
+
+List<Map<String, dynamic>> getClasses(String branchId, String boardId) {
+  final boards = getBoards(branchId);
+  final board =
+      boards.firstWhere((b) => b['boardId'] == boardId, orElse: () => {});
+  return board != null ? List<Map<String, dynamic>>.from(board['classes']) : [];
+}
+
+List<Map<String, dynamic>> getSections(
+    String branchId, String boardId, String classId) {
+  final classes = getClasses(branchId, boardId);
+  final classItem =
+      classes.firstWhere((c) => c['classId'] == classId, orElse: () => {});
+  return classItem != null
+      ? List<Map<String, dynamic>>.from(classItem['sections'])
+      : [];
 }

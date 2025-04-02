@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/filter_provider.dart';
-import 'dart:convert';
 import '../constants/constants.dart';
 
 class FilterButtonWidget extends ConsumerWidget {
@@ -26,9 +25,7 @@ class FilterButtonWidget extends ConsumerWidget {
   }
 
   void _showFilterBottomSheet(BuildContext context, WidgetRef ref) {
-    final branches = jsonDecode(branchesJson) as List<dynamic>;
-    final boards = jsonDecode(boardsJson) as List<dynamic>;
-
+    final branches = getBranches();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -37,7 +34,6 @@ class FilterButtonWidget extends ConsumerWidget {
       ),
       builder: (context) => FilterBottomSheet(
         branches: branches,
-        boards: boards,
         onFilterApplied: onFilterApplied,
         onFilterReset: onFilterReset,
       ),
@@ -47,14 +43,12 @@ class FilterButtonWidget extends ConsumerWidget {
 
 class FilterBottomSheet extends ConsumerWidget {
   final List<dynamic> branches;
-  final List<dynamic> boards;
   final VoidCallback? onFilterApplied;
   final VoidCallback? onFilterReset;
 
   const FilterBottomSheet({
     super.key,
     required this.branches,
-    required this.boards,
     this.onFilterApplied,
     this.onFilterReset,
   });
@@ -63,27 +57,17 @@ class FilterBottomSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final filterState = ref.watch(filterStateProvider);
 
-    final availableBoards = filterState.branch != null
-        ? boards
-            .where((board) => (board['assignedBranches'] as List)
-                .contains(filterState.branch))
-            .toList()
-        : [];
+    final availableBoards =
+        filterState.branch != null ? getBoards(filterState.branch!) : [];
 
     final availableClasses = filterState.board != null
-        ? (boards.firstWhere((board) => board['boardId'] == filterState.board,
-                orElse: () => {'classes': []})['classes'] as List)
-            .toList()
+        ? getClasses(filterState.branch!, filterState.board!)
         : [];
 
-    final availableSections =
-        filterState.grade != null && filterState.branch != null
-            ? (availableClasses.firstWhere(
-                    (cls) => cls['classId'] == filterState.grade,
-                    orElse: () => {'sections': []})['sections'] as List)
-                .where((section) => section['branchId'] == filterState.branch)
-                .toList()
-            : [];
+    final availableSections = filterState.grade != null
+        ? getSections(
+            filterState.branch!, filterState.board!, filterState.grade!)
+        : [];
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
@@ -115,8 +99,8 @@ class FilterBottomSheet extends ConsumerWidget {
                       ref: ref,
                       title: 'Branch',
                       items: branches,
-                      valueKey: 'key',
-                      displayKey: 'name',
+                      valueKey: 'branchId',
+                      displayKey: 'branchName',
                       selectedValue: filterState.branch,
                       onSelected: (value) => ref
                           .read(filterStateProvider.notifier)
