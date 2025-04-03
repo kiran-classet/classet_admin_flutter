@@ -59,6 +59,27 @@ class AdminUserNotifier extends StateNotifier<AdminUserState> {
     }
   }
 
+  Future<void> fetchUserDetailsBasedOnAcademicYear(
+      String username, String year) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final response =
+          await _apiService.get('user/details/$username?reqAcademicYear=$year');
+      state = state.copyWith(
+        userDetails: response,
+        isLoading: false,
+      );
+      _saveToPrefs(response);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString(),
+      );
+      _navigationService.navigateTo('/something-went-wrong');
+    }
+  }
+
   Future<void> _saveToPrefs(Map<String, dynamic> data) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('userDetails', jsonEncode(data));
