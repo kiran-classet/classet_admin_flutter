@@ -40,6 +40,12 @@ class FilterButtonWidget extends ConsumerWidget {
   void _showFilterBottomSheet(
       BuildContext context, WidgetRef ref, Map<String, dynamic> userDetails) {
     final branches = FilterDataParser.getBranchesFromUserDetails(userDetails);
+
+    // Load main state into temporary state
+    ref
+        .read(tempFilterStateProvider.notifier)
+        .loadFromMainState(ref.read(filterStateProvider));
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -48,7 +54,7 @@ class FilterButtonWidget extends ConsumerWidget {
       ),
       builder: (context) => FilterBottomSheet(
         branches: branches,
-        userDetails: userDetails, // Pass userDetails to FilterBottomSheet
+        userDetails: userDetails,
         onFilterApplied: onFilterApplied,
         onFilterReset: onFilterReset,
       ),
@@ -72,20 +78,25 @@ class FilterBottomSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final filterState = ref.watch(filterStateProvider);
+    final tempFilterState =
+        ref.watch(tempFilterStateProvider); // Use temporary state
 
-    final availableBoards = filterState.branch != null
-        ? FilterDataParser.getBoardsFromBranch(userDetails, filterState.branch!)
+    final availableBoards = tempFilterState.branch != null
+        ? FilterDataParser.getBoardsFromBranch(
+            userDetails, tempFilterState.branch!)
         : [];
 
-    final availableClasses = filterState.board != null
+    final availableClasses = tempFilterState.board != null
         ? FilterDataParser.getClassesFromBoard(
-            userDetails, filterState.branch!, filterState.board!)
+            userDetails, tempFilterState.branch!, tempFilterState.board!)
         : [];
 
-    final availableSections = filterState.grade != null
-        ? FilterDataParser.getSectionsFromClass(userDetails,
-            filterState.branch!, filterState.board!, filterState.grade!)
+    final availableSections = tempFilterState.grade != null
+        ? FilterDataParser.getSectionsFromClass(
+            userDetails,
+            tempFilterState.branch!,
+            tempFilterState.board!,
+            tempFilterState.grade!)
         : [];
 
     return Container(
@@ -120,12 +131,12 @@ class FilterBottomSheet extends ConsumerWidget {
                       items: branches,
                       valueKey: 'branchId',
                       displayKey: 'branchName',
-                      selectedValue: filterState.branch,
+                      selectedValue: tempFilterState.branch,
                       onSelected: (value) => ref
-                          .read(filterStateProvider.notifier)
+                          .read(tempFilterStateProvider.notifier)
                           .updateBranch(value),
                     ),
-                    if (filterState.branch != null) ...[
+                    if (tempFilterState.branch != null) ...[
                       const SizedBox(height: 24),
                       _buildFilterSection(
                         context: context,
@@ -134,13 +145,13 @@ class FilterBottomSheet extends ConsumerWidget {
                         items: availableBoards,
                         valueKey: 'boardId',
                         displayKey: 'boardName',
-                        selectedValue: filterState.board,
+                        selectedValue: tempFilterState.board,
                         onSelected: (value) => ref
-                            .read(filterStateProvider.notifier)
+                            .read(tempFilterStateProvider.notifier)
                             .updateBoard(value),
                       ),
                     ],
-                    if (filterState.board != null) ...[
+                    if (tempFilterState.board != null) ...[
                       const SizedBox(height: 24),
                       _buildFilterSection(
                         context: context,
@@ -149,13 +160,13 @@ class FilterBottomSheet extends ConsumerWidget {
                         items: availableClasses,
                         valueKey: 'classId',
                         displayKey: 'className',
-                        selectedValue: filterState.grade,
+                        selectedValue: tempFilterState.grade,
                         onSelected: (value) => ref
-                            .read(filterStateProvider.notifier)
+                            .read(tempFilterStateProvider.notifier)
                             .updateGrade(value),
                       ),
                     ],
-                    if (filterState.grade != null) ...[
+                    if (tempFilterState.grade != null) ...[
                       const SizedBox(height: 24),
                       _buildFilterSection(
                         context: context,
@@ -164,9 +175,9 @@ class FilterBottomSheet extends ConsumerWidget {
                         items: availableSections,
                         valueKey: 'sectionId',
                         displayKey: 'sectionName',
-                        selectedValues: filterState.section,
+                        selectedValues: tempFilterState.section,
                         onSelected: (values) => ref
-                            .read(filterStateProvider.notifier)
+                            .read(tempFilterStateProvider.notifier)
                             .updateSections(values),
                         isMultiSelect: true,
                       ),
@@ -329,11 +340,11 @@ class FilterBottomSheet extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
-    final filterState = ref.watch(filterStateProvider);
-    final hasActiveFilters = filterState.branch != null ||
-        filterState.board != null ||
-        filterState.grade != null ||
-        filterState.section.isNotEmpty;
+    final tempFilterState = ref.watch(tempFilterStateProvider);
+    final hasActiveFilters = tempFilterState.branch != null ||
+        tempFilterState.board != null ||
+        tempFilterState.grade != null ||
+        tempFilterState.section.isNotEmpty;
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -371,7 +382,7 @@ class FilterBottomSheet extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      _getActiveFiltersText(filterState),
+                      _getActiveFiltersText(tempFilterState),
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.blue[800],
@@ -390,7 +401,9 @@ class FilterBottomSheet extends ConsumerWidget {
               Expanded(
                 child: OutlinedButton(
                   onPressed: hasActiveFilters
-                      ? () => _showResetConfirmation(context, ref)
+                      ? () => ref
+                          .read(tempFilterStateProvider.notifier)
+                          .resetTempFilters()
                       : null,
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -421,8 +434,8 @@ class FilterBottomSheet extends ConsumerWidget {
                   onPressed: hasActiveFilters
                       ? () {
                           ref
-                              .read(filterStateProvider.notifier)
-                              .saveState(); // Save state explicitly
+                              .read(tempFilterStateProvider.notifier)
+                              .applyTempState(ref); // Apply temp state
                           if (onFilterApplied != null) {
                             onFilterApplied!();
                           }

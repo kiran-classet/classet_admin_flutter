@@ -85,6 +85,11 @@ final filterStateProvider =
   return FilterStateNotifier();
 });
 
+final tempFilterStateProvider =
+    StateNotifierProvider<FilterStateNotifier, FilterState>((ref) {
+  return FilterStateNotifier(); // Separate instance for temporary state
+});
+
 class FilterStateNotifier extends StateNotifier<FilterState> {
   static const String _storageKey = 'filter_state';
   bool _isInitialized = false;
@@ -172,6 +177,19 @@ class FilterStateNotifier extends StateNotifier<FilterState> {
 
   void resetFilters() {
     state = const FilterState(); // Reset to initial empty state
+  }
+
+  void loadFromMainState(FilterState mainState) {
+    state = mainState; // Load main state into temporary state
+  }
+
+  void applyTempState(WidgetRef ref) {
+    ref.read(filterStateProvider.notifier).state =
+        state; // Apply temp state to main state
+  }
+
+  void resetTempFilters() {
+    state = const FilterState(); // Reset temporary state
   }
 
   bool _listEquals<T>(List<T>? a, List<T>? b) {
