@@ -1,3 +1,4 @@
+import 'package:classet_admin/core/providers/filter_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -258,19 +259,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
 
   Future<void> _logout(BuildContext context) async {
     try {
-      context.go('/'); // Ensure this matches your login route
+      // Clear filter state
+      ref.read(filterStateProvider.notifier).clearAllFilters();
 
       final prefs = await SharedPreferences.getInstance();
       String? savedEmail = prefs.getString('email');
       String? savedPassword = prefs.getString('password');
 
-      // Invalidate the providers correctly
-      // await MyAppProviders.invalidateAllProviders(ref);
-
       // Clear all preferences
       await prefs.clear();
 
-      // Save the email and password if they exist
+      // Save back only email and password if remember me was enabled
       if (savedEmail != null) {
         await prefs.setString('email', savedEmail);
       }
@@ -278,10 +277,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
         await prefs.setString('password', savedPassword);
       }
 
-      // Navigate to the login screen (ensure your GoRouter setup is correct)
-      context.go('/login'); // Ensure this matches your login route
+      // Navigate to login
+      context.go('/login');
     } catch (e) {
-      // Handle any errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Logout failed: $e')),
       );

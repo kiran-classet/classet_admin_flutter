@@ -420,6 +420,9 @@ class FilterBottomSheet extends ConsumerWidget {
                 child: ElevatedButton(
                   onPressed: hasActiveFilters
                       ? () {
+                          ref
+                              .read(filterStateProvider.notifier)
+                              .saveState(); // Save state explicitly
                           if (onFilterApplied != null) {
                             onFilterApplied!();
                           }

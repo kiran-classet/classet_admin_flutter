@@ -1,3 +1,4 @@
+import 'package:classet_admin/core/providers/filter_provider.dart';
 import 'package:classet_admin/features/academic/providers/academic_year_provider.dart';
 import 'package:classet_admin/features/auth/providers/login_state.dart';
 import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
@@ -15,7 +16,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final emailController = TextEditingController(text: 'aauadmin');
+  final emailController = TextEditingController(text: 'aauramana');
   final passwordController = TextEditingController(text: 'Classet@123');
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
@@ -105,13 +106,60 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           }
         }
       } else {
+        ref.read(loginProvider.notifier).setLoading(false);
         ref
             .read(loginProvider.notifier)
             .setError('Login failed. Please try again.');
+        context.go('/'); // Ensure this matches your login route
+
+        final prefs = await SharedPreferences.getInstance();
+        String? savedEmail = prefs.getString('email');
+        String? savedPassword = prefs.getString('password');
+
+        // Invalidate the providers correctly
+        // await MyAppProviders.invalidateAllProviders(ref);
+
+        // Clear all preferences
+        await prefs.clear();
+
+        // Save the email and password if they exist
+        if (savedEmail != null) {
+          await prefs.setString('email', savedEmail);
+        }
+        if (savedPassword != null) {
+          await prefs.setString('password', savedPassword);
+        }
+
+        // Navigate to the login screen (ensure your GoRouter setup is correct)
+        context.go('/login');
       }
     } catch (e) {
       ref.read(loginProvider.notifier).setLoading(false);
       ref.read(loginProvider.notifier).setError('Error: $e');
+
+      // Clear filter state
+      ref.read(filterStateProvider.notifier).clearAllFilters();
+
+      final prefs = await SharedPreferences.getInstance();
+      String? savedEmail = prefs.getString('email');
+      String? savedPassword = prefs.getString('password');
+
+      // Invalidate the providers correctly
+      // await MyAppProviders.invalidateAllProviders(ref);
+
+      // Clear all preferences
+      await prefs.clear();
+
+      // Save the email and password if they exist
+      if (savedEmail != null) {
+        await prefs.setString('email', savedEmail);
+      }
+      if (savedPassword != null) {
+        await prefs.setString('password', savedPassword);
+      }
+
+      // Navigate to the login screen (ensure your GoRouter setup is correct)
+      context.go('/login');
     }
   }
 

@@ -92,6 +92,9 @@ class FilterStateNotifier extends StateNotifier<FilterState> {
   FilterStateNotifier() : super(const FilterState()) {
     _loadSavedState();
   }
+  void clearAllFilters() {
+    state = FilterState(); // Reset to initial empty state
+  }
 
   Future<void> _loadSavedState() async {
     try {
@@ -129,7 +132,6 @@ class FilterStateNotifier extends StateNotifier<FilterState> {
         clearGrade: true,
         clearSection: true,
       );
-      _saveState();
     }
   }
 
@@ -140,7 +142,6 @@ class FilterStateNotifier extends StateNotifier<FilterState> {
         clearGrade: true,
         clearSection: true,
       );
-      _saveState();
     }
   }
 
@@ -150,20 +151,27 @@ class FilterStateNotifier extends StateNotifier<FilterState> {
         grade: grade,
         clearSection: true,
       );
-      _saveState();
     }
   }
 
   void updateSections(List<String> sections) {
     if (!_listEquals(sections, state.section)) {
       state = state.copyWith(section: sections);
-      _saveState();
+    }
+  }
+
+  void saveState() async {
+    if (!_isInitialized) return; // Don't save until initial load is complete
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_storageKey, jsonEncode(state.toJson()));
+    } catch (e) {
+      print('Error saving filter state: $e');
     }
   }
 
   void resetFilters() {
-    state = const FilterState();
-    _saveState();
+    state = const FilterState(); // Reset to initial empty state
   }
 
   bool _listEquals<T>(List<T>? a, List<T>? b) {
