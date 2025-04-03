@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:classet_admin/features/academic/providers/academic_year_provider.dart';
-import 'package:lottie/lottie.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -15,6 +14,8 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  bool _isLoading = false; // Add this state variable
+
   @override
   Widget build(BuildContext context) {
     final academicYearState = ref.watch(academicYearProvider);
@@ -33,8 +34,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const SizedBox(height: 20),
                 _buildAcademicYearDropdown(academicYearState),
                 const SizedBox(height: 20),
-                _buildQuickStats(),
-                const SizedBox(height: 20),
                 _buildProfileDetails(),
                 const SizedBox(height: 20),
                 _buildActionButtons(),
@@ -47,6 +46,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildProfileHeader() {
+    final adminUserState = ref.watch(adminUserProvider);
+    final userDetails = adminUserState.userDetails;
+
+    if (userDetails == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final userInfo = userDetails['data']['user_info'];
+    final profileImage = userInfo['studentPhoto']['storageLocation'] ?? '';
+    final name = userInfo['name'] ?? 'N/A';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -58,161 +68,62 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
       child: Column(
         children: [
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              CircleAvatar(
-                radius: 60,
-                backgroundImage: NetworkImage(
-                    'https://misedu-manage.classet.in/profilew.jpg'),
-              ),
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Theme.of(context).primaryColor,
-                    width: 2,
-                  ),
-                ),
-                child: Icon(
-                  Icons.edit,
-                  size: 20,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-            ],
+          CircleAvatar(
+            radius: 60,
+            backgroundImage: NetworkImage(profileImage),
           ),
           const SizedBox(height: 16),
           Text(
-            'Kiran Monangi',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            name.toUpperCase(),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
           ),
           const SizedBox(height: 8),
-          Text(
-            'School Administrator',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.grey[600],
-                ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'ID: ADM001',
-            style: TextStyle(
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickStats() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildStatItem('Experience', '5+ Years'),
-          _buildStatItem('Department', 'Administration'),
-          _buildStatItem('Status', 'Active'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 12,
-            ),
-          ),
         ],
       ),
     );
   }
 
   Widget _buildProfileDetails() {
+    final adminUserState = ref.watch(adminUserProvider);
+    final userDetails = adminUserState.userDetails;
+
+    if (userDetails == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final userInfo = userDetails['data']['user_info'];
+    final email = userInfo['email'] ?? 'N/A';
+    final phone = userInfo['phone_number'] ?? 'N/A';
+    final address = 'Hyderabad, Telangana'; // Placeholder
+    final education = 'M.Tech'; // Placeholder
+    final specialization = userInfo['roles']?.isNotEmpty ?? false
+        ? 'School Administration'
+        : 'N/A'; // Placeholder
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Card(
-        elevation: 2,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Column(
           children: [
-            _buildDetailItem(
-                Icons.email, 'Email', 'kiran.monangi@classet.com', ''),
+            _buildDetailItem(Icons.email, 'Email', email, ''),
             const Divider(),
-            _buildDetailItem(Icons.phone, 'Phone', '+91 9876543210', ''),
+            _buildDetailItem(Icons.phone, 'Phone', phone, ''),
             const Divider(),
-            _buildDetailItem(
-                Icons.location_on, 'Address', 'Hyderabad, Telangana', ''),
+            _buildDetailItem(Icons.location_on, 'Address', address, ''),
             const Divider(),
-            _buildDetailItem(Icons.school, 'Education', 'M.Tech', ''),
+            _buildDetailItem(Icons.school, 'Education', education, ''),
             const Divider(),
-            _buildDetailItem(
-                Icons.work, 'Specialization', 'School Administration', ''),
+            _buildDetailItem(Icons.work, 'Specialization', specialization, ''),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _logout(BuildContext context) async {
-    try {
-      // Clear filter state
-      ref.read(filterStateProvider.notifier).clearAllFilters();
-
-      final prefs = await SharedPreferences.getInstance();
-      String? savedEmail = prefs.getString('email');
-      String? savedPassword = prefs.getString('password');
-
-      // Clear all preferences
-      await prefs.clear();
-
-      // Save back only email and password if remember me was enabled
-      if (savedEmail != null) {
-        await prefs.setString('email', savedEmail);
-      }
-      if (savedPassword != null) {
-        await prefs.setString('password', savedPassword);
-      }
-
-      // Navigate to login
-      context.go('/login');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Logout failed: $e')),
-      );
-    }
   }
 
   Widget _buildDetailItem(
@@ -247,7 +158,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final adminUserState = ref.watch(adminUserProvider);
     final userDetails = adminUserState.userDetails;
 
-    // Early return if userDetails or academic years are not available
     if (userDetails == null ||
         userDetails['data']['user_info']['academicYears'] == null) {
       return const SizedBox.shrink();
@@ -262,7 +172,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Card(
-        elevation: 2,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -287,18 +200,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 }).toList(),
                 onChanged: (value) async {
                   if (value != null) {
-                    // Update academic year in provider
-                    ref
-                        .read(academicYearProvider.notifier)
-                        .setSelectedAcademicYear(value);
+                    setState(() {
+                      _isLoading = true; // Show loader
+                    });
 
-                    // Fetch updated user details based on selected academic year
                     await ref
                         .read(adminUserProvider.notifier)
                         .fetchUserDetailsBasedOnAcademicYear(username, value);
+
+                    setState(() {
+                      _isLoading = false; // Hide loader
+                    });
                   }
                 },
               ),
+              if (_isLoading)
+                const Padding(
+                  padding: EdgeInsets.only(top: 8.0),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
             ],
           ),
         ),
@@ -311,41 +231,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          _buildActionButton(
-            'Change Password',
-            Icons.lock,
-            Colors.blue,
-            () {
-              // TODO: Implement change password
-            },
-          ),
-          const SizedBox(height: 12),
-          _buildActionButton(
-            'Notification Settings',
-            Icons.notifications,
-            Colors.orange,
-            () {
-              // TODO: Implement notification settings
-            },
-          ),
-          const SizedBox(height: 12),
-          _buildActionButton(
-            'Privacy Settings',
-            Icons.security,
-            Colors.green,
-            () {
-              // TODO: Implement privacy settings
-            },
-          ),
-          const SizedBox(height: 12),
-          _buildActionButton(
-            'Help & Support',
-            Icons.help,
-            Colors.purple,
-            () {
-              // TODO: Implement help & support
-            },
-          ),
           const SizedBox(height: 12),
           _buildActionButton(
             'Logout',
@@ -353,7 +238,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Colors.red,
             () {
               _logout(context);
-              // TODO: Implement logout
             },
           ),
         ],
@@ -387,5 +271,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    try {
+      ref.read(filterStateProvider.notifier).clearAllFilters();
+
+      final prefs = await SharedPreferences.getInstance();
+      String? savedEmail = prefs.getString('email');
+      String? savedPassword = prefs.getString('password');
+
+      await prefs.clear();
+
+      if (savedEmail != null) {
+        await prefs.setString('email', savedEmail);
+      }
+      if (savedPassword != null) {
+        await prefs.setString('password', savedPassword);
+      }
+
+      context.go('/login');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Logout failed: $e')),
+      );
+    }
   }
 }
