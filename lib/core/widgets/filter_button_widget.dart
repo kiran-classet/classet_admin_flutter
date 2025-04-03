@@ -1,6 +1,8 @@
+import 'package:classet_admin/core/utils/filter_data_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/filter_provider.dart';
+import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 import '../constants/constants.dart';
 
 class FilterButtonWidget extends ConsumerWidget {
@@ -15,8 +17,19 @@ class FilterButtonWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final adminUserState = ref.watch(adminUserProvider);
+    final userDetails = adminUserState.userDetails;
+
     return FloatingActionButton(
-      onPressed: () => _showFilterBottomSheet(context, ref),
+      onPressed: () {
+        if (userDetails != null) {
+          _showFilterBottomSheet(context, ref, userDetails);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('User details not available')),
+          );
+        }
+      },
       tooltip: 'Filter',
       backgroundColor: Colors.blue[600],
       foregroundColor: Colors.white,
@@ -24,8 +37,9 @@ class FilterButtonWidget extends ConsumerWidget {
     );
   }
 
-  void _showFilterBottomSheet(BuildContext context, WidgetRef ref) {
-    final branches = getBranches();
+  void _showFilterBottomSheet(
+      BuildContext context, WidgetRef ref, Map<String, dynamic> userDetails) {
+    final branches = FilterDataParser.getBranchesFromUserDetails(userDetails);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -34,6 +48,7 @@ class FilterButtonWidget extends ConsumerWidget {
       ),
       builder: (context) => FilterBottomSheet(
         branches: branches,
+        userDetails: userDetails, // Pass userDetails to FilterBottomSheet
         onFilterApplied: onFilterApplied,
         onFilterReset: onFilterReset,
       ),
@@ -43,12 +58,14 @@ class FilterButtonWidget extends ConsumerWidget {
 
 class FilterBottomSheet extends ConsumerWidget {
   final List<dynamic> branches;
+  final Map<String, dynamic> userDetails; // Add userDetails parameter
   final VoidCallback? onFilterApplied;
   final VoidCallback? onFilterReset;
 
   const FilterBottomSheet({
     super.key,
     required this.branches,
+    required this.userDetails, // Initialize userDetails
     this.onFilterApplied,
     this.onFilterReset,
   });
@@ -57,15 +74,17 @@ class FilterBottomSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final filterState = ref.watch(filterStateProvider);
 
-    final availableBoards =
-        filterState.branch != null ? getBoards(filterState.branch!) : [];
+    final availableBoards = filterState.branch != null
+        ? FilterDataParser.getBoardsFromBranch(userDetails, filterState.branch!)
+        : [];
 
     final availableClasses = filterState.board != null
-        ? getClasses(filterState.branch!, filterState.board!)
+        ? FilterDataParser.getClassesFromBoard(
+            userDetails, filterState.branch!, filterState.board!)
         : [];
 
     final availableSections = filterState.grade != null
-        ? getSections(
+        ? FilterDataParser.getSectionsFromClass(userDetails,
             filterState.branch!, filterState.board!, filterState.grade!)
         : [];
 
