@@ -1,3 +1,4 @@
+import 'package:classet_admin/core/utils/filter_data_parser.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -110,13 +111,52 @@ class FilterStateNotifier extends StateNotifier<FilterState> {
         if (decodedState is Map<String, dynamic>) {
           state = FilterState.fromJson(decodedState);
         }
+      } else {
+        // Set default values for the first time
+        final userDetails = await _getUserDetails(); // Fetch user details
+        if (userDetails != null) {
+          final branches =
+              FilterDataParser.getBranchesFromUserDetails(userDetails);
+          if (branches.isNotEmpty) {
+            final firstBranch = branches.first['branchId'];
+            final boards =
+                FilterDataParser.getBoardsFromBranch(userDetails, firstBranch);
+            final firstBoard =
+                boards.isNotEmpty ? boards.first['boardId'] : null;
+            final classes = firstBoard != null
+                ? FilterDataParser.getClassesFromBoard(
+                    userDetails, firstBranch, firstBoard)
+                : [];
+            final firstClass =
+                classes.isNotEmpty ? classes.first['classId'] : null;
+            final sections = firstClass != null
+                ? FilterDataParser.getSectionsFromClass(
+                    userDetails, firstBranch, firstBoard!, firstClass)
+                : [];
+            final firstSection =
+                sections.isNotEmpty ? [sections.first['sectionId']] : [];
+
+            state = FilterState(
+              branch: firstBranch,
+              board: firstBoard,
+              grade: firstClass,
+              section: firstSection.cast<String>(),
+            );
+          }
+        }
       }
     } catch (e) {
-      // If there's any error loading the state, keep the default empty state
       print('Error loading filter state: $e');
     } finally {
       _isInitialized = true;
     }
+  }
+
+// Add a helper method to fetch user details
+  Future<Map<String, dynamic>?> _getUserDetails() async {
+    // Replace this with the actual logic to fetch user details
+    // For example, you might fetch it from a provider or API
+    return null;
   }
 
   Future<void> _saveState() async {

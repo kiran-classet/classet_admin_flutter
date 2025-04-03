@@ -20,6 +20,39 @@ class FilterButtonWidget extends ConsumerWidget {
     final adminUserState = ref.watch(adminUserProvider);
     final userDetails = adminUserState.userDetails;
 
+    // Initialize default filter state if not already set
+    if (userDetails != null && ref.read(filterStateProvider).branch == null) {
+      Future.microtask(() {
+        final branches =
+            FilterDataParser.getBranchesFromUserDetails(userDetails);
+        if (branches.isNotEmpty) {
+          final firstBranch = branches.first['branchId'];
+          final boards =
+              FilterDataParser.getBoardsFromBranch(userDetails, firstBranch);
+          final firstBoard = boards.isNotEmpty ? boards.first['boardId'] : null;
+          final classes = firstBoard != null
+              ? FilterDataParser.getClassesFromBoard(
+                  userDetails, firstBranch, firstBoard)
+              : [];
+          final firstClass =
+              classes.isNotEmpty ? classes.first['classId'] : null;
+          final sections = firstClass != null
+              ? FilterDataParser.getSectionsFromClass(
+                  userDetails, firstBranch, firstBoard!, firstClass)
+              : [];
+          final firstSection =
+              sections.isNotEmpty ? [sections.first['sectionId']] : [];
+
+          ref.read(filterStateProvider.notifier).state = FilterState(
+            branch: firstBranch,
+            board: firstBoard,
+            grade: firstClass,
+            section: firstSection.cast<String>(),
+          );
+        }
+      });
+    }
+
     return FloatingActionButton(
       onPressed: () {
         if (userDetails != null) {
@@ -114,6 +147,8 @@ class FilterBottomSheet extends ConsumerWidget {
         ],
       ),
       child: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment.start, // Align content to the top
         children: [
           _buildHeader(context),
           Expanded(
