@@ -67,19 +67,7 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/icons/default_icon.png"
   adaptive_icon_background: "#ffffff"
-  adaptive_icon_foreground: "assets/icons/default_icon_foreground.png"
-  # Define multiple icons
-  icons:
-    - image_path: "assets/icons/abhyasa_icon.png"
-      adaptive_icon_foreground: "assets/icons/abhyasa_foreground.png"
-      adaptive_icon_background: "#ffffff"
-      android: "launcher_icon_abhyasa"
-      ios: "AppIcon-abhyasa"
-    - image_path: "assets/icons/kshetra_icon.png"
-      adaptive_icon_foreground: "assets/icons/kshetra_foreground.png"
-      adaptive_icon_background: "#ffffff"
-      android: "launcher_icon_kshetra"
-      ios: "AppIcon-kshetra"
+  # Removed multiple icons configuration
 
 # The following section is specific to Flutter packages.
 flutter:

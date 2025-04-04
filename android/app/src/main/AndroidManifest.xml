@@ -36,19 +36,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
-        <!-- New Year icon alias -->
-        <activity-alias
-            android:name=".MainActivityAbhyasa"
-            android:enabled="false"
-            android:exported="true"
-            android:icon="@mipmap/abhyasa"
-            android:targetActivity=".MainActivity"
-            android:theme="@style/LaunchTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

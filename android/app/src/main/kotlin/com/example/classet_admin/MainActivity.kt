@@ -10,15 +10,8 @@ class MainActivity: FlutterActivity() {
     override fun onCreate(@NonNull savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "onCreate called")
-        updateIcon()
+        // Removed updateIcon() call
     }
 
-    private fun updateIcon() {
-        try {
-            IconManager(this).updateAppIcon()
-        } catch (e: Exception) {
-            Log.e("MainActivity", "Error updating icon", e)
-            e.printStackTrace()
-        }
-    }
+    // Removed updateIcon method
 }
