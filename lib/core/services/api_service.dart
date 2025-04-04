@@ -7,7 +7,8 @@ class ApiService {
   static const String productionBaseUrl =
       'https://8bzo5ffosh.execute-api.ap-south-1.amazonaws.com/sasdev/v1/data';
 
-  static const String localhostBaseUrl = 'http://192.168.0.114:4000/v1/data/';
+  // static const String localhostBaseUrl = 'http://192.168.0.114:4000/v1/data/';
+  static const String localhostBaseUrl = 'http://192.168.1.12:4000/v1/data/';
 
   static const String baseUrl =
       localhostBaseUrl; // Switch to productionBaseUrl for production.

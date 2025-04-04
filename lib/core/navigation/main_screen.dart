@@ -13,17 +13,19 @@ import 'package:classet_admin/features/timetable/views/timetable_screen.dart';
 import 'package:classet_admin/features/transport/views/transport_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:classet_admin/features/dashboard/views/home_screen.dart';
+import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Main screen
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends ConsumerState<MainScreen> {
   int _selectedIndex = 0;
   int _selectedDrawerIndex = 0;
   final int _notificationCount = 0; // Add this variable
@@ -80,9 +82,35 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final adminUserState = ref.watch(adminUserProvider);
+    final userDetails = adminUserState.userDetails;
+
+    String userName = 'User';
+    String userPhoto = '';
+
+    if (userDetails != null) {
+      final userInfo = userDetails['data']['user_info'];
+      userName = userInfo['name'] ?? 'User';
+      userPhoto = userInfo['studentPhoto']['storageLocation'] ?? '';
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
+        title: Row(
+          children: [
+            if (userPhoto.isNotEmpty)
+              // CircleAvatar(
+              //   radius: 16,
+              //   backgroundImage: NetworkImage(userPhoto),
+              // ),
+              // if (userPhoto.isNotEmpty) const SizedBox(width: 8),
+              Text(
+                'Classet',
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+          ],
+        ),
         actions: [
           // Notification Icon with Badge
           Stack(
@@ -126,6 +154,8 @@ class _MainScreenState extends State<MainScreen> {
       drawer: CustomDrawer(
         selectedIndex: _selectedDrawerIndex,
         onItemTapped: _onDrawerItemTapped,
+        userName: userName,
+        userPhoto: userPhoto,
       ),
       body: PageView(
         controller: _pageController,
@@ -149,11 +179,15 @@ class _MainScreenState extends State<MainScreen> {
 class CustomDrawer extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onItemTapped;
+  final String userName;
+  final String userPhoto;
 
   const CustomDrawer({
     super.key,
     required this.selectedIndex,
     required this.onItemTapped,
+    required this.userName,
+    required this.userPhoto,
   });
 
   @override
@@ -170,29 +204,24 @@ class CustomDrawer extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 40,
-                    backgroundImage: NetworkImage(
-                        'https://classet-profiles-old.s3.ap-south-1.amazonaws.com/uploads/1739512678367kiran.jpg'),
+                    backgroundImage: userPhoto.isNotEmpty
+                        ? NetworkImage(userPhoto)
+                        : const AssetImage('assets/images/default_avatar.png')
+                            as ImageProvider,
                   ),
                   const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Text(
-                        'Kiran Monangi',
-                        style: TextStyle(
+                        userName.toUpperCase(),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Designation',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
                         ),
                       ),
                     ],
