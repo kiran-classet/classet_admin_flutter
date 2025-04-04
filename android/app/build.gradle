@@ -57,10 +57,10 @@ android {
     
     flavorDimensions "environment"
     productFlavors {
-        development {
+        abhyasa {
             dimension "environment"
-            applicationIdSuffix ".dev"
-            resValue "string", "app_name", "Dev Classet"
+            applicationIdSuffix ".abhyasa"
+            resValue "string", "app_name", "abhyasa Classet"
         }
         staging {
             dimension "environment"
