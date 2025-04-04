@@ -60,12 +60,12 @@ android {
         abhyasa {
             dimension "environment"
             applicationIdSuffix ".abhyasa"
-            resValue "string", "app_name", "abhyasa Classet"
+            resValue "string", "app_name", "abhyasa-Classet"
         }
-        staging {
+        meluha {
             dimension "environment"
-            applicationIdSuffix ".stg"
-            resValue "string", "app_name", "Stag Classet"
+            applicationIdSuffix ".meluha"
+            resValue "string", "app_name", "meluha-Classet"
         }
         production {
             dimension "environment"
