@@ -1,4 +1,4 @@
-package com.example.classet_admin
+package com.classet_admin
 
 import io.flutter.embedding.android.FlutterActivity
 
