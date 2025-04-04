@@ -54,6 +54,24 @@ android {
             minifyEnabled true
         }
     }
+    
+    flavorDimensions "environment"
+    productFlavors {
+        development {
+            dimension "environment"
+            applicationIdSuffix ".dev"
+            resValue "string", "app_name", "Dev Classet"
+        }
+        staging {
+            dimension "environment"
+            applicationIdSuffix ".stg"
+            resValue "string", "app_name", "Stag Classet"
+        }
+        production {
+            dimension "environment"
+            resValue "string", "app_name", "Classet"
+        }
+    }
 }
 
 flutter {
