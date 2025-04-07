@@ -1,10 +1,9 @@
-import 'package:classet_admin/core/constants/constants.dart';
 import 'package:classet_admin/core/widgets/filter_button_widget.dart';
+import 'package:classet_admin/features/dashboard/views/attendance_quick_actions_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
-import 'dart:convert';
 
 // Filter provider
 final filterProvider = StateProvider<Map<String, dynamic>>((ref) => {
@@ -47,12 +46,6 @@ class HomeScreen extends ConsumerWidget {
                 adminUserState.isLoading
                     ? _buildShimmerEffect()
                     : _buildQuickActions(context),
-                const SizedBox(height: 20),
-                _buildSectionTitle(context, 'Recent Activities'),
-                const SizedBox(height: 10),
-                adminUserState.isLoading
-                    ? _buildShimmerEffect()
-                    : _buildRecentActivities(context),
                 const SizedBox(height: 20),
                 adminUserState.isLoading
                     ? _buildShimmerEffect()
@@ -195,8 +188,8 @@ class HomeScreen extends ConsumerWidget {
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
       children: [
-        _buildActionItem(context, 'Admissions', Icons.school, Colors.blue),
         _buildActionItem(context, 'Attendance', Icons.fact_check, Colors.green),
+        _buildActionItem(context, 'Admissions', Icons.school, Colors.blue),
         _buildActionItem(
             context, 'Finance', Icons.account_balance_wallet, Colors.purple),
         _buildActionItem(
@@ -208,7 +201,16 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildActionItem(
       BuildContext context, String label, IconData icon, Color color) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        if (label == 'Attendance') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AttendanceQuickActionsPage(),
+            ),
+          );
+        }
+      },
       child: Container(
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
@@ -232,92 +234,6 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRecentActivities(BuildContext context) {
-    return Card(
-      elevation: 2,
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: 5,
-        itemBuilder: (context, index) {
-          return _buildActivityItem(context, _getActivityData(index));
-        },
-      ),
-    );
-  }
-
-  Map<String, dynamic> _getActivityData(int index) {
-    final activities = [
-      {
-        'title': 'New Admission',
-        'description': 'John Doe admitted to Class 10-A',
-        'time': '2 hours ago',
-        'icon': Icons.person_add,
-        'color': Colors.green,
-      },
-      {
-        'title': 'Fee Collection',
-        'description': 'Received ₹25,000 from Class 9 students',
-        'time': '3 hours ago',
-        'icon': Icons.payment,
-        'color': Colors.blue,
-      },
-      {
-        'title': 'Attendance Update',
-        'description': 'Class 8 attendance marked for today',
-        'time': '4 hours ago',
-        'icon': Icons.fact_check,
-        'color': Colors.orange,
-      },
-      {
-        'title': 'Transport Alert',
-        'description': 'Bus 02 route updated for evening schedule',
-        'time': '5 hours ago',
-        'icon': Icons.directions_bus,
-        'color': Colors.purple,
-      },
-      {
-        'title': 'Teacher Diary',
-        'description': 'Mathematics class notes updated for Class 10',
-        'time': '6 hours ago',
-        'icon': Icons.book,
-        'color': Colors.red,
-      },
-    ];
-    return activities[index];
-  }
-
-  Widget _buildActivityItem(
-      BuildContext context, Map<String, dynamic> activity) {
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: activity['color'].withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          activity['icon'],
-          color: activity['color'],
-        ),
-      ),
-      title: Text(
-        activity['title'],
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      subtitle: Text(activity['description']),
-      trailing: Text(
-        activity['time'],
-        style: TextStyle(
-          color: Colors.grey[600],
-          fontSize: 12,
         ),
       ),
     );

@@ -1,5 +1,4 @@
 import 'package:classet_admin/core/providers/filter_provider.dart';
-import 'package:classet_admin/features/academic/providers/academic_year_provider.dart';
 import 'package:classet_admin/features/auth/providers/login_state.dart';
 import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +15,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final emailController = TextEditingController(text: '');
-  final passwordController = TextEditingController(text: '');
+  final emailController = TextEditingController(text: 'aauramana');
+  final passwordController = TextEditingController(text: 'Classet@123');
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
 
