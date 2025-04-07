@@ -16,8 +16,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final emailController = TextEditingController(text: 'aauramana');
-  final passwordController = TextEditingController(text: 'Classet@123');
+  final emailController = TextEditingController(text: '');
+  final passwordController = TextEditingController(text: '');
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
 
@@ -180,143 +180,162 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             end: Alignment.bottomRight,
           ),
         ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Card(
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      'SIGN IN',
-                      style:
-                          TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Card(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Please sign in with your account',
-                      style: TextStyle(fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    TextField(
-                      controller: emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        labelText: 'Username',
-                        prefixIcon: Icon(Icons.person),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: passwordController,
-                      obscureText: !_isPasswordVisible,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        labelText: 'Password',
-                        prefixIcon: Icon(Icons.lock),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isPasswordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            'SIGN IN',
+                            style: TextStyle(
+                                fontSize: 32, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordVisible = !_isPasswordVisible;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _rememberMe,
-                          onChanged: (value) {
-                            setState(() {
-                              _rememberMe = value ?? false;
-                            });
-                          },
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _rememberMe = !_rememberMe;
-                            });
-                          },
-                          child: const Text('Remember Me'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    if (loginState.isLoading || adminUserState.isLoading)
-                      Container(
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 1, 131, 238),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Center(
-                          child: SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                              strokeWidth: 2.5,
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Please sign in with your account',
+                            style: TextStyle(fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+                          TextField(
+                            controller: emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              labelText: 'Username',
+                              prefixIcon: Icon(Icons.person),
                             ),
                           ),
-                        ),
-                      )
-                    else ...[
-                      ElevatedButton(
-                        onPressed: _signIn,
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor:
-                              const Color.fromARGB(255, 1, 131, 238),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: passwordController,
+                            obscureText: !_isPasswordVisible,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              labelText: 'Password',
+                              prefixIcon: Icon(Icons.lock),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _isPasswordVisible
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _isPasswordVisible = !_isPasswordVisible;
+                                  });
+                                },
+                              ),
+                            ),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        ),
-                        child: const Text(
-                          'Sign In',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: _rememberMe,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _rememberMe = value ?? false;
+                                  });
+                                },
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _rememberMe = !_rememberMe;
+                                  });
+                                },
+                                child: const Text('Remember Me'),
+                              ),
+                            ],
                           ),
-                        ),
+                          const SizedBox(height: 24),
+                          if (loginState.isLoading || adminUserState.isLoading)
+                            Container(
+                              height: 56,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 1, 131, 238),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                    strokeWidth: 2.5,
+                                  ),
+                                ),
+                              ),
+                            )
+                          else ...[
+                            ElevatedButton(
+                              onPressed: _signIn,
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor:
+                                    const Color.fromARGB(255, 1, 131, 238),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16.0),
+                              ),
+                              child: const Text(
+                                'Sign In',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            if (loginState.errorMessage != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: Text(
+                                  loginState.errorMessage!,
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                          ],
+                        ],
                       ),
-                      if (loginState.errorMessage != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16.0),
-                          child: Text(
-                            loginState.errorMessage!,
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                    ],
-                  ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                '© MELUHA TECHNOLOGIES PRIVATE LIMITED',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
         ),
       ),
     );

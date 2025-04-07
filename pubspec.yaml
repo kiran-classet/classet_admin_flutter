@@ -108,3 +108,13 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+
+
+
+
+# get aab file command 
+# flutter build appbundle --release --flavor meluha --dart-define=FLAVOR=meluha
+
+# get apk file command
+# flutter build apk --release --flavor meluha --dart-define=FLAVOR=meluha

@@ -4,7 +4,28 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    
+        {
+            "name": "meluha debug",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": [
+                "--flavor",
+                "meluha",
+                "--dart-define=FLAVOR=meluha"
+            ]
+        },
+        {
+            "name": "abhyasa debug",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": [
+                "--flavor",
+                "abhyasa",
+                "--dart-define=FLAVOR=abhyasa"
+            ]
+        },
         {
             "name": "classet_admin",
             "request": "launch",

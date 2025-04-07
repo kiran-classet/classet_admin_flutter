@@ -4,14 +4,16 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
+  // static const String productionBaseUrl ='https://8bzo5ffosh.execute-api.ap-south-1.amazonaws.com/sasdev/v1/data';
+
   static const String productionBaseUrl =
-      'https://8bzo5ffosh.execute-api.ap-south-1.amazonaws.com/sasdev/v1/data';
+      'https://d0xfkv0fi4.execute-api.ap-south-2.amazonaws.com/sasprod/v1/data/';
 
   // static const String localhostBaseUrl = 'http://192.168.0.114:4000/v1/data/';
   static const String localhostBaseUrl = 'http://192.168.1.12:4000/v1/data/';
 
   static const String baseUrl =
-      localhostBaseUrl; // Switch to productionBaseUrl for production.
+      productionBaseUrl; // Switch to productionBaseUrl for production.
 
   // Generic GET request
   Future<dynamic> get(String endpoint) async {

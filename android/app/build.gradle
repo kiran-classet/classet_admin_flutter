@@ -65,7 +65,7 @@ android {
         meluha {
             dimension "environment"
             applicationIdSuffix ".meluha"
-            resValue "string", "app_name", "meluha-Classet"
+            resValue "string", "app_name", "Meluha-Classet"
         }
         production {
             dimension "environment"

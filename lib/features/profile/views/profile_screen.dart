@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:classet_admin/features/academic/providers/academic_year_provider.dart';
+import 'privacy_policy_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -26,19 +27,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).padding.bottom + 10.0,
           ),
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              children: [
-                _buildProfileHeader(),
-                const SizedBox(height: 20),
-                _buildAcademicYearDropdown(academicYearState),
-                const SizedBox(height: 20),
-                _buildProfileDetails(),
-                const SizedBox(height: 20),
-                _buildActionButtons(),
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      _buildProfileHeader(),
+                      const SizedBox(height: 20),
+                      _buildAcademicYearDropdown(academicYearState),
+                      const SizedBox(height: 20),
+                      _buildProfileDetails(),
+                      const SizedBox(height: 20),
+                      _buildActionButtons(),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  '© MELUHA TECHNOLOGIES PRIVATE LIMITED',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -231,6 +250,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
+          const SizedBox(height: 12),
+          _buildActionButton(
+            'Privacy Policy',
+            Icons.privacy_tip,
+            Colors.blue,
+            () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PrivacyPolicyScreen(),
+                ),
+              );
+            },
+          ),
           const SizedBox(height: 12),
           _buildActionButton(
             'Logout',
