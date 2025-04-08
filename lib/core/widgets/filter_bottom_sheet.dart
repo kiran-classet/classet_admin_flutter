@@ -156,7 +156,8 @@ class FilterBottomSheet extends ConsumerWidget {
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Padding(
-                const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(
+                    16), // Add the required padding parameter
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
