@@ -7,13 +7,11 @@ import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 class FilterButtonWidget extends ConsumerWidget {
   final VoidCallback? onFilterApplied;
   final VoidCallback? onFilterReset;
-  final bool showSections; // Add parameter to control section visibility
 
   const FilterButtonWidget({
     super.key,
     this.onFilterApplied,
     this.onFilterReset,
-    this.showSections = false, // Default to false
   });
 
   @override
@@ -89,7 +87,6 @@ class FilterButtonWidget extends ConsumerWidget {
       builder: (context) => FilterBottomSheet(
         branches: branches,
         userDetails: userDetails,
-        showSections: showSections, // Pass the parameter
         onFilterApplied: onFilterApplied,
         onFilterReset: onFilterReset,
       ),
@@ -99,15 +96,15 @@ class FilterButtonWidget extends ConsumerWidget {
 
 class FilterBottomSheet extends ConsumerWidget {
   final List<dynamic> branches;
-  final Map<String, dynamic> userDetails; // Add userDetails parameter
+  final Map<String, dynamic> userDetails;
   final VoidCallback? onFilterApplied;
   final VoidCallback? onFilterReset;
-  final bool showSections; // Add showSections parameter
+  final bool showSections; // Add parameter to control section visibility
 
   const FilterBottomSheet({
     super.key,
     required this.branches,
-    required this.userDetails, // Initialize userDetails
+    required this.userDetails,
     this.onFilterApplied,
     this.onFilterReset,
     this.showSections = false, // Default to false
@@ -159,7 +156,7 @@ class FilterBottomSheet extends ConsumerWidget {
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -205,7 +202,7 @@ class FilterBottomSheet extends ConsumerWidget {
                             .updateGrade(value),
                       ),
                     ],
-                    if (showSections && tempFilterState.grade != null) ...[
+                    if (tempFilterState.grade != null && showSections) ...[
                       const SizedBox(height: 24),
                       _buildFilterSection(
                         context: context,

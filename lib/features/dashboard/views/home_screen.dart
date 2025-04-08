@@ -60,8 +60,8 @@ class HomeScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FilterButtonWidget(
+        showSections: false, // Do not show sections in Home screen
         onFilterApplied: () {
-          // Remove _showFilterBottomSheet call
           final currentFilters = ref.read(filterProvider);
           print('Applied filters: $currentFilters');
         },
