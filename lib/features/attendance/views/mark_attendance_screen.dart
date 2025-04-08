@@ -95,6 +95,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
         ],
       ),
       floatingActionButton: FilterButtonWidget(
+        openBottomSheet: true,
         showSections: true, // Show sections in Mark Attendance screen
         onFilterApplied: () {
           print('Applied filters: $_filters');

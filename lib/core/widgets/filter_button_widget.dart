@@ -9,6 +9,7 @@ class FilterButtonWidget extends ConsumerWidget {
   final VoidCallback? onFilterReset;
   final bool showSections; // Add parameter to control section visibility
   final bool isSingleSectionsSelection; // Add parameter
+  final bool openBottomSheet;
 
   const FilterButtonWidget({
     super.key,
@@ -16,10 +17,39 @@ class FilterButtonWidget extends ConsumerWidget {
     this.onFilterReset,
     this.showSections = false, // Default to false
     this.isSingleSectionsSelection = false, // Default to false
+    this.openBottomSheet = false,
   });
+
+  void init(BuildContext context, WidgetRef ref) {
+    if (openBottomSheet) {
+      final adminUserState = ref.watch(adminUserProvider);
+      final userDetails = adminUserState.userDetails;
+
+      // Delay state modification
+      Future.microtask(() {
+        ref.read(filterStateProvider.notifier).state = FilterState(
+          branch: ref.read(filterStateProvider).branch,
+          board: ref.read(filterStateProvider).board,
+          grade: ref.read(filterStateProvider).grade,
+          section: [],
+        );
+      });
+
+      if (userDetails != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showFilterBottomSheet(context, ref, userDetails);
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User filters not available')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    init(context, ref); // Call the init method
     final adminUserState = ref.watch(adminUserProvider);
     final userDetails = adminUserState.userDetails;
 
