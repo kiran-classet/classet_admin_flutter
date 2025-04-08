@@ -404,7 +404,7 @@ class FilterBottomSheet extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
-              'You can select multiple options',
+              '',
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 13,

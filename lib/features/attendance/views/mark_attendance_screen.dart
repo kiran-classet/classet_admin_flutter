@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:classet_admin/core/widgets/filter_button_widget.dart';
 import 'package:classet_admin/core/services/api_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:classet_admin/core/providers/filter_provider.dart';
 
-class MarkAttendanceScreen extends StatefulWidget {
+class MarkAttendanceScreen extends ConsumerStatefulWidget {
   const MarkAttendanceScreen({super.key});
 
   @override
-  State<MarkAttendanceScreen> createState() => _MarkAttendanceScreenState();
+  ConsumerState<MarkAttendanceScreen> createState() =>
+      _MarkAttendanceScreenState();
 }
 
-class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
-  // Controllers and state variables remain the same
+class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
   final TextEditingController _searchController = TextEditingController();
   final List<Map<String, dynamic>> _students = [];
   String _searchQuery = '';
-  final Map<String, dynamic> _filters = {
-    'branch': null,
-    'board': null,
-    'grade': null,
-    'section': <String>[],
-  };
 
   @override
   void initState() {
@@ -27,15 +23,23 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     _fetchAttendanceData();
   }
 
-  // API related methods remain the same
   Future<void> _fetchAttendanceData() async {
-    // if (_filters['section'] != null && _filters['section'].isNotEmpty) {
-    // final sectionId = _filters['section'].first;
-    final sectionId = "c8e11add-1285-4b7a-b1e0-fc41604b5de7";
+    final filterState = ref.read(filterStateProvider); // Access saved filters
+    final sectionId =
+        filterState.section.isNotEmpty ? filterState.section[0] : null;
 
-    final currentDate = "2025-04-08T08:03:14.330Z";
+    if (sectionId == null) {
+      setState(() {
+        _students.clear();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No section selected in filters')),
+      );
+      return;
+    }
 
-    // DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(DateTime.now());
+    final currentDate = DateTime.now().toIso8601String(); // Use current date
+
     final payload = {
       "sectionId": sectionId,
       "date": currentDate,
@@ -48,7 +52,6 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
       if (response['status'] == true) {
         setState(() {
           _students.clear();
-          // Ensure response['data'] is cast to List<Map<String, dynamic>>
           _students.addAll((response['data'] as List)
               .map((e) => e as Map<String, dynamic>)
               .toList());
@@ -64,19 +67,6 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
         SnackBar(content: Text('Error: $e')),
       );
     }
-    // }
-  }
-
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
   }
 
   Widget _buildSearchField() {
@@ -154,6 +144,8 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: ExpansionTile(
+            // by default, the ExpansionTile is to be expanded
+            initiallyExpanded: true,
             leading: CircleAvatar(
               backgroundColor: Colors.blue.shade100,
               child: Text(
