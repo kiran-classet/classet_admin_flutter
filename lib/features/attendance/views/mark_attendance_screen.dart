@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:classet_admin/core/widgets/filter_button_widget.dart';
+// import 'package:intl/intl.dart'; // Add for date formatting
+import 'package:classet_admin/core/services/api_service.dart'; // Add for API service
 
 class MarkAttendanceScreen extends StatefulWidget {
   const MarkAttendanceScreen({super.key});
@@ -10,9 +12,9 @@ class MarkAttendanceScreen extends StatefulWidget {
 
 class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final List<String> _students = ['kiran', 'madhu', 'venu'];
+  final List<Map<String, dynamic>> _students =
+      []; // Update to store student details
   String _searchQuery = '';
-  // Add filter state
   final Map<String, dynamic> _filters = {
     'branch': null,
     'board': null,
@@ -21,10 +23,56 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   };
 
   @override
+  void initState() {
+    super.initState();
+    _fetchAttendanceData(); // Fetch data on screen load
+  }
+
+  Future<void> _fetchAttendanceData() async {
+    // if (_filters['section'] != null && _filters['section'].isNotEmpty) {
+    // final sectionId = _filters['section'].first;
+    final sectionId = "c8e11add-1285-4b7a-b1e0-fc41604b5de7";
+
+    final currentDate = "2025-04-08T08:03:14.330Z";
+
+    // DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(DateTime.now());
+    final payload = {
+      "sectionId": sectionId,
+      "date": currentDate,
+    };
+
+    try {
+      final apiService = ApiService();
+      final response =
+          await apiService.post('attendance/get?limit=100000&page=1', payload);
+      if (response['status'] == true) {
+        setState(() {
+          _students.clear();
+          // Ensure response['data'] is cast to List<Map<String, dynamic>>
+          _students.addAll((response['data'] as List)
+              .map((e) => e as Map<String, dynamic>)
+              .toList());
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(response['message'] ?? 'Failed to fetch data')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+    // }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final filteredStudents = _students
-        .where((student) =>
-            student.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .where((student) => student['given_name']
+            .toLowerCase()
+            .contains(_searchQuery.toLowerCase()))
         .toList();
 
     return Scaffold(
@@ -55,34 +103,38 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
               itemBuilder: (context, index) {
                 final student = filteredStudents[index];
                 return ListTile(
-                  title: Text(student),
+                  title: Text(student['given_name']),
+                  subtitle: Text('Enrollment ID: ${student['enrollmentId']}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Radio(
                         value: 'Present',
-                        groupValue:
-                            null, // Replace with actual state management
+                        groupValue: student['attendanceState'],
                         onChanged: (value) {
-                          // Handle Present selection
+                          setState(() {
+                            student['attendanceState'] = value;
+                          });
                         },
                       ),
                       const Text('Present'),
                       Radio(
                         value: 'Absent',
-                        groupValue:
-                            null, // Replace with actual state management
+                        groupValue: student['attendanceState'],
                         onChanged: (value) {
-                          // Handle Absent selection
+                          setState(() {
+                            student['attendanceState'] = value;
+                          });
                         },
                       ),
                       const Text('Absent'),
                       Radio(
                         value: 'Half Day',
-                        groupValue:
-                            null, // Replace with actual state management
+                        groupValue: student['attendanceState'],
                         onChanged: (value) {
-                          // Handle Half Day selection
+                          setState(() {
+                            student['attendanceState'] = value;
+                          });
                         },
                       ),
                       const Text('Half Day'),
@@ -98,7 +150,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
         openBottomSheet: true,
         showSections: true, // Show sections in Mark Attendance screen
         onFilterApplied: () {
-          print('Applied filters: $_filters');
+          _fetchAttendanceData(); // Fetch data when filters are applied
         },
         isSingleSectionsSelection: true, // Pass the flag as true
       ),

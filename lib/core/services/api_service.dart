@@ -46,7 +46,7 @@ class ApiService {
         body: json.encode(body),
       );
 
-      return _handleResponse(response);
+      return json.decode(response.body);
     } catch (e) {
       return _handleError(e);
     }
