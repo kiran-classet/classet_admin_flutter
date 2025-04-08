@@ -99,7 +99,7 @@ class FilterBottomSheet extends ConsumerWidget {
   final Map<String, dynamic> userDetails;
   final VoidCallback? onFilterApplied;
   final VoidCallback? onFilterReset;
-  final bool showSections; // Add parameter to control section visibility
+  final bool showSections;
 
   const FilterBottomSheet({
     super.key,
@@ -107,13 +107,12 @@ class FilterBottomSheet extends ConsumerWidget {
     required this.userDetails,
     this.onFilterApplied,
     this.onFilterReset,
-    this.showSections = false, // Default to false
+    this.showSections = false,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tempFilterState =
-        ref.watch(tempFilterStateProvider); // Use temporary state
+    final tempFilterState = ref.watch(tempFilterStateProvider);
 
     final availableBoards = tempFilterState.branch != null
         ? FilterDataParser.getBoardsFromBranch(
@@ -148,16 +147,14 @@ class FilterBottomSheet extends ConsumerWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start, // Align content to the top
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(context),
           Expanded(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Padding(
-                padding: const EdgeInsets.all(
-                    16), // Add the required padding parameter
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -203,7 +200,7 @@ class FilterBottomSheet extends ConsumerWidget {
                             .updateGrade(value),
                       ),
                     ],
-                    if (tempFilterState.grade != null && showSections) ...[
+                    if (showSections && tempFilterState.grade != null) ...[
                       const SizedBox(height: 24),
                       _buildFilterSection(
                         context: context,
@@ -247,10 +244,9 @@ class FilterBottomSheet extends ConsumerWidget {
           const Text(
             'Filters',
             style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87),
           ),
           Material(
             color: Colors.transparent,
@@ -259,11 +255,7 @@ class FilterBottomSheet extends ConsumerWidget {
               onTap: () => Navigator.pop(context),
               child: Container(
                 padding: const EdgeInsets.all(8),
-                child: Icon(
-                  Icons.close,
-                  color: Colors.grey[600],
-                  size: 24,
-                ),
+                child: Icon(Icons.close, color: Colors.grey[600], size: 24),
               ),
             ),
           ),
@@ -290,21 +282,18 @@ class FilterBottomSheet extends ConsumerWidget {
         Text(
           title,
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[800],
-            letterSpacing: 0.5,
-          ),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[800]),
         ),
         const SizedBox(height: 12),
         if (items.isEmpty)
           Text(
             'No options available',
             style: TextStyle(
-              color: Colors.grey[600],
-              fontStyle: FontStyle.italic,
-              fontSize: 14,
-            ),
+                color: Colors.grey[600],
+                fontStyle: FontStyle.italic,
+                fontSize: 14),
           )
         else
           Wrap(
@@ -321,20 +310,16 @@ class FilterBottomSheet extends ConsumerWidget {
                 label: Text(
                   display,
                   style: TextStyle(
-                    color: isSelected ? Colors.blue[700] : Colors.grey[800],
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
+                      color: isSelected ? Colors.blue[700] : Colors.grey[800],
+                      fontWeight: FontWeight.w500),
                 ),
                 selected: isSelected,
                 onSelected: (_) {
                   if (isMultiSelect) {
                     final newSelection = List<String>.from(selectedValues);
-                    if (isSelected) {
-                      newSelection.remove(value);
-                    } else {
-                      newSelection.add(value);
-                    }
+                    isSelected
+                        ? newSelection.remove(value)
+                        : newSelection.add(value);
                     onSelected(newSelection);
                   } else {
                     onSelected(isSelected ? null : value);
@@ -343,34 +328,14 @@ class FilterBottomSheet extends ConsumerWidget {
                 selectedColor: Colors.blue[50],
                 backgroundColor: Colors.grey[100],
                 checkmarkColor: Colors.blue[700],
-                elevation: isSelected ? 2 : 0,
-                pressElevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(
-                    color: isSelected ? Colors.blue[200]! : Colors.grey[300]!,
-                    width: 1,
-                  ),
+                      color: isSelected ? Colors.blue[200]! : Colors.grey[300]!,
+                      width: 1),
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               );
             }).toList(),
-          ),
-        if (isMultiSelect && items.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              'You can select multiple options',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 13,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
           ),
       ],
     );
@@ -385,170 +350,56 @@ class FilterBottomSheet extends ConsumerWidget {
 
     return Container(
       padding: EdgeInsets.fromLTRB(
-        16,
-        8,
-        16,
-        16 + MediaQuery.of(context).padding.bottom,
-      ),
+          16, 8, 16, 16 + MediaQuery.of(context).padding.bottom),
       decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(
-            color: Colors.grey.withOpacity(0.2),
-            width: 1,
-          ),
+          top: BorderSide(color: Colors.grey.withOpacity(0.2), width: 1),
         ),
       ),
-      child: Column(
+      child: Row(
         children: [
-          if (hasActiveFilters) ...[
-            Container(
-              padding: const EdgeInsets.all(10),
-              margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.blue[100]!, width: 1),
+          Expanded(
+            child: OutlinedButton(
+              onPressed: hasActiveFilters
+                  ? () => ref
+                      .read(tempFilterStateProvider.notifier)
+                      .resetTempFilters()
+                  : null,
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                side: BorderSide(
+                    color: hasActiveFilters
+                        ? Colors.blue[600]!
+                        : Colors.grey[400]!,
+                    width: 1.5),
               ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.filter_list,
-                    size: 16,
-                    color: Colors.blue[600],
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _getActiveFiltersText(tempFilterState),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blue[800],
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+              child: const Text('Reset',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
             ),
-          ],
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: hasActiveFilters
-                      ? () => ref
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: hasActiveFilters
+                  ? () {
+                      ref
                           .read(tempFilterStateProvider.notifier)
-                          .resetTempFilters()
-                      : null,
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: BorderSide(
-                      color: hasActiveFilters
-                          ? Colors.blue[600]!
-                          : Colors.grey[400]!,
-                      width: 1.5,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    foregroundColor:
-                        hasActiveFilters ? Colors.blue[600] : Colors.grey[400],
-                  ),
-                  child: const Text(
-                    'Reset',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+                          .applyTempState(ref);
+                      onFilterApplied?.call();
+                      Navigator.pop(context);
+                    }
+                  : null,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                backgroundColor:
+                    hasActiveFilters ? Colors.blue[600] : Colors.grey[400],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: hasActiveFilters
-                      ? () {
-                          ref
-                              .read(tempFilterStateProvider.notifier)
-                              .applyTempState(ref); // Apply temp state
-                          if (onFilterApplied != null) {
-                            onFilterApplied!();
-                          }
-                          Navigator.pop(context);
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor:
-                        hasActiveFilters ? Colors.blue[600] : Colors.grey[400],
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: hasActiveFilters ? 3 : 0,
-                  ),
-                  child: const Text(
-                    'Apply',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _getActiveFiltersText(FilterState state) {
-    final List<String> activeFilters = [];
-
-    if (state.branch != null) activeFilters.add('Branch');
-    if (state.board != null) activeFilters.add('Board');
-    if (state.grade != null) activeFilters.add('Grade');
-    if (state.section.isNotEmpty) {
-      activeFilters.add(
-          '${state.section.length} Section${state.section.length > 1 ? 's' : ''}');
-    }
-
-    if (activeFilters.isEmpty) return 'No filters applied';
-    return 'Active filters: ${activeFilters.join(', ')}';
-  }
-
-  Future<void> _showResetConfirmation(
-      BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reset Filters'),
-        content: const Text('Are you sure you want to reset all filters?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
+              child: const Text('Apply',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
             ),
-            child: const Text('Reset'),
           ),
         ],
       ),
     );
-
-    if (confirmed == true) {
-      ref.read(filterStateProvider.notifier).resetFilters();
-      if (onFilterReset != null) {
-        onFilterReset!();
-      }
-      Navigator.pop(context);
-    }
   }
 }
