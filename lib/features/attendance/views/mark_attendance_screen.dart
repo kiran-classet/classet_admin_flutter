@@ -74,6 +74,11 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
     final filterState = ref.read(filterStateProvider);
     final sectionId =
         filterState.section.isNotEmpty ? filterState.section[0] : null;
+
+    final branchId = filterState.branch;
+    final boardId = filterState.board;
+    final classId = filterState.grade;
+
     final adminUserState = ref.watch(adminUserProvider);
     final userDetails = adminUserState.userDetails;
     final academicYear =
@@ -85,7 +90,7 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
       return;
     }
 
-    final currentDate = DateTime.now().toIso8601String();
+    final currentDate = DateTime.now().toUtc().toIso8601String();
     final studentsInfo = _students
         .where((student) =>
             student['attendanceState'] != 'P' &&
@@ -95,11 +100,19 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
               "attendanceState": student['attendanceState'] == 'A' ? 'A' : 'HD',
             })
         .toList();
+    final presentStudentsInfo = _students
+        .where((student) => student['attendanceState'] == 'P')
+        .map((student) => student['user_id'])
+        .toList(); // Convert to List
 
     final payload = {
+      "branchId": branchId,
+      "boardId": boardId,
+      "classId": classId,
       "sectionId": sectionId,
       "academicYear": academicYear,
       "date": currentDate,
+      "presentStudentsInfo": presentStudentsInfo,
       "studentsInfo": studentsInfo,
     };
 
@@ -125,32 +138,22 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
   }
 
   Widget _buildSearchField() {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.all(16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: TextField(
-          controller: _searchController,
-          decoration: InputDecoration(
-            labelText: 'Search Students',
-            border: InputBorder.none,
-            prefixIcon: const Icon(Icons.search, color: Colors.blue),
-            suffixIcon: _searchQuery.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear, color: Colors.grey),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() => _searchQuery = '');
-                    },
-                  )
-                : null,
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Search Here',
+          prefixIcon: const Icon(Icons.search, color: Colors.grey),
+          filled: true,
+          fillColor: Colors.grey.shade200,
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
           ),
-          onChanged: (value) => setState(() => _searchQuery = value),
         ),
+        onChanged: (value) => setState(() => _searchQuery = value),
       ),
     );
   }
@@ -161,28 +164,25 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
     String label,
     Color color,
   ) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      child: FilterChip(
-        selected: student['attendanceState'] == value,
-        label: Text(
+    return Row(
+      children: [
+        Checkbox(
+          value: student['attendanceState'] == value,
+          onChanged: (bool? selected) {
+            setState(() {
+              student['attendanceState'] = selected == true ? value : null;
+            });
+          },
+          activeColor: color,
+        ),
+        Text(
           label,
           style: TextStyle(
-            color: student['attendanceState'] == value
-                ? Colors.white
-                : Colors.black87,
-            fontSize: 12,
+            color: color,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.grey.shade200,
-        selectedColor: color,
-        onSelected: (bool selected) {
-          setState(() {
-            student['attendanceState'] = selected ? value : null;
-          });
-        },
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-      ),
+      ],
     );
   }
 
@@ -192,67 +192,73 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
       itemCount: filteredStudents.length,
       itemBuilder: (context, index) {
         final student = filteredStudents[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: ExpansionTile(
-            // by default, the ExpansionTile is to be expanded
-            initiallyExpanded: true,
-            leading: CircleAvatar(
-              backgroundColor: Colors.blue.shade100,
-              child: Text(
-                student['given_name'][0].toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                ),
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '${index + 1}. ',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          student['given_name'],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'ID ${student['enrollmentId']}',
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildAttendanceOption(
+                        student,
+                        'P',
+                        'Present',
+                        Colors.green,
+                      ),
+                      _buildAttendanceOption(
+                        student,
+                        'A',
+                        'Absent',
+                        Colors.red,
+                      ),
+                      _buildAttendanceOption(
+                        student,
+                        'HD',
+                        'Half day',
+                        Colors.orange,
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            title: Text(
-              student['given_name'],
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            subtitle: Text(
-              'ID: ${student['enrollmentId']}',
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 14,
-              ),
-            ),
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildAttendanceOption(
-                      student,
-                      'P',
-                      'Present',
-                      Colors.green,
-                    ),
-                    _buildAttendanceOption(
-                      student,
-                      'A',
-                      'Absent',
-                      Colors.red,
-                    ),
-                    _buildAttendanceOption(
-                      student,
-                      'HD',
-                      'Half Day',
-                      Colors.orange,
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ),
         );
       },
