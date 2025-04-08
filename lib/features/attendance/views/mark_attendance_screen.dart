@@ -17,6 +17,7 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
   final TextEditingController _searchController = TextEditingController();
   final List<Map<String, dynamic>> _students = [];
   String _searchQuery = '';
+  bool _isLoading = false; // Add loading state
 
   @override
   void initState() {
@@ -25,6 +26,9 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
   }
 
   Future<void> _fetchAttendanceData() async {
+    setState(() {
+      _isLoading = true; // Show loader
+    });
     final filterState = ref.read(filterStateProvider); // Access saved filters
     final sectionId =
         filterState.section.isNotEmpty ? filterState.section[0] : null;
@@ -36,6 +40,9 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No section selected in filters')),
       );
+      setState(() {
+        _isLoading = false; // Hide loader
+      });
       return;
     }
 
@@ -67,10 +74,17 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false; // Hide loader
+      });
     }
   }
 
   Future<void> _saveAttendance() async {
+    setState(() {
+      _isLoading = true; // Show loader
+    });
     final filterState = ref.read(filterStateProvider);
     final sectionId =
         filterState.section.isNotEmpty ? filterState.section[0] : null;
@@ -87,6 +101,9 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Section or Academic Year not selected')),
       );
+      setState(() {
+        _isLoading = false; // Hide loader
+      });
       return;
     }
 
@@ -134,7 +151,221 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false; // Hide loader
+      });
     }
+  }
+
+  Future<void> _showAttendancePreview() async {
+    final presentCount =
+        _students.where((student) => student['attendanceState'] == 'P').length;
+    final absentCount =
+        _students.where((student) => student['attendanceState'] == 'A').length;
+    final halfDayCount =
+        _students.where((student) => student['attendanceState'] == 'HD').length;
+    final totalStudents = _students.length;
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 8,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.preview_outlined,
+                        color: Colors.blue,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Text(
+                        'Attendance',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Statistics Cards
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildStatCard(
+                        count: halfDayCount,
+                        total: totalStudents,
+                        label: 'Half Day',
+                        color: Colors.orange,
+                        icon: Icons.timelapse_outlined,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatCard(
+                        count: absentCount,
+                        total: totalStudents,
+                        label: 'Absent',
+                        color: Colors.red,
+                        icon: Icons.cancel_outlined,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _buildStatCard(
+                  count: presentCount,
+                  total: totalStudents,
+                  label: 'Present',
+                  color: Colors.green,
+                  icon: Icons.check_circle_outline,
+                  isWide: true,
+                ),
+
+                const SizedBox(height: 24),
+
+                // Summary Text
+                Text(
+                  'Total Students: $totalStudents',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Action Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Confirm',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (result == true) {
+      await _saveAttendance();
+    }
+  }
+
+  Widget _buildStatCard({
+    required int count,
+    required int total,
+    required String label,
+    required Color color,
+    required IconData icon,
+    bool isWide = false,
+  }) {
+    final percentage = (count / total * 100).toStringAsFixed(1);
+
+    return Container(
+      width: isWide ? double.infinity : null,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisSize: isWide ? MainAxisSize.max : MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisSize: isWide ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                count.toString(),
+                style: TextStyle(
+                  color: color,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '$percentage%',
+                style: TextStyle(
+                  color: color.withOpacity(0.8),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildSearchField() {
@@ -273,58 +504,69 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
             .contains(_searchQuery.toLowerCase()))
         .toList();
 
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: const Text(
-          'Mark Attendance',
-          style: TextStyle(fontWeight: FontWeight.normal),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save_rounded),
-            onPressed: _saveAttendance,
-          ),
-        ],
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              const Color.fromARGB(255, 242, 243, 243),
-              Colors.white,
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            title: const Text(
+              'Mark Attendance',
+              style: TextStyle(fontWeight: FontWeight.normal),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.save_rounded),
+                onPressed: _showAttendancePreview,
+              ),
             ],
           ),
-        ),
-        child: Column(
-          children: [
-            _buildSearchField(),
-            Expanded(
-              child: _buildStudentList(filteredStudents),
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  const Color.fromARGB(255, 242, 243, 243),
+                  Colors.white,
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+            child: Column(
+              children: [
+                _buildSearchField(),
+                Expanded(
+                  child: _buildStudentList(filteredStudents),
+                ),
+              ],
             ),
-          ],
+          ),
+          floatingActionButton: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: FilterButtonWidget(
+              openBottomSheet: true,
+              showSections: true,
+              onFilterApplied: _fetchAttendanceData,
+              isSingleSectionsSelection: true,
+            ),
+          ),
         ),
-        child: FilterButtonWidget(
-          openBottomSheet: true,
-          showSections: true,
-          onFilterApplied: _fetchAttendanceData,
-          isSingleSectionsSelection: true,
-        ),
-      ),
+        if (_isLoading)
+          Container(
+            color: Colors.black.withOpacity(0.5),
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+      ],
     );
   }
 }
