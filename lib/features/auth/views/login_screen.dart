@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:classet_admin/config/cognitoAuthService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:classet_admin/config/app_config.dart'; // Add this import
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -15,8 +16,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final emailController = TextEditingController(text: 'aauadmin');
-  final passwordController = TextEditingController(text: 'Classet@123');
+  final emailController = TextEditingController(text: '');
+  final passwordController = TextEditingController(text: '');
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
 
@@ -166,175 +167,268 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final loginState = ref.watch(loginProvider);
     final adminUserState = ref.watch(adminUserProvider);
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              const Color.fromARGB(255, 246, 247, 248),
-              const Color.fromARGB(255, 246, 247, 249)
+              Colors.blue.shade50,
+              Colors.white,
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.centerRight,
+            end: Alignment.centerLeft,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Card(
-                    elevation: 8,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const Text(
-                            'SIGN IN',
-                            style: TextStyle(
-                                fontSize: 32, fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Please sign in with your account',
-                            style: TextStyle(fontSize: 16),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 24),
-                          TextField(
-                            controller: emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              labelText: 'Username',
-                              prefixIcon: Icon(Icons.person),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          TextField(
-                            controller: passwordController,
-                            obscureText: !_isPasswordVisible,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              labelText: 'Password',
-                              prefixIcon: Icon(Icons.lock),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _isPasswordVisible
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _isPasswordVisible = !_isPasswordVisible;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Checkbox(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: SizedBox(
+              height: size.height - MediaQuery.of(context).padding.top,
+              child: Column(
+                children: [
+                  const SizedBox(height: 40),
+                  // Logo and Welcome Text
+                  Column(
+                    children: [
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Welcome To Classet!',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Sign In to continue',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 40),
+                  // Login Form
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        // Username Field
+                        _buildTextField(
+                          controller: emailController,
+                          label: 'Username',
+                          icon: Icons.person_outline_rounded,
+                        ),
+                        const SizedBox(height: 20),
+                        // Password Field
+                        _buildTextField(
+                          controller: passwordController,
+                          label: 'Password',
+                          icon: Icons.lock_outline_rounded,
+                          isPassword: true,
+                          isPasswordVisible: _isPasswordVisible,
+                          onVisibilityToggle: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        // Remember Me
+                        Row(
+                          children: [
+                            SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: Checkbox(
                                 value: _rememberMe,
                                 onChanged: (value) {
-                                  setState(() {
-                                    _rememberMe = value ?? false;
-                                  });
+                                  setState(() => _rememberMe = value ?? false);
                                 },
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _rememberMe = !_rememberMe;
-                                  });
-                                },
-                                child: const Text('Remember Me'),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-                          if (loginState.isLoading || adminUserState.isLoading)
-                            Container(
-                              height: 56,
-                              decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 1, 131, 238),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white),
-                                    strokeWidth: 2.5,
-                                  ),
-                                ),
-                              ),
-                            )
-                          else ...[
-                            ElevatedButton(
-                              onPressed: _signIn,
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor:
-                                    const Color.fromARGB(255, 1, 131, 238),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16.0),
-                              ),
-                              child: const Text(
-                                'Sign In',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                                  borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
                             ),
-                            if (loginState.errorMessage != null)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 16.0),
-                                child: Text(
-                                  loginState.errorMessage!,
-                                  style: TextStyle(color: Colors.red),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() => _rememberMe = !_rememberMe);
+                              },
+                              child: Text(
+                                'Remember Me',
+                                style: TextStyle(
+                                  color: Colors.grey.shade700,
+                                  fontSize: 14,
                                 ),
                               ),
+                            ),
                           ],
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 24),
+                        // Sign In Button
+                        if (loginState.isLoading || adminUserState.isLoading)
+                          const CircularProgressIndicator()
+                        else
+                          _buildSignInButton(),
+                        if (loginState.errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: Colors.red.shade700,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      loginState.errorMessage!,
+                                      style: TextStyle(
+                                        color: Colors.red.shade700,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                ),
+                  const Spacer(),
+                  // Footer
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Text(
+                          '© 2025 Meluha Technologies Pvt Limited',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Version ${AppConfig.version}', // Use dynamic version
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                '© MELUHA TECHNOLOGIES PRIVATE LIMITED',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool isPassword = false,
+    bool isPasswordVisible = false,
+    VoidCallback? onVisibilityToggle,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: isPassword && !isPasswordVisible,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Colors.grey.shade600),
+          prefixIcon: Icon(icon, color: Colors.blue.shade400),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    isPasswordVisible
+                        ? Icons.visibility_rounded
+                        : Icons.visibility_off_rounded,
+                    color: Colors.grey.shade400,
+                  ),
+                  onPressed: onVisibilityToggle,
+                )
+              : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignInButton() {
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.blue.shade400,
+            Colors.blue.shade600,
           ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: _signIn,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: const Text(
+          'Sign In',
+          style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+              color: Colors.white),
         ),
       ),
     );

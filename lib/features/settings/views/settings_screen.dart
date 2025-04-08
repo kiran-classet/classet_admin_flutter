@@ -1,3 +1,5 @@
+import 'package:classet_admin/features/help_center/views/help_center_screen.dart';
+import 'package:classet_admin/features/profile/views/privacy_policy_screen.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -37,11 +39,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 20),
                 _buildNotificationSettings(),
                 const SizedBox(height: 20),
-                _buildAppearanceSettings(),
-                const SizedBox(height: 20),
-                _buildAccountSettings(),
-                const SizedBox(height: 20),
-                _buildSecuritySettings(),
+                // _buildAppearanceSettings(),
+                // const SizedBox(height: 20),
+                // _buildAccountSettings(),
+                // const SizedBox(height: 20),
+                // _buildSecuritySettings(),
                 const SizedBox(height: 20),
                 _buildAboutSection(),
               ],
@@ -269,29 +271,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
             padding: const EdgeInsets.all(16.0),
             child: _buildSectionTitle('About'),
           ),
-          ListTile(
-            leading: const Icon(Icons.info),
-            title: const Text('App Information'),
-            subtitle: const Text('Version 1.0.0'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // TODO: Show app info
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.description),
-            title: const Text('Terms of Service'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // TODO: Show terms of service
-            },
-          ),
+          // ListTile(
+          //   leading: const Icon(Icons.info),
+          //   title: const Text('App Information'),
+          //   subtitle: const Text('Version 1.0.0'),
+          //   trailing: const Icon(Icons.chevron_right),
+          //   onTap: () {
+          //     // TODO: Show app info
+          //   },
+          // ),
+          // ListTile(
+          //   leading: const Icon(Icons.description),
+          //   title: const Text('Terms of Service'),
+          //   trailing: const Icon(Icons.chevron_right),
+          //   onTap: () {
+          //     // TODO: Show terms of service
+          //   },
+          // ),
           ListTile(
             leading: const Icon(Icons.privacy_tip),
             title: const Text('Privacy Policy'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // TODO: Show privacy policy
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      PrivacyPolicyScreen(), // Replace with your PrivacyPolicyScreen widget
+                ),
+              );
             },
           ),
           ListTile(
@@ -299,7 +307,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('Help & Support'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // TODO: Navigate to help section
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      HelpCenterScreen(), // Replace with your HelpSupportScreen widget
+                ),
+              );
             },
           ),
         ],

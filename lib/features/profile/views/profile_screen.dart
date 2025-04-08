@@ -49,7 +49,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  '© MELUHA TECHNOLOGIES PRIVATE LIMITED',
+                  '© 2025 Meluha Technologies Pvt Limited',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey,

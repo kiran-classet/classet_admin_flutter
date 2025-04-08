@@ -11,16 +11,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   // Sample notification data - replace with your actual data structure
   final List<NotificationItem> _notifications = [
     NotificationItem(
-      title: "New Message",
-      description: "You have received a new message",
-      time: DateTime.now().subtract(const Duration(minutes: 5)),
-      isRead: false,
-    ),
-    NotificationItem(
       title: "System Update",
-      description: "System maintenance scheduled for tomorrow",
-      time: DateTime.now().subtract(const Duration(hours: 2)),
-      isRead: true,
+      description: "System maintenance scheduled for May 10th",
+      time: DateTime.now().subtract(const Duration(hours: 68)),
+      isRead: false,
     ),
     // Add more sample notifications as needed
   ];

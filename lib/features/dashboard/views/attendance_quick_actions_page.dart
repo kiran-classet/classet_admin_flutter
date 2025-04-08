@@ -19,10 +19,10 @@ class AttendanceQuickActionsPage extends StatelessWidget {
           children: [
             _buildActionItem(
                 context, 'Mark Attendance', Icons.edit, Colors.green),
-            _buildActionItem(
-                context, 'View Individual Student', Icons.person, Colors.blue),
+            _buildActionItem(context, 'View Individual Student', Icons.person,
+                const Color.fromARGB(255, 97, 102, 107)),
             _buildActionItem(context, 'Send Notifications', Icons.notifications,
-                Colors.orange),
+                const Color.fromARGB(255, 97, 102, 107)),
           ],
         ),
       ),
@@ -37,6 +37,14 @@ class AttendanceQuickActionsPage extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => MarkAttendanceScreen()),
+          );
+        } else if (label == 'View Individual Student' ||
+            label == 'Send Notifications') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('$label: Coming Soon'),
+              duration: Duration(seconds: 1), // Show snackbar for 3 seconds
+            ),
           );
         } else {
           print('$label clicked');

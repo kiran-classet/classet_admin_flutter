@@ -10,11 +10,43 @@ class ApprovalScreen extends StatefulWidget {
 class _ApprovalScreenState extends State<ApprovalScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  List<Map<String, dynamic>> _approvalData = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _fetchApprovalData();
+  }
+
+  Future<void> _fetchApprovalData() async {
+    // Simulate fetching JSON data
+    await Future.delayed(const Duration(seconds: 1));
+    setState(() {
+      _approvalData = [
+        {
+          "title": "Leave Request",
+          "requesterName": "Kiran",
+          "requestDate": "2024-01-01",
+          "type": "Sick Leave",
+          "status": "pending"
+        },
+        {
+          "title": "Expense Reimbursement",
+          "requesterName": "Mohan",
+          "requestDate": "2024-01-02",
+          "type": "Travel",
+          "status": "approved"
+        },
+        {
+          "title": "Leave Request",
+          "requesterName": "Venu",
+          "requestDate": "2024-01-03",
+          "type": "Casual Leave",
+          "status": "rejected"
+        },
+      ];
+    });
   }
 
   @override
@@ -62,45 +94,44 @@ class _ApprovalScreenState extends State<ApprovalScreen>
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: Handle creating new approval request
-        },
-        tooltip: 'Create New Request',
-        child: const Icon(Icons.add),
-      ),
     );
   }
 
   Widget _buildApprovalList(ApprovalStatus status) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: 10, // Replace with actual data length
-      itemBuilder: (context, index) {
-        return _ApprovalCard(
-          title: 'Leave Request',
-          requesterName: 'John Doe',
-          requestDate: '2024-01-${index + 1}',
-          type: 'Sick Leave',
-          status: status,
-          onApprove: () => _handleApprove(index),
-          onReject: () => _handleReject(index),
-        );
-      },
-    );
+    final filteredData =
+        _approvalData.where((item) => item['status'] == status.name).toList();
+
+    return filteredData.isEmpty
+        ? const Center(child: Text('No data available'))
+        : ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: filteredData.length,
+            itemBuilder: (context, index) {
+              final item = filteredData[index];
+              return _ApprovalCard(
+                title: item['title'],
+                requesterName: item['requesterName'],
+                requestDate: item['requestDate'],
+                type: item['type'],
+                status: status,
+                onApprove: () => _handleApprove(index),
+                onReject: () => _handleReject(index),
+              );
+            },
+          );
   }
 
   void _handleApprove(int index) {
     // TODO: Implement approval logic
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Request Approved')),
+      const SnackBar(content: Text('Access Denied')),
     );
   }
 
   void _handleReject(int index) {
     // TODO: Implement rejection logic
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Request Rejected')),
+      const SnackBar(content: Text('Access Denied')),
     );
   }
 }

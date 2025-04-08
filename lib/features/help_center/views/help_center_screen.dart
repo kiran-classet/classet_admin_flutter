@@ -29,50 +29,58 @@ class HelpCenterScreen extends StatelessWidget {
                   'How do I manage notifications?',
                   'Go to Settings > Notifications to customize your notification preferences.',
                 ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            _buildSection(
-              'Contact Support',
-              [
-                _buildContactItem(
-                  'Email Support',
-                  'support@classet.com',
-                  Icons.email,
+                _buildFAQItem(
+                  'How do I contact customer support?',
+                  'You can contact customer support via the Help Center > Contact Support section.',
                 ),
-                _buildContactItem(
-                  'Phone Support',
-                  '+1 234 567 8900',
-                  Icons.phone,
-                ),
-                _buildContactItem(
-                  'Live Chat',
-                  'Available 24/7',
-                  Icons.chat,
+                _buildFAQItem(
+                  'How do I report a bug?',
+                  'Navigate to Help Center > Report a Bug and provide the necessary details.',
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            _buildSection(
-              'Help Resources',
-              [
-                _buildResourceItem(
-                  'User Guide',
-                  'Comprehensive guide to using the app',
-                  Icons.book,
-                ),
-                _buildResourceItem(
-                  'Video Tutorials',
-                  'Step-by-step video guides',
-                  Icons.play_circle,
-                ),
-                _buildResourceItem(
-                  'Knowledge Base',
-                  'Detailed articles and how-to guides',
-                  Icons.library_books,
-                ),
-              ],
-            ),
+            // _buildSection(
+            //   'Contact Support',
+            //   [
+            //     _buildContactItem(
+            //       'Email Support',
+            //       'support@classet.com',
+            //       Icons.email,
+            //     ),
+            //     _buildContactItem(
+            //       'Phone Support',
+            //       '+1 234 567 8900',
+            //       Icons.phone,
+            //     ),
+            //     _buildContactItem(
+            //       'Live Chat',
+            //       'Available 24/7',
+            //       Icons.chat,
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 20),
+            // _buildSection(
+            //   'Help Resources',
+            //   [
+            //     _buildResourceItem(
+            //       'User Guide',
+            //       'Comprehensive guide to using the app',
+            //       Icons.book,
+            //     ),
+            //     _buildResourceItem(
+            //       'Video Tutorials',
+            //       'Step-by-step video guides',
+            //       Icons.play_circle,
+            //     ),
+            //     _buildResourceItem(
+            //       'Knowledge Base',
+            //       'Detailed articles and how-to guides',
+            //       Icons.library_books,
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ),

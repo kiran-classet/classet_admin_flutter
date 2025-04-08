@@ -106,15 +106,6 @@ class HomeScreen extends ConsumerWidget {
             ),
           ],
         ),
-        CircleAvatar(
-          radius: 24,
-          backgroundImage:
-              NetworkImage('https://misedu-manage.classet.in/profilew.jpg'),
-          onBackgroundImageError: (exception, stackTrace) {
-            // Handle image load error
-            print('Error loading profile image: $exception');
-          },
-        ),
       ],
     );
   }
@@ -190,11 +181,12 @@ class HomeScreen extends ConsumerWidget {
       mainAxisSpacing: 16,
       children: [
         _buildActionItem(context, 'Attendance', Icons.fact_check, Colors.green),
-        _buildActionItem(context, 'Admissions', Icons.school, Colors.blue),
-        _buildActionItem(
-            context, 'Finance', Icons.account_balance_wallet, Colors.purple),
-        _buildActionItem(
-            context, 'Transport', Icons.directions_bus, Colors.orange),
+        _buildActionItem(context, 'Admissions', Icons.school,
+            const Color.fromARGB(255, 97, 102, 107)),
+        _buildActionItem(context, 'Finance', Icons.account_balance_wallet,
+            const Color.fromARGB(255, 97, 102, 107)),
+        _buildActionItem(context, 'Transport', Icons.directions_bus,
+            const Color.fromARGB(255, 97, 102, 107)),
       ],
     );
   }
@@ -208,6 +200,15 @@ class HomeScreen extends ConsumerWidget {
             context,
             MaterialPageRoute(
               builder: (context) => AttendanceQuickActionsPage(),
+            ),
+          );
+        } else if (label == 'Admissions' ||
+            label == 'Finance' ||
+            label == 'Transport') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('$label: Coming Soon'),
+              duration: Duration(seconds: 1), // Show snackbar for 3 seconds
             ),
           );
         }
