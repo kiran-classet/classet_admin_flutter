@@ -1,3 +1,4 @@
+import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:classet_admin/core/widgets/filter_button_widget.dart';
 import 'package:classet_admin/core/services/api_service.dart';
@@ -60,6 +61,60 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(response['message'] ?? 'Failed to fetch data')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+  Future<void> _saveAttendance() async {
+    final filterState = ref.read(filterStateProvider);
+    final sectionId =
+        filterState.section.isNotEmpty ? filterState.section[0] : null;
+    final adminUserState = ref.watch(adminUserProvider);
+    final userDetails = adminUserState.userDetails;
+    final academicYear =
+        userDetails?['data']['user_info']['selectedAcademicYear'];
+    if (sectionId == null || academicYear == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Section or Academic Year not selected')),
+      );
+      return;
+    }
+
+    final currentDate = DateTime.now().toIso8601String();
+    final studentsInfo = _students
+        .where((student) =>
+            student['attendanceState'] != 'P' &&
+            student['attendanceState'] != null)
+        .map((student) => {
+              "user_id": student['user_id'],
+              "attendanceState": student['attendanceState'] == 'A' ? 'A' : 'HD',
+            })
+        .toList();
+
+    final payload = {
+      "sectionId": sectionId,
+      "academicYear": academicYear,
+      "date": currentDate,
+      "studentsInfo": studentsInfo,
+    };
+
+    try {
+      final apiService = ApiService();
+      final response = await apiService.post('attendance/save', payload);
+      if (response['status'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Attendance saved successfully')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(response['message'] ?? 'Failed to save attendance')),
         );
       }
     } catch (e) {
@@ -178,19 +233,19 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
                   children: [
                     _buildAttendanceOption(
                       student,
-                      'Present',
+                      'P',
                       'Present',
                       Colors.green,
                     ),
                     _buildAttendanceOption(
                       student,
-                      'Absent',
+                      'A',
                       'Absent',
                       Colors.red,
                     ),
                     _buildAttendanceOption(
                       student,
-                      'Half Day',
+                      'HD',
                       'Half Day',
                       Colors.orange,
                     ),
@@ -219,6 +274,12 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
           'Mark Attendance',
           style: TextStyle(fontWeight: FontWeight.normal),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save_rounded),
+            onPressed: _saveAttendance,
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(
