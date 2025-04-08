@@ -8,12 +8,14 @@ class FilterButtonWidget extends ConsumerWidget {
   final VoidCallback? onFilterApplied;
   final VoidCallback? onFilterReset;
   final bool showSections; // Add parameter to control section visibility
+  final bool isSingleSectionsSelection; // Add parameter
 
   const FilterButtonWidget({
     super.key,
     this.onFilterApplied,
     this.onFilterReset,
     this.showSections = false, // Default to false
+    this.isSingleSectionsSelection = false, // Default to false
   });
 
   @override
@@ -90,6 +92,7 @@ class FilterButtonWidget extends ConsumerWidget {
         branches: branches,
         userDetails: userDetails,
         showSections: showSections, // Pass the parameter
+        isSingleSectionsSelection: isSingleSectionsSelection, // Pass the flag
         onFilterApplied: onFilterApplied,
         onFilterReset: onFilterReset,
       ),
@@ -102,7 +105,9 @@ class FilterBottomSheet extends ConsumerWidget {
   final Map<String, dynamic> userDetails; // Add userDetails parameter
   final VoidCallback? onFilterApplied;
   final VoidCallback? onFilterReset;
-  final bool showSections; // Add showSections parameter
+  final bool showSections; // Add showSections parameter,
+  final bool
+      isSingleSectionsSelection; // Add isSingleSectionsSelection parameter
 
   const FilterBottomSheet({
     super.key,
@@ -111,6 +116,7 @@ class FilterBottomSheet extends ConsumerWidget {
     this.onFilterApplied,
     this.onFilterReset,
     this.showSections = false, // Default to false
+    this.isSingleSectionsSelection = false, // Default to false
   });
 
   @override
@@ -217,7 +223,9 @@ class FilterBottomSheet extends ConsumerWidget {
                         selectedValues: tempFilterState.section,
                         onSelected: (values) => ref
                             .read(tempFilterStateProvider.notifier)
-                            .updateSections(values),
+                            .updateSections(values,
+                                isSingleSectionsSelection:
+                                    isSingleSectionsSelection),
                         isMultiSelect: true,
                       ),
                     ],

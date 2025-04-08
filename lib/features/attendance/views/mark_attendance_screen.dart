@@ -99,6 +99,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
         onFilterApplied: () {
           print('Applied filters: $_filters');
         },
+        isSingleSectionsSelection: true, // Pass the flag as true
       ),
     );
   }

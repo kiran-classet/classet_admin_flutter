@@ -199,9 +199,15 @@ class FilterStateNotifier extends StateNotifier<FilterState> {
     }
   }
 
-  void updateSections(List<String> sections) {
-    if (!_listEquals(sections, state.section)) {
-      state = state.copyWith(section: sections);
+  void updateSections(List<String> sections,
+      {bool isSingleSectionsSelection = false}) {
+    if (isSingleSectionsSelection) {
+      state = state.copyWith(
+          section: sections.isNotEmpty
+              ? [sections.last]
+              : []); // Add only the last section
+    } else if (!_listEquals(sections, state.section)) {
+      state = state.copyWith(section: sections); // Update sections
     }
   }
 

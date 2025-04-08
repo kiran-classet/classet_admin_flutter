@@ -100,6 +100,7 @@ class FilterBottomSheet extends ConsumerWidget {
   final VoidCallback? onFilterApplied;
   final VoidCallback? onFilterReset;
   final bool showSections;
+  final bool isSingleSectionsSelection; // Add parameter
 
   const FilterBottomSheet({
     super.key,
@@ -108,6 +109,7 @@ class FilterBottomSheet extends ConsumerWidget {
     this.onFilterApplied,
     this.onFilterReset,
     this.showSections = false,
+    this.isSingleSectionsSelection = false, // Default to false
   });
 
   @override
@@ -212,7 +214,9 @@ class FilterBottomSheet extends ConsumerWidget {
                         selectedValues: tempFilterState.section,
                         onSelected: (values) => ref
                             .read(tempFilterStateProvider.notifier)
-                            .updateSections(values),
+                            .updateSections(values,
+                                isSingleSectionsSelection:
+                                    isSingleSectionsSelection), // Pass the flag
                         isMultiSelect: true,
                       ),
                     ],
