@@ -21,6 +21,7 @@ class _FinanceQuickActionsPageState
   bool _isInitialized = false; // Track initialization
   String _selectedTimeframe = 'monthly'; // Default to monthly
   String _selectedPaymentModeMetric = 'amount'; // Default to amounts
+  String _selectedConcessionMetric = 'count'; // Default to counts
 
   @override
   void initState() {
@@ -167,6 +168,37 @@ class _FinanceQuickActionsPageState
     });
   }
 
+  List<PieChartSectionData> _getConcessionsPieChartData() {
+    if (_dashboardData == null) return [];
+
+    final concessions = _dashboardData?['charts']?['concessions'];
+    final labels = concessions?['labels'] ?? [];
+    final details = concessions?['details'] ?? {};
+
+    return List.generate(labels.length, (index) {
+      final label = labels[index].toLowerCase(); // Convert label to lowercase
+      final value = _selectedConcessionMetric == 'amount'
+          ? (details[label]?['amount'] ?? 0) // Default to 0 if missing
+          : (details[label]?['count'] ?? 0); // Default to 0 if missing
+
+      // Ensure a small placeholder value for sections with 0 value
+      final displayValue = value > 0 ? value.toDouble() : 0.01;
+
+      return PieChartSectionData(
+        value: displayValue,
+        title:
+            value > 0 ? value.toString() : '', // Show title only if value > 0
+        color: _getColorForIndex(index),
+        radius: 50,
+        titleStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      );
+    });
+  }
+
   // Helper method to assign colors to pie chart sections
   Color _getColorForIndex(int index) {
     const colors = [
@@ -205,36 +237,6 @@ class _FinanceQuickActionsPageState
                 BarChartData(
                   barGroups: _getBarChartData(),
                   titlesData: FlTitlesData(
-                    // leftTitles: AxisTitles(
-                    //   sideTitles: SideTitles(
-                    //     showTitles: true, // Show the left side (Y-axis)
-                    //     interval:
-                    //         1000000, // Adjust the interval for Y-axis labels
-                    //     getTitlesWidget: (value, meta) {
-                    //       // Format the value for better readability
-                    //       String formattedValue;
-                    //       if (value >= 1000000) {
-                    //         formattedValue =
-                    //             '${(value / 1000000).toStringAsFixed(1)}M'; // e.g., 1.5M
-                    //       } else if (value >= 1000) {
-                    //         formattedValue =
-                    //             '${(value / 1000).toStringAsFixed(1)}K'; // e.g., 1.2K
-                    //       } else {
-                    //         formattedValue =
-                    //             value.toInt().toString(); // e.g., 500
-                    //       }
-
-                    //       return Text(
-                    //         formattedValue,
-                    //         style: const TextStyle(
-                    //           fontSize: 12,
-                    //           color: Colors.black,
-                    //           fontWeight: FontWeight.bold,
-                    //         ),
-                    //       );
-                    //     },
-                    //   ),
-                    // ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
@@ -330,6 +332,43 @@ class _FinanceQuickActionsPageState
     );
   }
 
+  Widget _buildConcessionsLegend() {
+    final concessions = _dashboardData?['charts']?['concessions'];
+    final labels = concessions?['labels'] ?? [];
+    final details = concessions?['details'] ?? {};
+
+    return Wrap(
+      spacing: 8.0, // Spacing between items
+      runSpacing: 8.0, // Spacing between rows
+      children: List.generate(labels.length, (index) {
+        final label = labels[index];
+        final value = _selectedConcessionMetric == 'amount'
+            ? (details[label.toLowerCase()]?['amount'] ?? 0)
+            : (details[label.toLowerCase()]?['count'] ?? 0);
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color:
+                    _getColorForIndex(index), // Use the color for the section
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 4), // Spacing between color and label
+            Text(
+              '$label: ${_selectedConcessionMetric == 'amount' ? formatIndianRupees(value) : value}',
+              style: const TextStyle(fontSize: 12),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
   Widget _buildPieChartCard() {
     return Card(
       elevation: 8, // Add elevation for shadow
@@ -393,6 +432,69 @@ class _FinanceQuickActionsPageState
     );
   }
 
+  Widget _buildConcessionsPieChartCard() {
+    return Card(
+      elevation: 8, // Add elevation for shadow
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12), // Rounded corners
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0), // Add padding inside the card
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Concessions Overview',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16), // Add spacing between title and chart
+            SizedBox(
+              height: 300, // Set a fixed height for the chart
+              child: PieChart(
+                PieChartData(
+                  sections: _getConcessionsPieChartData(),
+                  centerSpaceRadius: 40,
+                  sectionsSpace: 2,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16), // Add spacing between chart and legend
+            _buildConcessionsLegend(), // Add the legend below the chart
+            const SizedBox(
+                height: 16), // Add spacing between legend and filters
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ChoiceChip(
+                  label: const Text('Count'),
+                  selected: _selectedConcessionMetric == 'count',
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedConcessionMetric = 'count';
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Amount'),
+                  selected: _selectedConcessionMetric == 'amount',
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedConcessionMetric = 'amount';
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -429,8 +531,10 @@ class _FinanceQuickActionsPageState
                       ],
                     ),
                     const SizedBox(height: 16), // Add spacing between sections
-                    _buildPieChartCard(), // Add the pie chart card here
+                    _buildPieChartCard(), // Add the payment modes pie chart card
                     const SizedBox(height: 16), // Add spacing between charts
+                    _buildConcessionsPieChartCard(), // Add the concessions pie chart card
+                    const SizedBox(height: 16),
                     _buildBarChartCard(), // Add the bar chart card here
                     const SizedBox(height: 16),
                   ],
