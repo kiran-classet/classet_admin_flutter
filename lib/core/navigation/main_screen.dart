@@ -89,9 +89,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     String userPhoto = '';
 
     if (userDetails != null) {
-      final userInfo = userDetails['data']['user_info'];
-      userName = userInfo['name'] ?? 'User';
-      userPhoto = userInfo['studentPhoto']['storageLocation'] ?? '';
+      final userInfo = userDetails['data']?['user_info'];
+      userName = userInfo?['name'] ?? 'User';
+      userPhoto = userInfo?['studentPhoto']?['storageLocation'] ?? '';
     }
 
     return Scaffold(
@@ -206,10 +206,15 @@ class CustomDrawer extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 40,
-                    backgroundImage: userPhoto.isNotEmpty
-                        ? NetworkImage(userPhoto)
-                        : const AssetImage('assets/images/default_avatar.png')
-                            as ImageProvider,
+                    backgroundImage:
+                        userPhoto.isNotEmpty ? NetworkImage(userPhoto) : null,
+                    child: userPhoto.isEmpty
+                        ? const Icon(
+                            Icons.person,
+                            size: 40,
+                            color: Colors.white,
+                          )
+                        : null,
                   ),
                   const SizedBox(width: 10),
                   Column(

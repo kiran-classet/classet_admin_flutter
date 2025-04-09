@@ -99,7 +99,10 @@ class FilterStateNotifier extends StateNotifier<FilterState> {
     _loadSavedState();
   }
   void clearAllFilters() {
-    state = FilterState(); // Reset to initial empty state
+    print('Before clearing filters: $state');
+    state = const FilterState(); // Reset to initial empty state
+    print('After clearing filters: $state');
+    _saveState(); // Persist the cleared state to SharedPreferences
   }
 
   Future<void> _loadSavedState() async {

@@ -1,5 +1,7 @@
+import 'package:classet_admin/core/providers/filter_provider.dart';
 import 'package:classet_admin/core/widgets/filter_button_widget.dart';
 import 'package:classet_admin/features/dashboard/views/attendance_quick_actions_page.dart';
+import 'package:classet_admin/features/dashboard/views/finance_quick_actions_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
@@ -45,7 +47,7 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: 10),
                 adminUserState.isLoading
                     ? _buildShimmerEffect()
-                    : _buildQuickActions(context),
+                    : _buildQuickActions(context, ref),
                 const SizedBox(height: 20),
                 adminUserState.isLoading
                     ? _buildShimmerEffect()
@@ -172,7 +174,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuickActions(BuildContext context) {
+  Widget _buildQuickActions(BuildContext context, WidgetRef ref) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -180,19 +182,16 @@ class HomeScreen extends ConsumerWidget {
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
       children: [
-        _buildActionItem(context, 'Attendance', Icons.fact_check, Colors.green),
-        _buildActionItem(context, 'Admissions', Icons.school,
-            const Color.fromARGB(255, 97, 102, 107)),
-        _buildActionItem(context, 'Finance', Icons.account_balance_wallet,
-            const Color.fromARGB(255, 97, 102, 107)),
-        _buildActionItem(context, 'Transport', Icons.directions_bus,
-            const Color.fromARGB(255, 97, 102, 107)),
+        _buildActionItem(
+            context, ref, 'Attendance', Icons.fact_check, Colors.green),
+        _buildActionItem(context, ref, 'Finance', Icons.account_balance_wallet,
+            Colors.purple),
       ],
     );
   }
 
-  Widget _buildActionItem(
-      BuildContext context, String label, IconData icon, Color color) {
+  Widget _buildActionItem(BuildContext context, WidgetRef ref, String label,
+      IconData icon, Color color) {
     return InkWell(
       onTap: () {
         if (label == 'Attendance') {
@@ -202,19 +201,26 @@ class HomeScreen extends ConsumerWidget {
               builder: (context) => AttendanceQuickActionsPage(),
             ),
           );
-        } else if (label == 'Admissions' ||
-            label == 'Finance' ||
-            label == 'Transport') {
+        } else if (label == 'Finance') {
+          Future.delayed(Duration(milliseconds: 100), () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FinanceQuickActionsPage(),
+              ),
+            );
+          });
+        } else if (label == 'Admissions' || label == 'Transport') {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('$label: Coming Soon'),
-              duration: Duration(seconds: 1), // Show snackbar for 3 seconds
+              duration: Duration(seconds: 1),
             ),
           );
         }
       },
       child: Material(
-        elevation: 4, // Adjust the elevation value as needed
+        elevation: 4,
         borderRadius: BorderRadius.circular(12),
         child: Container(
           decoration: BoxDecoration(

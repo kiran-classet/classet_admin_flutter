@@ -73,7 +73,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
 
     final userInfo = userDetails['data']['user_info'];
-    final profileImage = userInfo['studentPhoto']['storageLocation'] ?? '';
+    final profileImage = userInfo?['studentPhoto']?['storageLocation'];
     final name = userInfo['name'] ?? 'N/A';
 
     return Container(
@@ -89,7 +89,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         children: [
           CircleAvatar(
             radius: 60,
-            backgroundImage: NetworkImage(profileImage),
+            backgroundImage: profileImage != null && profileImage.isNotEmpty
+                ? NetworkImage(profileImage)
+                : null,
+            child: profileImage == null || profileImage.isEmpty
+                ? Icon(Icons.person, size: 60)
+                : null,
           ),
           const SizedBox(height: 16),
           Text(

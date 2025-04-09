@@ -13,16 +13,16 @@ class AttendanceQuickActionsPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: GridView.count(
-          crossAxisCount: 3,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
+          crossAxisCount: 4,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
           children: [
             _buildActionItem(
                 context, 'Mark Attendance', Icons.edit, Colors.green),
-            _buildActionItem(context, 'View Individual Student', Icons.person,
-                const Color.fromARGB(255, 97, 102, 107)),
-            _buildActionItem(context, 'Send Notifications', Icons.notifications,
-                const Color.fromARGB(255, 97, 102, 107)),
+            // _buildActionItem(context, 'View Individual Student', Icons.person,
+            //     const Color.fromARGB(255, 97, 102, 107)),
+            // _buildActionItem(context, 'Send Notifications', Icons.notifications,
+            //     const Color.fromARGB(255, 97, 102, 107)),
           ],
         ),
       ),
@@ -64,7 +64,7 @@ class AttendanceQuickActionsPage extends StatelessWidget {
               Icon(
                 icon,
                 color: color,
-                size: 32,
+                size: 30,
               ),
               const SizedBox(height: 8),
               Text(

@@ -16,8 +16,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final emailController = TextEditingController(text: '');
-  final passwordController = TextEditingController(text: '');
+  final emailController = TextEditingController(text: 'zaaadminuser');
+  final passwordController = TextEditingController(text: 'Classet@123');
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
 
@@ -321,13 +321,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(
-                          'Version ${AppConfig.version}', // Use dynamic version
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
+                        // Text(
+                        //   'Version ${AppConfig.version}', // Use dynamic version
+                        //   style: TextStyle(
+                        //     fontSize: 12,
+                        //     color: Colors.grey.shade500,
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
