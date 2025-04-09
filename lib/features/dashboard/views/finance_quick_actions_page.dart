@@ -157,36 +157,36 @@ class _FinanceQuickActionsPageState
                 BarChartData(
                   barGroups: _getBarChartData(),
                   titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true, // Show the left side (Y-axis)
-                        interval:
-                            1000000, // Adjust the interval for Y-axis labels
-                        getTitlesWidget: (value, meta) {
-                          // Format the value for better readability
-                          String formattedValue;
-                          if (value >= 1000000) {
-                            formattedValue =
-                                '${(value / 1000000).toStringAsFixed(1)}M'; // e.g., 1.5M
-                          } else if (value >= 1000) {
-                            formattedValue =
-                                '${(value / 1000).toStringAsFixed(1)}K'; // e.g., 1.2K
-                          } else {
-                            formattedValue =
-                                value.toInt().toString(); // e.g., 500
-                          }
+                    // leftTitles: AxisTitles(
+                    //   sideTitles: SideTitles(
+                    //     showTitles: true, // Show the left side (Y-axis)
+                    //     interval:
+                    //         1000000, // Adjust the interval for Y-axis labels
+                    //     getTitlesWidget: (value, meta) {
+                    //       // Format the value for better readability
+                    //       String formattedValue;
+                    //       if (value >= 1000000) {
+                    //         formattedValue =
+                    //             '${(value / 1000000).toStringAsFixed(1)}M'; // e.g., 1.5M
+                    //       } else if (value >= 1000) {
+                    //         formattedValue =
+                    //             '${(value / 1000).toStringAsFixed(1)}K'; // e.g., 1.2K
+                    //       } else {
+                    //         formattedValue =
+                    //             value.toInt().toString(); // e.g., 500
+                    //       }
 
-                          return Text(
-                            formattedValue,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                    //       return Text(
+                    //         formattedValue,
+                    //         style: const TextStyle(
+                    //           fontSize: 12,
+                    //           color: Colors.black,
+                    //           fontWeight: FontWeight.bold,
+                    //         ),
+                    //       );
+                    //     },
+                    //   ),
+                    // ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
@@ -261,10 +261,6 @@ class _FinanceQuickActionsPageState
             child: Column(
               children: [
                 if (_dashboardData != null) ...[
-                  _buildBarChartCard(), // Add the bar chart card here
-                  const SizedBox(
-                      height:
-                          16), // Add spacing between chart and summary cards
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -285,6 +281,10 @@ class _FinanceQuickActionsPageState
                     ],
                   ),
                   const SizedBox(height: 16),
+                  _buildBarChartCard(), // Add the bar chart card here
+                  const SizedBox(
+                      height:
+                          16), // Add spacing between chart and summary cards
                 ],
                 if (_isLoading)
                   const CircularProgressIndicator()
