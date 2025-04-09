@@ -132,31 +132,118 @@ class _FinanceQuickActionsPageState
     });
   }
 
-  Widget _buildBarChart() {
-    return BarChart(
-      BarChartData(
-        barGroups: _getBarChartData(),
-        titlesData: FlTitlesData(
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: false, // Hide the left side (Y-axis)
+  Widget _buildBarChartCard() {
+    return Card(
+      elevation: 8, // Add elevation for shadow
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12), // Rounded corners
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0), // Add padding inside the card
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Fee Collection Overview',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              getTitlesWidget: (value, meta) {
-                final charts = _dashboardData?['charts']?['feeCollection'];
-                final labels = charts?[_selectedTimeframe]?['labels'] ?? [];
-                if (value.toInt() < labels.length) {
-                  return Text(labels[value.toInt()]);
-                }
-                return const SizedBox.shrink();
-              },
+            const SizedBox(height: 16), // Add spacing between title and chart
+            SizedBox(
+              height: 300, // Set a fixed height for the chart
+              child: BarChart(
+                BarChartData(
+                  barGroups: _getBarChartData(),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true, // Show the left side (Y-axis)
+                        interval:
+                            1000000, // Adjust the interval for Y-axis labels
+                        getTitlesWidget: (value, meta) {
+                          // Format the value for better readability
+                          String formattedValue;
+                          if (value >= 1000000) {
+                            formattedValue =
+                                '${(value / 1000000).toStringAsFixed(1)}M'; // e.g., 1.5M
+                          } else if (value >= 1000) {
+                            formattedValue =
+                                '${(value / 1000).toStringAsFixed(1)}K'; // e.g., 1.2K
+                          } else {
+                            formattedValue =
+                                value.toInt().toString(); // e.g., 500
+                          }
+
+                          return Text(
+                            formattedValue,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final charts =
+                              _dashboardData?['charts']?['feeCollection'];
+                          final labels =
+                              charts?[_selectedTimeframe]?['labels'] ?? [];
+                          if (value.toInt() < labels.length) {
+                            return Text(labels[value.toInt()]);
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                ),
+              ),
             ),
-          ),
+            const SizedBox(height: 16), // Add spacing between chart and filters
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ChoiceChip(
+                  label: const Text('Monthly'),
+                  selected: _selectedTimeframe == 'monthly',
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedTimeframe = 'monthly';
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Weekly'),
+                  selected: _selectedTimeframe == 'weekly',
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedTimeframe = 'weekly';
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Daily'),
+                  selected: _selectedTimeframe == 'daily',
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedTimeframe = 'daily';
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
-        borderData: FlBorderData(show: false),
       ),
     );
   }
@@ -174,6 +261,10 @@ class _FinanceQuickActionsPageState
             child: Column(
               children: [
                 if (_dashboardData != null) ...[
+                  _buildBarChartCard(), // Add the bar chart card here
+                  const SizedBox(
+                      height:
+                          16), // Add spacing between chart and summary cards
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -227,10 +318,6 @@ class _FinanceQuickActionsPageState
                         },
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: _buildBarChart(),
                   ),
                 ],
                 if (_isLoading)
