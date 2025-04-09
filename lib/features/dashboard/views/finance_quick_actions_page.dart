@@ -107,8 +107,24 @@ class _FinanceQuickActionsPageState
       return branch['branchData'];
     }
 
-    // Return top-level data if no filters are applied
+    // Return organization-level data if no filters are applied
     return data['dashboardData'];
+  }
+
+  String _getCurrentHierarchy() {
+    if (_dashboardData == null) return 'No data available';
+
+    // Check for class, board, and branch details
+    if (_dashboardData?['className'] != null) {
+      return 'Class: ${_dashboardData?['className']}';
+    } else if (_dashboardData?['boardName'] != null) {
+      return 'Board: ${_dashboardData?['boardName']}';
+    } else if (_dashboardData?['branchName'] != null) {
+      return 'Branch: ${_dashboardData?['branchName']}';
+    }
+
+    // Default to organization name
+    return _dashboardData?['orgName'] ?? 'Organization';
   }
 
   List<BarChartGroupData> _getBarChartData() {
@@ -259,8 +275,16 @@ class _FinanceQuickActionsPageState
           body: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (_dashboardData != null) ...[
+                  // Text(
+                  //   _getCurrentHierarchy(),
+                  //   style: const TextStyle(
+                  //     fontSize: 16,
+                  //     fontWeight: FontWeight.bold,
+                  //   ),
+                  // ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -280,11 +304,14 @@ class _FinanceQuickActionsPageState
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(
+                      height: 8), // Add spacing below the hierarchy text
                   _buildBarChartCard(), // Add the bar chart card here
                   const SizedBox(
                       height:
                           16), // Add spacing between chart and summary cards
+
+                  const SizedBox(height: 16),
                 ],
                 if (_isLoading)
                   const CircularProgressIndicator()
