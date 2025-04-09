@@ -296,7 +296,7 @@ class _FinanceQuickActionsPageState
                         Colors.green,
                       ),
                       _buildSummaryCard(
-                        'Total Concession',
+                        'Concession',
                         _dashboardData?['summaryCards']?['feeConcession']
                                 ?.toString() ??
                             'N/A',
@@ -383,32 +383,78 @@ class _FinanceQuickActionsPageState
     );
   }
 
-  Widget _buildSummaryCard(String title, String value, Color color) {
+  String formatIndianRupees(dynamic amount) {
+    if (amount == null) return '₹0';
+
+    double numericAmount =
+        amount is String ? double.tryParse(amount) ?? 0 : amount.toDouble();
+
+    RegExp regex = RegExp(r'(\d+?)(?=(\d\d)+(\d)(?!\d))');
+    String formattedAmount = numericAmount
+        .toStringAsFixed(0)
+        .replaceAllMapped(regex, (Match match) => '${match[1]},');
+
+    return '₹$formattedAmount';
+  }
+
+  Widget _buildSummaryCard(String title, dynamic value, Color color) {
+    String displayValue = value is num || value is String
+        ? formatIndianRupees(value)
+        : value.toString();
+
     return Expanded(
       child: Card(
         elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15.0),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withOpacity(0.1),
+                Colors.white,
+              ],
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                    letterSpacing: 0.5,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 12),
+                Text(
+                  displayValue,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                Container(
+                  height: 3,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
