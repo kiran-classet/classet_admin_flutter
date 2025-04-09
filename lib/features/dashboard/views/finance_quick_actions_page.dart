@@ -20,6 +20,7 @@ class _FinanceQuickActionsPageState
   bool _isLoading = false;
   bool _isInitialized = false; // Track initialization
   String _selectedTimeframe = 'monthly'; // Default to monthly
+  String _selectedPaymentModeMetric = 'amount'; // Default to amounts
 
   @override
   void initState() {
@@ -111,22 +112,6 @@ class _FinanceQuickActionsPageState
     return data['dashboardData'];
   }
 
-  String _getCurrentHierarchy() {
-    if (_dashboardData == null) return 'No data available';
-
-    // Check for class, board, and branch details
-    if (_dashboardData?['className'] != null) {
-      return 'Class: ${_dashboardData?['className']}';
-    } else if (_dashboardData?['boardName'] != null) {
-      return 'Board: ${_dashboardData?['boardName']}';
-    } else if (_dashboardData?['branchName'] != null) {
-      return 'Branch: ${_dashboardData?['branchName']}';
-    }
-
-    // Default to organization name
-    return _dashboardData?['orgName'] ?? 'Organization';
-  }
-
   List<BarChartGroupData> _getBarChartData() {
     if (_dashboardData == null) return [];
 
@@ -146,6 +131,53 @@ class _FinanceQuickActionsPageState
         ],
       );
     });
+  }
+
+  List<PieChartSectionData> _getPieChartData() {
+    if (_dashboardData == null) return [];
+
+    final paymentModes = _dashboardData?['charts']?['paymentModes'];
+    final labels = paymentModes?['labels'] ?? [];
+    final details = paymentModes?['details'] ?? {};
+
+    return List.generate(labels.length, (index) {
+      final label = labels[index]; // Use the label as-is
+      final key = label
+          .toLowerCase()
+          .replaceAll(' ', '_'); // Convert to match the details key format
+      final value = _selectedPaymentModeMetric == 'amount'
+          ? (details[key]?['amount'] ?? 0) // Default to 0 if missing
+          : (details[key]?['count'] ?? 0); // Default to 0 if missing
+
+      // Ensure a small placeholder value for sections with 0 value
+      final displayValue = value > 0 ? value.toDouble() : 0.01;
+
+      return PieChartSectionData(
+        value: displayValue,
+        title:
+            value > 0 ? value.toString() : '', // Show title only if value > 0
+        color: _getColorForIndex(index),
+        radius: 50,
+        titleStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      );
+    });
+  }
+
+  // Helper method to assign colors to pie chart sections
+  Color _getColorForIndex(int index) {
+    const colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.red,
+      Colors.teal,
+    ];
+    return colors[index % colors.length];
   }
 
   Widget _buildBarChartCard() {
@@ -264,6 +296,103 @@ class _FinanceQuickActionsPageState
     );
   }
 
+  Widget _buildLegend() {
+    final paymentModes = _dashboardData?['charts']?['paymentModes'];
+    final labels = paymentModes?['labels'] ?? [];
+    final details = paymentModes?['details'] ?? {};
+
+    return Wrap(
+      spacing: 8.0, // Spacing between items
+      runSpacing: 8.0, // Spacing between rows
+      children: List.generate(labels.length, (index) {
+        final label = labels[index];
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color:
+                    _getColorForIndex(index), // Use the color for the section
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 4), // Spacing between color and label
+            Text(
+              '$label',
+              style: const TextStyle(fontSize: 12),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget _buildPieChartCard() {
+    return Card(
+      elevation: 8, // Add elevation for shadow
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12), // Rounded corners
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0), // Add padding inside the card
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Payment Modes Overview',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16), // Add spacing between title and chart
+            SizedBox(
+              height: 300, // Set a fixed height for the chart
+              child: PieChart(
+                PieChartData(
+                  sections: _getPieChartData(),
+                  centerSpaceRadius: 40,
+                  sectionsSpace: 2,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16), // Add spacing between chart and legend
+            _buildLegend(), // Add the legend below the chart
+            const SizedBox(
+                height: 16), // Add spacing between legend and filters
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ChoiceChip(
+                  label: const Text('Amount'),
+                  selected: _selectedPaymentModeMetric == 'amount',
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedPaymentModeMetric = 'amount';
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Count'),
+                  selected: _selectedPaymentModeMetric == 'count',
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedPaymentModeMetric = 'count';
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -272,52 +401,45 @@ class _FinanceQuickActionsPageState
           appBar: AppBar(
             title: const Text('Finance Management'),
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_dashboardData != null) ...[
-                  // Text(
-                  //   _getCurrentHierarchy(),
-                  //   style: const TextStyle(
-                  //     fontSize: 16,
-                  //     fontWeight: FontWeight.bold,
-                  //   ),
-                  // ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildSummaryCard(
-                        'Fee Collected',
-                        _dashboardData?['summaryCards']?['feeCollection']
-                                ?.toString() ??
-                            'N/A',
-                        Colors.green,
-                      ),
-                      _buildSummaryCard(
-                        'Concession',
-                        _dashboardData?['summaryCards']?['feeConcession']
-                                ?.toString() ??
-                            'N/A',
-                        Colors.blue,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                      height: 8), // Add spacing below the hierarchy text
-                  _buildBarChartCard(), // Add the bar chart card here
-                  const SizedBox(
-                      height:
-                          16), // Add spacing between chart and summary cards
-
-                  const SizedBox(height: 16),
+          body: SingleChildScrollView(
+            // Wrap the content in a scrollable view
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_dashboardData != null) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildSummaryCard(
+                          'Fee Collected',
+                          _dashboardData?['summaryCards']?['feeCollection']
+                                  ?.toString() ??
+                              'N/A',
+                          Colors.green,
+                        ),
+                        _buildSummaryCard(
+                          'Concession',
+                          _dashboardData?['summaryCards']?['feeConcession']
+                                  ?.toString() ??
+                              'N/A',
+                          Colors.blue,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16), // Add spacing between sections
+                    _buildPieChartCard(), // Add the pie chart card here
+                    const SizedBox(height: 16), // Add spacing between charts
+                    _buildBarChartCard(), // Add the bar chart card here
+                    const SizedBox(height: 16),
+                  ],
+                  if (_isLoading)
+                    const CircularProgressIndicator()
+                  else if (_dashboardData == null)
+                    const Text('No data available for the selected filters.'),
                 ],
-                if (_isLoading)
-                  const CircularProgressIndicator()
-                else if (_dashboardData == null)
-                  const Text('No data available for the selected filters.'),
-              ],
+              ),
             ),
           ),
           floatingActionButton: FilterButtonWidget(
@@ -336,50 +458,6 @@ class _FinanceQuickActionsPageState
             ),
           ),
       ],
-    );
-  }
-
-  Widget _buildActionItem(
-      BuildContext context, String label, IconData icon, Color color) {
-    return InkWell(
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$label: Coming Soon'),
-            duration: Duration(seconds: 1),
-          ),
-        );
-      },
-      child: Material(
-        elevation: 4,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                color: color,
-                size: 32,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
