@@ -4,6 +4,7 @@ import 'package:classet_admin/core/widgets/filter_button_widget.dart';
 import 'package:classet_admin/core/providers/filter_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:classet_admin/core/services/api_service.dart';
+import 'package:fl_chart/fl_chart.dart'; // Import for bar chart
 
 class FinanceQuickActionsPage extends ConsumerStatefulWidget {
   const FinanceQuickActionsPage({super.key});
@@ -18,6 +19,7 @@ class _FinanceQuickActionsPageState
   Map<String, dynamic>? _dashboardData;
   bool _isLoading = false;
   bool _isInitialized = false; // Track initialization
+  String _selectedTimeframe = 'monthly'; // Default to monthly
 
   @override
   void initState() {
@@ -109,6 +111,56 @@ class _FinanceQuickActionsPageState
     return data['dashboardData'];
   }
 
+  List<BarChartGroupData> _getBarChartData() {
+    if (_dashboardData == null) return [];
+
+    final charts = _dashboardData?['charts']?['feeCollection'];
+    final labels = charts?[_selectedTimeframe]?['labels'] ?? [];
+    final data = charts?[_selectedTimeframe]?['data']?[0] ?? [];
+
+    return List.generate(labels.length, (index) {
+      return BarChartGroupData(
+        x: index,
+        barRods: [
+          BarChartRodData(
+            toY: data[index]?.toDouble() ?? 0,
+            color: Colors.blue,
+            width: 16,
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildBarChart() {
+    return BarChart(
+      BarChartData(
+        barGroups: _getBarChartData(),
+        titlesData: FlTitlesData(
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: false, // Hide the left side (Y-axis)
+            ),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, meta) {
+                final charts = _dashboardData?['charts']?['feeCollection'];
+                final labels = charts?[_selectedTimeframe]?['labels'] ?? [];
+                if (value.toInt() < labels.length) {
+                  return Text(labels[value.toInt()]);
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ),
+        borderData: FlBorderData(show: false),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -142,7 +194,44 @@ class _FinanceQuickActionsPageState
                     ],
                   ),
                   const SizedBox(height: 16),
-                  // Add charts or other data visualizations here
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ChoiceChip(
+                        label: const Text('Monthly'),
+                        selected: _selectedTimeframe == 'monthly',
+                        onSelected: (selected) {
+                          setState(() {
+                            _selectedTimeframe = 'monthly';
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('Weekly'),
+                        selected: _selectedTimeframe == 'weekly',
+                        onSelected: (selected) {
+                          setState(() {
+                            _selectedTimeframe = 'weekly';
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: const Text('Daily'),
+                        selected: _selectedTimeframe == 'daily',
+                        onSelected: (selected) {
+                          setState(() {
+                            _selectedTimeframe = 'daily';
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: _buildBarChart(),
+                  ),
                 ],
                 if (_isLoading)
                   const CircularProgressIndicator()
