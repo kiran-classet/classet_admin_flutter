@@ -285,40 +285,6 @@ class _FinanceQuickActionsPageState
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ChoiceChip(
-                        label: const Text('Monthly'),
-                        selected: _selectedTimeframe == 'monthly',
-                        onSelected: (selected) {
-                          setState(() {
-                            _selectedTimeframe = 'monthly';
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      ChoiceChip(
-                        label: const Text('Weekly'),
-                        selected: _selectedTimeframe == 'weekly',
-                        onSelected: (selected) {
-                          setState(() {
-                            _selectedTimeframe = 'weekly';
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      ChoiceChip(
-                        label: const Text('Daily'),
-                        selected: _selectedTimeframe == 'daily',
-                        onSelected: (selected) {
-                          setState(() {
-                            _selectedTimeframe = 'daily';
-                          });
-                        },
-                      ),
-                    ],
-                  ),
                 ],
                 if (_isLoading)
                   const CircularProgressIndicator()
