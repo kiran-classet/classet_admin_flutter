@@ -18,24 +18,16 @@ class HelpCenterScreen extends StatelessWidget {
               'Frequently Asked Questions',
               [
                 _buildFAQItem(
-                  'How do I reset my password?',
-                  'Go to Settings > Security > Change Password and follow the instructions.',
+                  'How can I update the academic year?',
+                  'Navigate to Profile > Academic Year > Change Academic Year and follow the provided steps.',
                 ),
                 _buildFAQItem(
-                  'How do I update my profile?',
-                  'Navigate to Settings > Account > Profile Settings to update your information.',
+                  'What should I do to reset my password?',
+                  'Please contact the administrator at support@classet.in or call +91 77992 79701.',
                 ),
                 _buildFAQItem(
-                  'How do I manage notifications?',
-                  'Go to Settings > Notifications to customize your notification preferences.',
-                ),
-                _buildFAQItem(
-                  'How do I contact customer support?',
-                  'You can contact customer support via the Help Center > Contact Support section.',
-                ),
-                _buildFAQItem(
-                  'How do I report a bug?',
-                  'Navigate to Help Center > Report a Bug and provide the necessary details.',
+                  'What is the process for marking attendance?',
+                  'Go to Home > Attendance > Mark Attendance. Use filters to select classes down to the section level to view students.',
                 ),
               ],
             ),

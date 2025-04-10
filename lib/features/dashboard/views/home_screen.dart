@@ -184,8 +184,8 @@ class HomeScreen extends ConsumerWidget {
       children: [
         _buildActionItem(
             context, ref, 'Attendance', Icons.fact_check, Colors.green),
-        _buildActionItem(context, ref, 'Finance', Icons.account_balance_wallet,
-            Colors.purple),
+        _buildActionItem(
+            context, ref, 'Fee', Icons.account_balance_wallet, Colors.purple),
       ],
     );
   }
@@ -201,7 +201,7 @@ class HomeScreen extends ConsumerWidget {
               builder: (context) => AttendanceQuickActionsPage(),
             ),
           );
-        } else if (label == 'Finance') {
+        } else if (label == 'Fee') {
           Future.delayed(Duration(milliseconds: 100), () {
             Navigator.push(
               context,

@@ -21,7 +21,7 @@ class _FinanceQuickActionsPageState
   bool _isInitialized = false; // Track initialization
   String _selectedTimeframe = 'monthly'; // Default to monthly
   String _selectedPaymentModeMetric = 'amount'; // Default to amounts
-  String _selectedConcessionMetric = 'count'; // Default to counts
+  String _selectedConcessionMetric = 'amount'; // Default to counts
 
   @override
   void initState() {
@@ -158,7 +158,7 @@ class _FinanceQuickActionsPageState
         title:
             value > 0 ? value.toString() : '', // Show title only if value > 0
         color: _getColorForIndex(index),
-        radius: 50,
+        radius: 140,
         titleStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
@@ -186,10 +186,11 @@ class _FinanceQuickActionsPageState
 
       return PieChartSectionData(
         value: displayValue,
-        title:
-            value > 0 ? value.toString() : '', // Show title only if value > 0
+        title: value > 0
+            ? value.toInt().toString()
+            : '', // Show title only if value > 0
         color: _getColorForIndex(index),
-        radius: 50,
+        radius: 140,
         titleStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
@@ -224,7 +225,7 @@ class _FinanceQuickActionsPageState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Fee Collection Overview',
+              'Fee Collection',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -237,6 +238,36 @@ class _FinanceQuickActionsPageState
                 BarChartData(
                   barGroups: _getBarChartData(),
                   titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true, // Show the left side (Y-axis)
+                        interval:
+                            1000000, // Adjust the interval for Y-axis labels
+                        getTitlesWidget: (value, meta) {
+                          // Format the value for better readability
+                          String formattedValue;
+                          if (value >= 1000000) {
+                            formattedValue =
+                                '${(value / 1000000).toStringAsFixed(1)}M'; // e.g., 1.5M
+                          } else if (value >= 1000) {
+                            formattedValue =
+                                '${(value / 1000).toStringAsFixed(1)}K'; // e.g., 1.2K
+                          } else {
+                            formattedValue =
+                                value.toInt().toString(); // e.g., 500
+                          }
+
+                          return Text(
+                            formattedValue,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
@@ -360,7 +391,8 @@ class _FinanceQuickActionsPageState
             ),
             const SizedBox(width: 4), // Spacing between color and label
             Text(
-              '$label: ${_selectedConcessionMetric == 'amount' ? formatIndianRupees(value) : value}',
+              // '$label: ${_selectedConcessionMetric == 'amount' ? formatIndianRupees(value) : value}',
+              '$label',
               style: const TextStyle(fontSize: 12),
             ),
           ],
@@ -381,7 +413,7 @@ class _FinanceQuickActionsPageState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Payment Modes Overview',
+              'Payment Modes',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -393,7 +425,7 @@ class _FinanceQuickActionsPageState
               child: PieChart(
                 PieChartData(
                   sections: _getPieChartData(),
-                  centerSpaceRadius: 40,
+                  centerSpaceRadius: 0,
                   sectionsSpace: 2,
                 ),
               ),
@@ -444,7 +476,7 @@ class _FinanceQuickActionsPageState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Concessions Overview',
+              'Concessions',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -456,7 +488,7 @@ class _FinanceQuickActionsPageState
               child: PieChart(
                 PieChartData(
                   sections: _getConcessionsPieChartData(),
-                  centerSpaceRadius: 40,
+                  centerSpaceRadius: 0,
                   sectionsSpace: 2,
                 ),
               ),
@@ -469,21 +501,21 @@ class _FinanceQuickActionsPageState
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ChoiceChip(
-                  label: const Text('Count'),
-                  selected: _selectedConcessionMetric == 'count',
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedConcessionMetric = 'count';
-                    });
-                  },
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
                   label: const Text('Amount'),
                   selected: _selectedConcessionMetric == 'amount',
                   onSelected: (selected) {
                     setState(() {
                       _selectedConcessionMetric = 'amount';
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Count'),
+                  selected: _selectedConcessionMetric == 'count',
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedConcessionMetric = 'count';
                     });
                   },
                 ),
@@ -501,7 +533,7 @@ class _FinanceQuickActionsPageState
       children: [
         Scaffold(
           appBar: AppBar(
-            title: const Text('Finance Management'),
+            title: const Text('Fee Reports'),
           ),
           body: SingleChildScrollView(
             // Wrap the content in a scrollable view
@@ -530,12 +562,12 @@ class _FinanceQuickActionsPageState
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    _buildBarChartCard(), // Add the bar chart card here
                     const SizedBox(height: 16), // Add spacing between sections
                     _buildPieChartCard(), // Add the payment modes pie chart card
                     const SizedBox(height: 16), // Add spacing between charts
                     _buildConcessionsPieChartCard(), // Add the concessions pie chart card
-                    const SizedBox(height: 16),
-                    _buildBarChartCard(), // Add the bar chart card here
                     const SizedBox(height: 16),
                   ],
                   if (_isLoading)
