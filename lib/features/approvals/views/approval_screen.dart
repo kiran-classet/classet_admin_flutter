@@ -25,13 +25,6 @@ class _ApprovalScreenState extends State<ApprovalScreen>
     setState(() {
       _approvalData = [
         {
-          "title": "Leave Request",
-          "requesterName": "Kiran",
-          "requestDate": "2024-01-01",
-          "type": "Sick Leave",
-          "status": "pending"
-        },
-        {
           "title": "Expense Reimbursement",
           "requesterName": "Mohan",
           "requestDate": "2024-01-02",
@@ -102,7 +95,7 @@ class _ApprovalScreenState extends State<ApprovalScreen>
         _approvalData.where((item) => item['status'] == status.name).toList();
 
     return filteredData.isEmpty
-        ? const Center(child: Text('No data available'))
+        ? const Center(child: Text('No Requests Pending'))
         : ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: filteredData.length,

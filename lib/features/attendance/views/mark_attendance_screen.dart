@@ -36,13 +36,11 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
     if (sectionId == null) {
       setState(() {
         _students.clear();
+        _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No section selected in filters')),
       );
-      setState(() {
-        _isLoading = false; // Hide loader
-      });
       return;
     }
 

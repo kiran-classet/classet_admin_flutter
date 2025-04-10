@@ -87,30 +87,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
               });
             },
           ),
-          SwitchListTile(
-            title: const Text('Email Notifications'),
-            subtitle: const Text('Receive email updates'),
-            value: _emailNotifications,
-            onChanged: _notificationsEnabled
-                ? (bool value) {
-                    setState(() {
-                      _emailNotifications = value;
-                    });
-                  }
-                : null,
-          ),
-          SwitchListTile(
-            title: const Text('SMS Notifications'),
-            subtitle: const Text('Receive SMS alerts'),
-            value: _smsNotifications,
-            onChanged: _notificationsEnabled
-                ? (bool value) {
-                    setState(() {
-                      _smsNotifications = value;
-                    });
-                  }
-                : null,
-          ),
+          // SwitchListTile(
+          //   title: const Text('Email Notifications'),
+          //   subtitle: const Text('Receive email updates'),
+          //   value: _emailNotifications,
+          //   onChanged: _notificationsEnabled
+          //       ? (bool value) {
+          //           setState(() {
+          //             _emailNotifications = value;
+          //           });
+          //         }
+          //       : null,
+          // ),
+          // SwitchListTile(
+          //   title: const Text('SMS Notifications'),
+          //   subtitle: const Text('Receive SMS alerts'),
+          //   value: _smsNotifications,
+          //   onChanged: _notificationsEnabled
+          //       ? (bool value) {
+          //           setState(() {
+          //             _smsNotifications = value;
+          //           });
+          //         }
+          //       : null,
+          // ),
         ],
       ),
     );

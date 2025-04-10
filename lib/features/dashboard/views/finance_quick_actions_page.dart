@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:classet_admin/core/widgets/filter_button_widget.dart';
@@ -5,6 +7,850 @@ import 'package:classet_admin/core/providers/filter_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:classet_admin/core/services/api_service.dart';
 import 'package:fl_chart/fl_chart.dart'; // Import for bar chart
+
+final dummyData = {
+  "status": true,
+  "data": {
+    "success": true,
+    "data": {
+      "orgId": "67a07dfc6dcf7f5cfd640077",
+      "orgName": "Meluha International School",
+      "dashboardData": {
+        "summaryCards": {"feeCollection": 0, "feeConcession": 0},
+        "charts": {
+          "feeCollection": {
+            "monthly": {
+              "labels": ["Jan", "Feb", "Mar", "Apr"],
+              "data": [
+                [0, 0, 0, 0]
+              ],
+              "total": 0
+            },
+            "weekly": {
+              "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+              "data": [
+                [0, 0, 0, 0]
+              ],
+              "total": 0
+            },
+            "daily": {
+              "labels": ["Mon", "Tue", "Wed", "Thu"],
+              "data": [
+                [0, 0, 0, 0]
+              ],
+              "total": 0
+            }
+          },
+          "paymentModes": {
+            "labels": [],
+            "data": [],
+            "details": {
+              "cash": {"count": 0, "amount": 0},
+              "online": {"count": 0, "amount": 0},
+              "credit_card": {"count": 0, "amount": 0},
+              "debit_card": {"count": 0, "amount": 0},
+              "qr_code": {"count": 0, "amount": 0},
+              "cheque_dd": {"count": 0, "amount": 0}
+            },
+            "total": 0
+          },
+          "concessions": {
+            "data": [0, 0, 0],
+            "labels": ["Granted", "Rejected", "Pending"],
+            "details": {
+              "granted": {"count": 0, "amount": 0},
+              "rejected": {"count": 0, "amount": 0},
+              "pending": {"count": 0, "amount": 0}
+            }
+          }
+        }
+      },
+      "branches": [
+        {
+          "branchId": "68cb9159-f951-411f-8fc7-95caeb0771e9",
+          "branchName": "Meluha International School",
+          "branchData": {
+            "summaryCards": {"feeCollection": 669498, "feeConcession": 0},
+            "charts": {
+              "feeCollection": {
+                "monthly": {
+                  "labels": ["Jan", "Feb", "Mar", "Apr"],
+                  "data": [
+                    [0, 0, 0, 669498]
+                  ],
+                  "total": 669498
+                },
+                "weekly": {
+                  "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                  "data": [
+                    [669498, 0, 0, 0]
+                  ],
+                  "total": 669498
+                },
+                "daily": {
+                  "labels": ["Mon", "Tue", "Wed", "Thu"],
+                  "data": [
+                    [0, 0, 0, 0]
+                  ],
+                  "total": 0
+                }
+              },
+              "paymentModes": {
+                "labels": [
+                  "CASH",
+                  "ONLINE",
+                  "CREDIT CARD",
+                  "DEBIT CARD",
+                  "CHEQUE DD"
+                ],
+                "data": [46466, 200000, 103032, 120000, 200000],
+                "details": {
+                  "cash": {"count": 2, "amount": 46466},
+                  "online": {"count": 4, "amount": 200000},
+                  "credit_card": {"count": 3, "amount": 103032},
+                  "debit_card": {"count": 3, "amount": 120000},
+                  "qr_code": {"count": 0, "amount": 0},
+                  "cheque_dd": {"count": 4, "amount": 200000}
+                },
+                "total": 669498
+              },
+              "concessions": {
+                "data": [8, 0, 0],
+                "labels": ["Granted", "Rejected", "Pending"],
+                "details": {
+                  "granted": {"count": 8, "amount": 23999.989999999998},
+                  "rejected": {"count": 0, "amount": 0},
+                  "pending": {"count": 0, "amount": 0}
+                }
+              }
+            }
+          },
+          "boards": [
+            {
+              "boardId": "78c97fc8-ddaf-4e72-abb1-abadeb3779e7",
+              "boardName": "Central Board of Secondary Education",
+              "boardData": {
+                "summaryCards": {"feeCollection": 669498, "feeConcession": 0},
+                "charts": {
+                  "feeCollection": {
+                    "monthly": {
+                      "labels": ["Jan", "Feb", "Mar", "Apr"],
+                      "data": [
+                        [0, 0, 0, 669498]
+                      ],
+                      "total": 669498
+                    },
+                    "weekly": {
+                      "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                      "data": [
+                        [669498, 0, 0, 0]
+                      ],
+                      "total": 669498
+                    },
+                    "daily": {
+                      "labels": ["Mon", "Tue", "Wed", "Thu"],
+                      "data": [
+                        [0, 0, 0, 0]
+                      ],
+                      "total": 0
+                    }
+                  },
+                  "paymentModes": {
+                    "labels": [
+                      "CASH",
+                      "ONLINE",
+                      "CREDIT CARD",
+                      "DEBIT CARD",
+                      "CHEQUE DD"
+                    ],
+                    "data": [46466, 200000, 103032, 120000, 200000],
+                    "details": {
+                      "cash": {"count": 2, "amount": 46466},
+                      "online": {"count": 4, "amount": 200000},
+                      "credit_card": {"count": 3, "amount": 103032},
+                      "debit_card": {"count": 3, "amount": 120000},
+                      "qr_code": {"count": 0, "amount": 0},
+                      "cheque_dd": {"count": 4, "amount": 200000}
+                    },
+                    "total": 669498
+                  },
+                  "concessions": {
+                    "data": [8, 0, 0],
+                    "labels": ["Granted", "Rejected", "Pending"],
+                    "details": {
+                      "granted": {"count": 8, "amount": 23999.989999999998},
+                      "rejected": {"count": 0, "amount": 0},
+                      "pending": {"count": 0, "amount": 0}
+                    }
+                  }
+                }
+              },
+              "classes": [
+                {
+                  "classId": "0a48796b-55bc-4008-b8f9-ea52bc695aba",
+                  "className": "Grade I",
+                  "dashboardData": {
+                    "summaryCards": {
+                      "feeCollection": 669498,
+                      "feeConcession": 0
+                    },
+                    "charts": {
+                      "feeCollection": {
+                        "monthly": {
+                          "labels": ["Jan", "Feb", "Mar", "Apr"],
+                          "data": [
+                            [0, 0, 0, 669498]
+                          ],
+                          "total": 669498
+                        },
+                        "weekly": {
+                          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                          "data": [
+                            [669498, 0, 0, 0]
+                          ],
+                          "total": 669498
+                        },
+                        "daily": {
+                          "labels": ["Mon", "Tue", "Wed", "Thu"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        }
+                      },
+                      "paymentModes": {
+                        "labels": [
+                          "CASH",
+                          "ONLINE",
+                          "CREDIT CARD",
+                          "DEBIT CARD",
+                          "CHEQUE DD"
+                        ],
+                        "data": [46466, 200000, 103032, 120000, 200000],
+                        "details": {
+                          "cash": {"count": 2, "amount": 46466},
+                          "online": {"count": 4, "amount": 200000},
+                          "credit_card": {"count": 3, "amount": 103032},
+                          "debit_card": {"count": 3, "amount": 120000},
+                          "qr_code": {"count": 0, "amount": 0},
+                          "cheque_dd": {"count": 4, "amount": 200000}
+                        },
+                        "total": 669498
+                      },
+                      "concessions": {
+                        "data": [8, 0, 0],
+                        "labels": ["Granted", "Rejected", "Pending"],
+                        "details": {
+                          "granted": {"count": 8, "amount": 23999.989999999998},
+                          "rejected": {"count": 0, "amount": 0},
+                          "pending": {"count": 0, "amount": 0}
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "classId": "5ab8abab-558b-456c-9036-e59af432195d",
+                  "className": "Grade II",
+                  "dashboardData": {
+                    "summaryCards": {"feeCollection": 0, "feeConcession": 0},
+                    "charts": {
+                      "feeCollection": {
+                        "monthly": {
+                          "labels": ["Jan", "Feb", "Mar", "Apr"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "weekly": {
+                          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "daily": {
+                          "labels": ["Mon", "Tue", "Wed", "Thu"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        }
+                      },
+                      "paymentModes": {
+                        "labels": [],
+                        "data": [],
+                        "details": {
+                          "cash": {"count": 0, "amount": 0},
+                          "online": {"count": 0, "amount": 0},
+                          "credit_card": {"count": 0, "amount": 0},
+                          "debit_card": {"count": 0, "amount": 0},
+                          "qr_code": {"count": 0, "amount": 0},
+                          "cheque_dd": {"count": 0, "amount": 0}
+                        },
+                        "total": 0
+                      },
+                      "concessions": {
+                        "data": [0, 0, 0],
+                        "labels": ["Granted", "Rejected", "Pending"],
+                        "details": {
+                          "granted": {"count": 0, "amount": 0},
+                          "rejected": {"count": 0, "amount": 0},
+                          "pending": {"count": 0, "amount": 0}
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "classId": "afecfb7d-c303-4950-a434-7ff3009a10ca",
+                  "className": "Grade III",
+                  "dashboardData": {
+                    "summaryCards": {"feeCollection": 0, "feeConcession": 0},
+                    "charts": {
+                      "feeCollection": {
+                        "monthly": {
+                          "labels": ["Jan", "Feb", "Mar", "Apr"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "weekly": {
+                          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "daily": {
+                          "labels": ["Mon", "Tue", "Wed", "Thu"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        }
+                      },
+                      "paymentModes": {
+                        "labels": [],
+                        "data": [],
+                        "details": {
+                          "cash": {"count": 0, "amount": 0},
+                          "online": {"count": 0, "amount": 0},
+                          "credit_card": {"count": 0, "amount": 0},
+                          "debit_card": {"count": 0, "amount": 0},
+                          "qr_code": {"count": 0, "amount": 0},
+                          "cheque_dd": {"count": 0, "amount": 0}
+                        },
+                        "total": 0
+                      },
+                      "concessions": {
+                        "data": [0, 0, 0],
+                        "labels": ["Granted", "Rejected", "Pending"],
+                        "details": {
+                          "granted": {"count": 0, "amount": 0},
+                          "rejected": {"count": 0, "amount": 0},
+                          "pending": {"count": 0, "amount": 0}
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "classId": "f2b8db55-57b4-4042-b4c2-534fbed19e0d",
+                  "className": "Grade IV",
+                  "dashboardData": {
+                    "summaryCards": {"feeCollection": 0, "feeConcession": 0},
+                    "charts": {
+                      "feeCollection": {
+                        "monthly": {
+                          "labels": ["Jan", "Feb", "Mar", "Apr"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "weekly": {
+                          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "daily": {
+                          "labels": ["Mon", "Tue", "Wed", "Thu"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        }
+                      },
+                      "paymentModes": {
+                        "labels": [],
+                        "data": [],
+                        "details": {
+                          "cash": {"count": 0, "amount": 0},
+                          "online": {"count": 0, "amount": 0},
+                          "credit_card": {"count": 0, "amount": 0},
+                          "debit_card": {"count": 0, "amount": 0},
+                          "qr_code": {"count": 0, "amount": 0},
+                          "cheque_dd": {"count": 0, "amount": 0}
+                        },
+                        "total": 0
+                      },
+                      "concessions": {
+                        "data": [0, 0, 0],
+                        "labels": ["Granted", "Rejected", "Pending"],
+                        "details": {
+                          "granted": {"count": 0, "amount": 0},
+                          "rejected": {"count": 0, "amount": 0},
+                          "pending": {"count": 0, "amount": 0}
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "classId": "fc31d04b-39b0-4035-8c9e-5a479f4be811",
+                  "className": "Grade V",
+                  "dashboardData": {
+                    "summaryCards": {"feeCollection": 0, "feeConcession": 0},
+                    "charts": {
+                      "feeCollection": {
+                        "monthly": {
+                          "labels": ["Jan", "Feb", "Mar", "Apr"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "weekly": {
+                          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "daily": {
+                          "labels": ["Mon", "Tue", "Wed", "Thu"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        }
+                      },
+                      "paymentModes": {
+                        "labels": [],
+                        "data": [],
+                        "details": {
+                          "cash": {"count": 0, "amount": 0},
+                          "online": {"count": 0, "amount": 0},
+                          "credit_card": {"count": 0, "amount": 0},
+                          "debit_card": {"count": 0, "amount": 0},
+                          "qr_code": {"count": 0, "amount": 0},
+                          "cheque_dd": {"count": 0, "amount": 0}
+                        },
+                        "total": 0
+                      },
+                      "concessions": {
+                        "data": [0, 0, 0],
+                        "labels": ["Granted", "Rejected", "Pending"],
+                        "details": {
+                          "granted": {"count": 0, "amount": 0},
+                          "rejected": {"count": 0, "amount": 0},
+                          "pending": {"count": 0, "amount": 0}
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "classId": "9121baa1-5672-4781-b0b3-97a4304393b3",
+                  "className": "Grade VI",
+                  "dashboardData": {
+                    "summaryCards": {"feeCollection": 0, "feeConcession": 0},
+                    "charts": {
+                      "feeCollection": {
+                        "monthly": {
+                          "labels": ["Jan", "Feb", "Mar", "Apr"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "weekly": {
+                          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "daily": {
+                          "labels": ["Mon", "Tue", "Wed", "Thu"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        }
+                      },
+                      "paymentModes": {
+                        "labels": [],
+                        "data": [],
+                        "details": {
+                          "cash": {"count": 0, "amount": 0},
+                          "online": {"count": 0, "amount": 0},
+                          "credit_card": {"count": 0, "amount": 0},
+                          "debit_card": {"count": 0, "amount": 0},
+                          "qr_code": {"count": 0, "amount": 0},
+                          "cheque_dd": {"count": 0, "amount": 0}
+                        },
+                        "total": 0
+                      },
+                      "concessions": {
+                        "data": [0, 0, 0],
+                        "labels": ["Granted", "Rejected", "Pending"],
+                        "details": {
+                          "granted": {"count": 0, "amount": 0},
+                          "rejected": {"count": 0, "amount": 0},
+                          "pending": {"count": 0, "amount": 0}
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "classId": "2b9da96a-7e30-4432-baff-e2429f35bcd4",
+                  "className": "Grade VII",
+                  "dashboardData": {
+                    "summaryCards": {"feeCollection": 0, "feeConcession": 0},
+                    "charts": {
+                      "feeCollection": {
+                        "monthly": {
+                          "labels": ["Jan", "Feb", "Mar", "Apr"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "weekly": {
+                          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "daily": {
+                          "labels": ["Mon", "Tue", "Wed", "Thu"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        }
+                      },
+                      "paymentModes": {
+                        "labels": [],
+                        "data": [],
+                        "details": {
+                          "cash": {"count": 0, "amount": 0},
+                          "online": {"count": 0, "amount": 0},
+                          "credit_card": {"count": 0, "amount": 0},
+                          "debit_card": {"count": 0, "amount": 0},
+                          "qr_code": {"count": 0, "amount": 0},
+                          "cheque_dd": {"count": 0, "amount": 0}
+                        },
+                        "total": 0
+                      },
+                      "concessions": {
+                        "data": [0, 0, 0],
+                        "labels": ["Granted", "Rejected", "Pending"],
+                        "details": {
+                          "granted": {"count": 0, "amount": 0},
+                          "rejected": {"count": 0, "amount": 0},
+                          "pending": {"count": 0, "amount": 0}
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "classId": "b78b3c86-df96-47d6-b163-262b03ffb5f4",
+                  "className": "Grade VIII",
+                  "dashboardData": {
+                    "summaryCards": {"feeCollection": 0, "feeConcession": 0},
+                    "charts": {
+                      "feeCollection": {
+                        "monthly": {
+                          "labels": ["Jan", "Feb", "Mar", "Apr"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "weekly": {
+                          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "daily": {
+                          "labels": ["Mon", "Tue", "Wed", "Thu"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        }
+                      },
+                      "paymentModes": {
+                        "labels": [],
+                        "data": [],
+                        "details": {
+                          "cash": {"count": 0, "amount": 0},
+                          "online": {"count": 0, "amount": 0},
+                          "credit_card": {"count": 0, "amount": 0},
+                          "debit_card": {"count": 0, "amount": 0},
+                          "qr_code": {"count": 0, "amount": 0},
+                          "cheque_dd": {"count": 0, "amount": 0}
+                        },
+                        "total": 0
+                      },
+                      "concessions": {
+                        "data": [0, 0, 0],
+                        "labels": ["Granted", "Rejected", "Pending"],
+                        "details": {
+                          "granted": {"count": 0, "amount": 0},
+                          "rejected": {"count": 0, "amount": 0},
+                          "pending": {"count": 0, "amount": 0}
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "classId": "929338b7-c8a2-42c2-99bd-8a42c81b3859",
+                  "className": "Grade IX",
+                  "dashboardData": {
+                    "summaryCards": {"feeCollection": 0, "feeConcession": 0},
+                    "charts": {
+                      "feeCollection": {
+                        "monthly": {
+                          "labels": ["Jan", "Feb", "Mar", "Apr"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "weekly": {
+                          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "daily": {
+                          "labels": ["Mon", "Tue", "Wed", "Thu"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        }
+                      },
+                      "paymentModes": {
+                        "labels": [],
+                        "data": [],
+                        "details": {
+                          "cash": {"count": 0, "amount": 0},
+                          "online": {"count": 0, "amount": 0},
+                          "credit_card": {"count": 0, "amount": 0},
+                          "debit_card": {"count": 0, "amount": 0},
+                          "qr_code": {"count": 0, "amount": 0},
+                          "cheque_dd": {"count": 0, "amount": 0}
+                        },
+                        "total": 0
+                      },
+                      "concessions": {
+                        "data": [0, 0, 0],
+                        "labels": ["Granted", "Rejected", "Pending"],
+                        "details": {
+                          "granted": {"count": 0, "amount": 0},
+                          "rejected": {"count": 0, "amount": 0},
+                          "pending": {"count": 0, "amount": 0}
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "classId": "d09bdce1-95db-4efe-944d-944e72291cb6",
+                  "className": "Grade X",
+                  "dashboardData": {
+                    "summaryCards": {"feeCollection": 0, "feeConcession": 0},
+                    "charts": {
+                      "feeCollection": {
+                        "monthly": {
+                          "labels": ["Jan", "Feb", "Mar", "Apr"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "weekly": {
+                          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "daily": {
+                          "labels": ["Mon", "Tue", "Wed", "Thu"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        }
+                      },
+                      "paymentModes": {
+                        "labels": [],
+                        "data": [],
+                        "details": {
+                          "cash": {"count": 0, "amount": 0},
+                          "online": {"count": 0, "amount": 0},
+                          "credit_card": {"count": 0, "amount": 0},
+                          "debit_card": {"count": 0, "amount": 0},
+                          "qr_code": {"count": 0, "amount": 0},
+                          "cheque_dd": {"count": 0, "amount": 0}
+                        },
+                        "total": 0
+                      },
+                      "concessions": {
+                        "data": [0, 0, 0],
+                        "labels": ["Granted", "Rejected", "Pending"],
+                        "details": {
+                          "granted": {"count": 0, "amount": 0},
+                          "rejected": {"count": 0, "amount": 0},
+                          "pending": {"count": 0, "amount": 0}
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "classId": "15791fd8-2b70-453f-903f-43dc109fbbeb",
+                  "className": "Grade XI",
+                  "dashboardData": {
+                    "summaryCards": {"feeCollection": 0, "feeConcession": 0},
+                    "charts": {
+                      "feeCollection": {
+                        "monthly": {
+                          "labels": ["Jan", "Feb", "Mar", "Apr"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "weekly": {
+                          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "daily": {
+                          "labels": ["Mon", "Tue", "Wed", "Thu"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        }
+                      },
+                      "paymentModes": {
+                        "labels": [],
+                        "data": [],
+                        "details": {
+                          "cash": {"count": 0, "amount": 0},
+                          "online": {"count": 0, "amount": 0},
+                          "credit_card": {"count": 0, "amount": 0},
+                          "debit_card": {"count": 0, "amount": 0},
+                          "qr_code": {"count": 0, "amount": 0},
+                          "cheque_dd": {"count": 0, "amount": 0}
+                        },
+                        "total": 0
+                      },
+                      "concessions": {
+                        "data": [0, 0, 0],
+                        "labels": ["Granted", "Rejected", "Pending"],
+                        "details": {
+                          "granted": {"count": 0, "amount": 0},
+                          "rejected": {"count": 0, "amount": 0},
+                          "pending": {"count": 0, "amount": 0}
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "classId": "6e799480-5c8e-44b9-9443-33b97df223e9",
+                  "className": "Grade XII",
+                  "dashboardData": {
+                    "summaryCards": {"feeCollection": 0, "feeConcession": 0},
+                    "charts": {
+                      "feeCollection": {
+                        "monthly": {
+                          "labels": ["Jan", "Feb", "Mar", "Apr"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "weekly": {
+                          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        },
+                        "daily": {
+                          "labels": ["Mon", "Tue", "Wed", "Thu"],
+                          "data": [
+                            [0, 0, 0, 0]
+                          ],
+                          "total": 0
+                        }
+                      },
+                      "paymentModes": {
+                        "labels": [],
+                        "data": [],
+                        "details": {
+                          "cash": {"count": 0, "amount": 0},
+                          "online": {"count": 0, "amount": 0},
+                          "credit_card": {"count": 0, "amount": 0},
+                          "debit_card": {"count": 0, "amount": 0},
+                          "qr_code": {"count": 0, "amount": 0},
+                          "cheque_dd": {"count": 0, "amount": 0}
+                        },
+                        "total": 0
+                      },
+                      "concessions": {
+                        "data": [0, 0, 0],
+                        "labels": ["Granted", "Rejected", "Pending"],
+                        "details": {
+                          "granted": {"count": 0, "amount": 0},
+                          "rejected": {"count": 0, "amount": 0},
+                          "pending": {"count": 0, "amount": 0}
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+};
 
 class FinanceQuickActionsPage extends ConsumerStatefulWidget {
   const FinanceQuickActionsPage({super.key});
@@ -51,11 +897,11 @@ class _FinanceQuickActionsPageState
 
     try {
       final apiService = ApiService();
-      final response =
-          await apiService.post('financeDashboard/get-dashboard', payload);
-
-      // Apply filters to the response
-      final filteredData = _applyFilters(response['data']['data'], filterState);
+      // final response =  await apiService.post('financeDashboard/get-dashboard', payload);
+      // final filteredData = _applyFilters(response['data']['data'], filterState);
+      final response = dummyData as Map<String, dynamic>;
+      final filteredData =
+          _applyFilters(response['data']?['data'] ?? {}, filterState);
 
       setState(() {
         _dashboardData = filteredData;
@@ -82,7 +928,7 @@ class _FinanceQuickActionsPageState
     if (branchId != null) {
       final branch = data['branches']?.firstWhere(
         (branch) => branch['branchId'] == branchId,
-        orElse: () => null,
+        // orElse: () => null,
       );
       if (branch == null) return null;
 
@@ -90,7 +936,7 @@ class _FinanceQuickActionsPageState
       if (boardId != null) {
         final board = branch['boards']?.firstWhere(
           (board) => board['boardId'] == boardId,
-          orElse: () => null,
+          // orElse: () => null,
         );
         if (board == null) return null;
 
@@ -98,7 +944,7 @@ class _FinanceQuickActionsPageState
         if (gradeId != null) {
           final grade = board['classes']?.firstWhere(
             (grade) => grade['classId'] == gradeId,
-            orElse: () => null,
+            // orElse: () => null,
           );
           return grade?['dashboardData'];
         }
