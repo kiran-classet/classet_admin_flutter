@@ -214,6 +214,8 @@ class _FinanceQuickActionsPageState
   }
 
   Widget _buildBarChartCard() {
+    final barChartData = _getBarChartData();
+
     return Card(
       elevation: 8, // Add elevation for shadow
       shape: RoundedRectangleBorder(
@@ -232,97 +234,106 @@ class _FinanceQuickActionsPageState
               ),
             ),
             const SizedBox(height: 16), // Add spacing between title and chart
-            SizedBox(
-              height: 300, // Set a fixed height for the chart
-              child: BarChart(
-                BarChartData(
-                  barGroups: _getBarChartData(),
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true, // Show the left side (Y-axis)
-                        interval:
-                            1000000, // Adjust the interval for Y-axis labels
-                        getTitlesWidget: (value, meta) {
-                          // Format the value for better readability
-                          String formattedValue;
-                          if (value >= 1000000) {
-                            formattedValue =
-                                '${(value / 1000000).toStringAsFixed(1)}M'; // e.g., 1.5M
-                          } else if (value >= 1000) {
-                            formattedValue =
-                                '${(value / 1000).toStringAsFixed(1)}K'; // e.g., 1.2K
-                          } else {
-                            formattedValue =
-                                value.toInt().toString(); // e.g., 500
-                          }
-
-                          return Text(
-                            formattedValue,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          final charts =
-                              _dashboardData?['charts']?['feeCollection'];
-                          final labels =
-                              charts?[_selectedTimeframe]?['labels'] ?? [];
-                          if (value.toInt() < labels.length) {
-                            return Text(labels[value.toInt()]);
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                    ),
+            if (barChartData.isEmpty)
+              const Center(
+                child: Text(
+                  'Reports not found',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
                   ),
-                  borderData: FlBorderData(show: false),
+                ),
+              )
+            else
+              SizedBox(
+                height: 300, // Set a fixed height for the chart
+                child: BarChart(
+                  BarChartData(
+                    barGroups: barChartData,
+                    titlesData: FlTitlesData(
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          interval: 1000000,
+                          getTitlesWidget: (value, meta) {
+                            String formattedValue;
+                            if (value >= 1000000) {
+                              formattedValue =
+                                  '${(value / 1000000).toStringAsFixed(1)}M';
+                            } else if (value >= 1000) {
+                              formattedValue =
+                                  '${(value / 1000).toStringAsFixed(1)}K';
+                            } else {
+                              formattedValue = value.toInt().toString();
+                            }
+                            return Text(
+                              formattedValue,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            final charts =
+                                _dashboardData?['charts']?['feeCollection'];
+                            final labels =
+                                charts?[_selectedTimeframe]?['labels'] ?? [];
+                            if (value.toInt() < labels.length) {
+                              return Text(labels[value.toInt()]);
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ),
+                    ),
+                    borderData: FlBorderData(show: false),
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 16), // Add spacing between chart and filters
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ChoiceChip(
-                  label: const Text('Monthly'),
-                  selected: _selectedTimeframe == 'monthly',
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedTimeframe = 'monthly';
-                    });
-                  },
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('Weekly'),
-                  selected: _selectedTimeframe == 'weekly',
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedTimeframe = 'weekly';
-                    });
-                  },
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('Daily'),
-                  selected: _selectedTimeframe == 'daily',
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedTimeframe = 'daily';
-                    });
-                  },
-                ),
-              ],
-            ),
+            if (barChartData.isNotEmpty)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Monthly'),
+                    selected: _selectedTimeframe == 'monthly',
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedTimeframe = 'monthly';
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('Weekly'),
+                    selected: _selectedTimeframe == 'weekly',
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedTimeframe = 'weekly';
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('Daily'),
+                    selected: _selectedTimeframe == 'daily',
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedTimeframe = 'daily';
+                      });
+                    },
+                  ),
+                ],
+              ),
           ],
         ),
       ),
@@ -402,6 +413,8 @@ class _FinanceQuickActionsPageState
   }
 
   Widget _buildPieChartCard() {
+    final pieChartData = _getPieChartData();
+
     return Card(
       elevation: 8, // Add elevation for shadow
       shape: RoundedRectangleBorder(
@@ -420,44 +433,58 @@ class _FinanceQuickActionsPageState
               ),
             ),
             const SizedBox(height: 16), // Add spacing between title and chart
-            SizedBox(
-              height: 300, // Set a fixed height for the chart
-              child: PieChart(
-                PieChartData(
-                  sections: _getPieChartData(),
-                  centerSpaceRadius: 0,
-                  sectionsSpace: 2,
+            if (pieChartData.isEmpty)
+              const Center(
+                child: Text(
+                  'Reports not found',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+                  ),
+                ),
+              )
+            else
+              SizedBox(
+                height: 300, // Set a fixed height for the chart
+                child: PieChart(
+                  PieChartData(
+                    sections: pieChartData,
+                    centerSpaceRadius: 0,
+                    sectionsSpace: 2,
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 16), // Add spacing between chart and legend
-            _buildLegend(), // Add the legend below the chart
+            if (pieChartData.isNotEmpty)
+              _buildLegend(), // Add the legend below the chart
             const SizedBox(
                 height: 16), // Add spacing between legend and filters
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ChoiceChip(
-                  label: const Text('Amount'),
-                  selected: _selectedPaymentModeMetric == 'amount',
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedPaymentModeMetric = 'amount';
-                    });
-                  },
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('Count'),
-                  selected: _selectedPaymentModeMetric == 'count',
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedPaymentModeMetric = 'count';
-                    });
-                  },
-                ),
-              ],
-            ),
+            if (pieChartData.isNotEmpty)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Amount'),
+                    selected: _selectedPaymentModeMetric == 'amount',
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedPaymentModeMetric = 'amount';
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('Count'),
+                    selected: _selectedPaymentModeMetric == 'count',
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedPaymentModeMetric = 'count';
+                      });
+                    },
+                  ),
+                ],
+              ),
           ],
         ),
       ),
@@ -465,6 +492,8 @@ class _FinanceQuickActionsPageState
   }
 
   Widget _buildConcessionsPieChartCard() {
+    final concessionsPieChartData = _getConcessionsPieChartData();
+
     return Card(
       elevation: 8, // Add elevation for shadow
       shape: RoundedRectangleBorder(
@@ -483,44 +512,58 @@ class _FinanceQuickActionsPageState
               ),
             ),
             const SizedBox(height: 16), // Add spacing between title and chart
-            SizedBox(
-              height: 300, // Set a fixed height for the chart
-              child: PieChart(
-                PieChartData(
-                  sections: _getConcessionsPieChartData(),
-                  centerSpaceRadius: 0,
-                  sectionsSpace: 2,
+            if (concessionsPieChartData.isEmpty)
+              const Center(
+                child: Text(
+                  'Reports not found',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+                  ),
+                ),
+              )
+            else
+              SizedBox(
+                height: 300, // Set a fixed height for the chart
+                child: PieChart(
+                  PieChartData(
+                    sections: concessionsPieChartData,
+                    centerSpaceRadius: 0,
+                    sectionsSpace: 2,
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 16), // Add spacing between chart and legend
-            _buildConcessionsLegend(), // Add the legend below the chart
+            if (concessionsPieChartData.isNotEmpty)
+              _buildConcessionsLegend(), // Add the legend below the chart
             const SizedBox(
                 height: 16), // Add spacing between legend and filters
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ChoiceChip(
-                  label: const Text('Amount'),
-                  selected: _selectedConcessionMetric == 'amount',
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedConcessionMetric = 'amount';
-                    });
-                  },
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('Count'),
-                  selected: _selectedConcessionMetric == 'count',
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedConcessionMetric = 'count';
-                    });
-                  },
-                ),
-              ],
-            ),
+            if (concessionsPieChartData.isNotEmpty)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Amount'),
+                    selected: _selectedConcessionMetric == 'amount',
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedConcessionMetric = 'amount';
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('Count'),
+                    selected: _selectedConcessionMetric == 'count',
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedConcessionMetric = 'count';
+                      });
+                    },
+                  ),
+                ],
+              ),
           ],
         ),
       ),
