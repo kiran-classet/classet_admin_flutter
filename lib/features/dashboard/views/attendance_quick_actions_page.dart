@@ -17,6 +17,7 @@ class AttendanceQuickActionsPage extends ConsumerStatefulWidget {
 class _AttendanceQuickActionsPageState
     extends ConsumerState<AttendanceQuickActionsPage> {
   Map<String, dynamic>? _dashboardData;
+  Map<String, dynamic>? _originalData; // Store the original data
   bool _isLoading = false;
   bool _isInitialized = false;
   String _selectedTimeframe = 'weekly'; // Default to weekly
@@ -40,7 +41,6 @@ class _AttendanceQuickActionsPageState
       _isLoading = true;
     });
 
-    final filterState = ref.watch(filterStateProvider);
     final adminUserState = ref.watch(adminUserProvider);
     final userDetails = adminUserState.userDetails;
     final academicYear =
@@ -54,10 +54,10 @@ class _AttendanceQuickActionsPageState
         payload,
       );
 
-      final filteredData = _applyFilters(response['data']['data'], filterState);
-
       setState(() {
-        _dashboardData = filteredData;
+        _originalData = response['data']['data']; // Store the original data
+        _dashboardData =
+            _applyFilters(_originalData!, ref.watch(filterStateProvider));
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -105,6 +105,13 @@ class _AttendanceQuickActionsPageState
     }
 
     return data['dashboardData'];
+  }
+
+  void _onFilterApplied() {
+    setState(() {
+      _dashboardData =
+          _applyFilters(_originalData!, ref.watch(filterStateProvider));
+    });
   }
 
   List<BarChartGroupData> _getAttendanceBarChartData() {
@@ -327,9 +334,7 @@ class _AttendanceQuickActionsPageState
       floatingActionButton: FilterButtonWidget(
         showSections: false,
         isSingleSectionsSelection: false,
-        onFilterApplied: () {
-          _fetchDashboardData();
-        },
+        onFilterApplied: _onFilterApplied, // Use the local filter method
       ),
     );
   }
