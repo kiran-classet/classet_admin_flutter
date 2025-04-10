@@ -245,6 +245,66 @@ class _AttendanceQuickActionsPageState
     );
   }
 
+  Widget _buildDailyAbsenteeTable() {
+    final dailyAbsentee =
+        _dashboardData?['summaryCards']?['dailyAbsentee']?['sections'] ?? [];
+
+    if (dailyAbsentee.isEmpty) {
+      return const Center(
+        child: Text(
+          'No absentee data available',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Daily Absentee Details',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columns: const [
+                  DataColumn(label: Text('Class')),
+                  DataColumn(label: Text('Section')),
+                  DataColumn(label: Text('Total Strength')),
+                  DataColumn(label: Text('Present Count')),
+                  DataColumn(label: Text('Absent Count')),
+                ],
+                rows: dailyAbsentee.map<DataRow>((section) {
+                  return DataRow(
+                    cells: [
+                      DataCell(Text(section['className'] ?? 'N/A')),
+                      DataCell(Text(section['sectionName'] ?? 'N/A')),
+                      DataCell(
+                          Text(section['totalStrength']?.toString() ?? 'N/A')),
+                      DataCell(
+                          Text(section['presentCount']?.toString() ?? 'N/A')),
+                      DataCell(
+                          Text(section['absentCount']?.toString() ?? 'N/A')),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSummaryCard(String title, String value, Color color) {
     return Card(
       elevation: 4,
@@ -311,24 +371,26 @@ class _AttendanceQuickActionsPageState
                                 'N/A',
                             Colors.blue,
                           ),
-                          _buildSummaryCard(
-                            'Present Today',
-                            (_dashboardData?['summaryCards']?['attendance']
-                                        is List &&
-                                    (_dashboardData?['summaryCards']
-                                            ?['attendance'] as List)
-                                        .isNotEmpty)
-                                ? (_dashboardData?['summaryCards']
-                                            ?['attendance']?[0]?['totalPresent']
-                                        ?.toString() ??
-                                    'N/A')
-                                : 'N/A',
-                            Colors.green,
-                          ),
+                          // _buildSummaryCard(
+                          //   'Present Today',
+                          //   (_dashboardData?['summaryCards']?['attendance']
+                          //               is List &&
+                          //           (_dashboardData?['summaryCards']
+                          //                   ?['attendance'] as List)
+                          //               .isNotEmpty)
+                          //       ? (_dashboardData?['summaryCards']
+                          //                   ?['attendance']?[0]?['totalPresent']
+                          //               ?.toString() ??
+                          //           'N/A')
+                          //       : 'N/A',
+                          //   Colors.green,
+                          // ),
                         ],
                       ),
                       const SizedBox(height: 16),
                       _buildAttendanceBarChart(),
+                      const SizedBox(height: 16),
+                      _buildDailyAbsenteeTable(),
                     ] else
                       const Center(
                         child: Text('No data available'),
