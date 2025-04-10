@@ -313,10 +313,16 @@ class _AttendanceQuickActionsPageState
                           ),
                           _buildSummaryCard(
                             'Present Today',
-                            _dashboardData?['summaryCards']?['attendance']?[0]
-                                        ?['totalPresent']
-                                    ?.toString() ??
-                                'N/A',
+                            (_dashboardData?['summaryCards']?['attendance']
+                                        is List &&
+                                    (_dashboardData?['summaryCards']
+                                            ?['attendance'] as List)
+                                        .isNotEmpty)
+                                ? (_dashboardData?['summaryCards']
+                                            ?['attendance']?[0]?['totalPresent']
+                                        ?.toString() ??
+                                    'N/A')
+                                : 'N/A',
                             Colors.green,
                           ),
                         ],
