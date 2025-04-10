@@ -126,7 +126,7 @@ class _FinanceQuickActionsPageState
         barRods: [
           BarChartRodData(
             toY: data[index]?.toDouble() ?? 0,
-            color: Colors.blue,
+            color: const Color.fromARGB(255, 4, 136, 243),
             width: 16,
           ),
         ],
@@ -203,12 +203,12 @@ class _FinanceQuickActionsPageState
   // Helper method to assign colors to pie chart sections
   Color _getColorForIndex(int index) {
     const colors = [
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
-      Colors.red,
-      Colors.teal,
+      Color.fromARGB(255, 26, 7, 240), // Blue
+      Color.fromARGB(255, 195, 149, 248), // Green
+      Color.fromARGB(255, 87, 91, 104), // Orange
+      Color.fromARGB(255, 209, 3, 245), // Purple
+      Color.fromARGB(255, 125, 6, 244), // Red
+      Color.fromARGB(255, 3, 243, 219),
     ];
     return colors[index % colors.length];
   }
