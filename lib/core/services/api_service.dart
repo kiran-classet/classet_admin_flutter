@@ -13,7 +13,7 @@ class ApiService {
   static const String localhostBaseUrl = 'http://192.168.1.14:4000/v1/data/';
 
   static const String baseUrl =
-      localhostBaseUrl; // Switch to productionBaseUrl for production.
+      productionBaseUrl; // Switch to productionBaseUrl for production.
 
   // Generic GET request
   Future<dynamic> get(String endpoint) async {
