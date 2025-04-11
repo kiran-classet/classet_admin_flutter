@@ -11,8 +11,8 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
-  bool _emailNotifications = true;
-  bool _smsNotifications = true;
+  final bool _emailNotifications = true;
+  final bool _smsNotifications = true;
   bool _darkMode = false;
   final String _selectedLanguage = 'English';
   final double _textSize = 16.0;

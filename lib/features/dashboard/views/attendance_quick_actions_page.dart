@@ -135,6 +135,27 @@ class _AttendanceQuickActionsPageState
     });
   }
 
+  List<PieChartSectionData> _getStudentTypesPieChartData() {
+    if (_dashboardData == null) return [];
+
+    final studentTypes =
+        _dashboardData?['charts']?['studentTypes']?['types'] ?? [];
+    final total = _dashboardData?['charts']?['studentTypes']?['total'] ?? 1;
+
+    return studentTypes.map<PieChartSectionData>((type) {
+      final count = type['count'] ?? 0;
+      final percentage = (count / total) * 100;
+
+      return PieChartSectionData(
+        value: count.toDouble(),
+        title: '${percentage.toStringAsFixed(1)}%',
+        color: type['name'] == 'Day Scholar' ? Colors.blue : Colors.orange,
+        radius: 50,
+        titleStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+      );
+    }).toList();
+  }
+
   Widget _buildAttendanceBarChart() {
     final barChartData = _getAttendanceBarChartData();
 
@@ -242,6 +263,91 @@ class _AttendanceQuickActionsPageState
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildStudentTypesPieChart() {
+    final pieChartData = _getStudentTypesPieChartData();
+
+    return Card(
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Student Types Distribution',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            if (pieChartData.isEmpty)
+              const Center(
+                child: Text(
+                  'No data available',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              )
+            else
+              Column(
+                children: [
+                  SizedBox(
+                    height: 250,
+                    child: PieChart(
+                      PieChartData(
+                        sections: pieChartData,
+                        centerSpaceRadius: 40,
+                        sectionsSpace: 2,
+                        borderData: FlBorderData(show: false),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildPieChartLegends(), // Add legends here
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPieChartLegends() {
+    if (_dashboardData == null) return const SizedBox.shrink();
+
+    final studentTypes =
+        _dashboardData?['charts']?['studentTypes']?['types'] ?? [];
+
+    return Wrap(
+      spacing: 16,
+      runSpacing: 8,
+      children: studentTypes.map<Widget>((type) {
+        final color =
+            type['name'] == 'Day Scholar' ? Colors.blue : Colors.orange;
+        final name = type['name'] ?? 'Unknown';
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              name,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ],
+        );
+      }).toList(),
     );
   }
 
@@ -389,6 +495,8 @@ class _AttendanceQuickActionsPageState
                       ),
                       const SizedBox(height: 16),
                       _buildAttendanceBarChart(),
+                      const SizedBox(height: 16),
+                      _buildStudentTypesPieChart(),
                       const SizedBox(height: 16),
                       _buildDailyAbsenteeTable(),
                     ] else

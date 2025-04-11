@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:classet_admin/config/cognitoAuthService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:classet_admin/config/app_config.dart'; // Add this import
+// Add this import
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
