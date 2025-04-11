@@ -148,9 +148,10 @@ class _AttendanceQuickActionsPageState
 
       return PieChartSectionData(
         value: count.toDouble(),
-        title: '${percentage.toStringAsFixed(1)}%',
+        title:
+            '$count (${percentage.toStringAsFixed(0)}%)', // Show count and percentage
         color: type['name'] == 'Day Scholar' ? Colors.blue : Colors.orange,
-        radius: 50,
+        radius: 140, // Increased radius
         titleStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
       );
     }).toList();
@@ -299,14 +300,14 @@ class _AttendanceQuickActionsPageState
                     child: PieChart(
                       PieChartData(
                         sections: pieChartData,
-                        centerSpaceRadius: 40,
+                        centerSpaceRadius: 0,
                         sectionsSpace: 2,
                         borderData: FlBorderData(show: false),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildPieChartLegends(), // Add legends here
+                  _buildPieChartLegends(),
                 ],
               ),
           ],
@@ -477,20 +478,20 @@ class _AttendanceQuickActionsPageState
                                 'N/A',
                             Colors.blue,
                           ),
-                          // _buildSummaryCard(
-                          //   'Present Today',
-                          //   (_dashboardData?['summaryCards']?['attendance']
-                          //               is List &&
-                          //           (_dashboardData?['summaryCards']
-                          //                   ?['attendance'] as List)
-                          //               .isNotEmpty)
-                          //       ? (_dashboardData?['summaryCards']
-                          //                   ?['attendance']?[0]?['totalPresent']
-                          //               ?.toString() ??
-                          //           'N/A')
-                          //       : 'N/A',
-                          //   Colors.green,
-                          // ),
+                          _buildSummaryCard(
+                            'Present Today',
+                            (_dashboardData?['summaryCards']?['attendance']
+                                        is List &&
+                                    (_dashboardData?['summaryCards']
+                                            ?['attendance'] as List)
+                                        .isNotEmpty)
+                                ? (_dashboardData?['summaryCards']
+                                            ?['attendance']?[0]?['totalPresent']
+                                        ?.toString() ??
+                                    'N/A')
+                                : 'N/A',
+                            Colors.green,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
