@@ -1,3 +1,4 @@
+import 'package:classet_admin/features/attendance/views/mark_attendance_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:classet_admin/core/services/api_service.dart';
@@ -453,6 +454,60 @@ class _AttendanceQuickActionsPageState
     );
   }
 
+  Widget _buildActionItem(
+      BuildContext context, String label, IconData icon, Color color) {
+    return InkWell(
+      onTap: () {
+        if (label == 'Mark Attendance') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MarkAttendanceScreen()),
+          );
+        } else if (label == 'View Individual Student' ||
+            label == 'Send Notifications') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('$label: Coming Soon'),
+              duration: Duration(seconds: 1), // Show snackbar for 3 seconds
+            ),
+          );
+        } else {
+          print('$label clicked');
+        }
+      },
+      child: Material(
+        elevation: 4, // Adjust the elevation value as needed
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: color,
+                size: 30,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -467,6 +522,8 @@ class _AttendanceQuickActionsPageState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    _buildActionItem(
+                        context, 'Mark Attendance', Icons.edit, Colors.green),
                     if (_dashboardData != null) ...[
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
