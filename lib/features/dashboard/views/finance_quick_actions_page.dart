@@ -579,44 +579,52 @@ class _FinanceQuickActionsPageState
           appBar: AppBar(
             title: const Text('Fee Reports'),
           ),
-          body: SingleChildScrollView(
-            // Wrap the content in a scrollable view
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (_dashboardData != null) ...[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildSummaryCard(
-                          'Fee Collected',
-                          _dashboardData?['summaryCards']?['feeCollection']
-                                  ?.toString() ??
-                              'N/A',
-                          Colors.green,
-                        ),
-                        _buildSummaryCard(
-                          'Concession',
-                          _dashboardData?['summaryCards']?['feeConcession']
-                                  ?.toString() ??
-                              'N/A',
-                          Colors.blue,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    _buildBarChartCard(), // Add the bar chart card here
-                    const SizedBox(height: 16), // Add spacing between sections
-                    _buildPieChartCard(), // Add the payment modes pie chart card
-                    const SizedBox(height: 16), // Add spacing between charts
-                    _buildConcessionsPieChartCard(), // Add the concessions pie chart card
-                    const SizedBox(height: 16),
+          body: RefreshIndicator(
+            onRefresh: () async {
+              await _fetchDashboardData(); // Call the API to refresh data
+            },
+            child: SingleChildScrollView(
+              // Wrap the content in a scrollable view
+              physics:
+                  const AlwaysScrollableScrollPhysics(), // Ensure pull-to-refresh works even when content is less
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (_dashboardData != null) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildSummaryCard(
+                            'Fee Collected',
+                            _dashboardData?['summaryCards']?['feeCollection']
+                                    ?.toString() ??
+                                'N/A',
+                            Colors.green,
+                          ),
+                          _buildSummaryCard(
+                            'Concession',
+                            _dashboardData?['summaryCards']?['feeConcession']
+                                    ?.toString() ??
+                                'N/A',
+                            Colors.blue,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildBarChartCard(), // Add the bar chart card here
+                      const SizedBox(
+                          height: 16), // Add spacing between sections
+                      _buildPieChartCard(), // Add the payment modes pie chart card
+                      const SizedBox(height: 16), // Add spacing between charts
+                      _buildConcessionsPieChartCard(), // Add the concessions pie chart card
+                      const SizedBox(height: 16),
+                    ],
+                    if (!_isLoading && _dashboardData == null)
+                      const Text('No data available for the selected filters.'),
                   ],
-                  if (!_isLoading && _dashboardData == null)
-                    const Text('No data available for the selected filters.'),
-                ],
+                ),
               ),
             ),
           ),

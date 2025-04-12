@@ -527,52 +527,59 @@ class _AttendanceQuickActionsPageState
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (_dashboardData != null) ...[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildSummaryCard(
-                            'Total Students',
-                            _dashboardData?['summaryCards']?['totalStudents']
-                                    ?.toString() ??
-                                'N/A',
-                            Colors.blue,
-                            Icons.group, // Icon for total students
-                          ),
-                          _buildSummaryCard(
-                            'Present Today',
-                            (_dashboardData?['summaryCards']?['attendance']
-                                        is List &&
-                                    (_dashboardData?['summaryCards']
-                                            ?['attendance'] as List)
-                                        .isNotEmpty)
-                                ? (_dashboardData?['summaryCards']
-                                            ?['attendance']?[0]?['totalPresent']
-                                        ?.toString() ??
-                                    'N/A')
-                                : 'N/A',
-                            Colors.green,
-                            Icons.check_circle, // Icon for present today
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _buildAttendanceBarChart(),
-                      const SizedBox(height: 16),
-                      _buildStudentTypesPieChart(),
-                      const SizedBox(height: 16),
-                      _buildDailyAbsenteeTable(),
-                    ] else
-                      const Center(
-                        child: Text('No data available'),
-                      ),
-                  ],
+          : RefreshIndicator(
+              onRefresh:
+                  _fetchDashboardData, // Trigger API call on pull-to-refresh
+              child: SingleChildScrollView(
+                physics:
+                    const AlwaysScrollableScrollPhysics(), // Ensure scrollable even if content is small
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_dashboardData != null) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildSummaryCard(
+                              'Total Students',
+                              _dashboardData?['summaryCards']?['totalStudents']
+                                      ?.toString() ??
+                                  'N/A',
+                              Colors.blue,
+                              Icons.group, // Icon for total students
+                            ),
+                            _buildSummaryCard(
+                              'Present Today',
+                              (_dashboardData?['summaryCards']?['attendance']
+                                          is List &&
+                                      (_dashboardData?['summaryCards']
+                                              ?['attendance'] as List)
+                                          .isNotEmpty)
+                                  ? (_dashboardData?['summaryCards']
+                                                  ?['attendance']?[0]
+                                              ?['totalPresent']
+                                          ?.toString() ??
+                                      'N/A')
+                                  : 'N/A',
+                              Colors.green,
+                              Icons.check_circle, // Icon for present today
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        _buildAttendanceBarChart(),
+                        const SizedBox(height: 16),
+                        _buildStudentTypesPieChart(),
+                        const SizedBox(height: 16),
+                        _buildDailyAbsenteeTable(),
+                      ] else
+                        const Center(
+                          child: Text('No data available'),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
