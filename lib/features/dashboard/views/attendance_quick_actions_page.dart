@@ -522,8 +522,6 @@ class _AttendanceQuickActionsPageState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildActionItem(
-                        context, 'Mark Attendance', Icons.edit, Colors.green),
                     if (_dashboardData != null) ...[
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -565,10 +563,32 @@ class _AttendanceQuickActionsPageState
                 ),
               ),
             ),
-      floatingActionButton: FilterButtonWidget(
-        showSections: false,
-        isSingleSectionsSelection: false,
-        onFilterApplied: _onFilterApplied, // Use the local filter method
+      floatingActionButton: Stack(
+        children: [
+          Align(
+            alignment: Alignment.bottomRight,
+            child: FilterButtonWidget(
+              showSections: false,
+              isSingleSectionsSelection: false,
+              onFilterApplied: _onFilterApplied, // Use the local filter method
+            ),
+          ),
+          Positioned(
+            bottom: 70, // Adjust to position above the filter button
+            right: 0,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MarkAttendanceScreen()),
+                );
+              },
+              backgroundColor: Colors.green,
+              child: const Icon(Icons.edit),
+            ),
+          ),
+        ],
       ),
     );
   }
