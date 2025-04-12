@@ -17,6 +17,8 @@ class FinanceQuickActionsPage extends ConsumerStatefulWidget {
 class _FinanceQuickActionsPageState
     extends ConsumerState<FinanceQuickActionsPage> {
   Map<String, dynamic>? _dashboardData;
+  Map<String, dynamic>?
+      _originalDashboardData; // Store original data for filtering
   bool _isLoading = false;
   bool _isInitialized = false; // Track initialization
   String _selectedTimeframe = 'monthly'; // Default to monthly
@@ -42,7 +44,6 @@ class _FinanceQuickActionsPageState
       _isLoading = true;
     });
 
-    final filterState = ref.watch(filterStateProvider);
     final adminUserState = ref.watch(adminUserProvider);
     final userDetails = adminUserState.userDetails;
     final academicYear =
@@ -54,11 +55,11 @@ class _FinanceQuickActionsPageState
       final response =
           await apiService.post('financeDashboard/get-dashboard', payload);
 
-      // Apply filters to the response
-      final filteredData = _applyFilters(response['data']['data'], filterState);
-
+      // Store the original data for local filtering
       setState(() {
-        _dashboardData = filteredData;
+        _originalDashboardData = response['data']['data'];
+        _dashboardData = _applyFilters(
+            _originalDashboardData!, ref.watch(filterStateProvider));
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -613,9 +614,7 @@ class _FinanceQuickActionsPageState
                     _buildConcessionsPieChartCard(), // Add the concessions pie chart card
                     const SizedBox(height: 16),
                   ],
-                  if (_isLoading)
-                    const CircularProgressIndicator()
-                  else if (_dashboardData == null)
+                  if (!_isLoading && _dashboardData == null)
                     const Text('No data available for the selected filters.'),
                 ],
               ),
@@ -625,7 +624,10 @@ class _FinanceQuickActionsPageState
             showSections: false,
             isSingleSectionsSelection: false,
             onFilterApplied: () {
-              _fetchDashboardData(); // Re-fetch data when filters are applied
+              setState(() {
+                _dashboardData = _applyFilters(
+                    _originalDashboardData!, ref.watch(filterStateProvider));
+              });
             },
           ),
         ),
