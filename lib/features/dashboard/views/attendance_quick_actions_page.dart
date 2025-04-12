@@ -413,9 +413,10 @@ class _AttendanceQuickActionsPageState
     );
   }
 
-  Widget _buildSummaryCard(String title, String value, Color color) {
+  Widget _buildSummaryCard(
+      String title, String value, Color color, IconData icon) {
     return Card(
-      elevation: 4,
+      elevation: 6,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -423,28 +424,38 @@ class _AttendanceQuickActionsPageState
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           gradient: LinearGradient(
-            colors: [color.withOpacity(0.1), Colors.white],
+            colors: [color.withOpacity(0.2), Colors.white],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
+              Icon(
+                icon,
+                color: color,
+                size: 36,
               ),
               const SizedBox(height: 8),
               Text(
                 value,
-                style: const TextStyle(
-                  fontSize: 24,
+                style: TextStyle(
+                  fontSize: 28,
                   fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
                 ),
               ),
             ],
@@ -524,7 +535,7 @@ class _AttendanceQuickActionsPageState
                   children: [
                     if (_dashboardData != null) ...[
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           _buildSummaryCard(
                             'Total Students',
@@ -532,6 +543,7 @@ class _AttendanceQuickActionsPageState
                                     ?.toString() ??
                                 'N/A',
                             Colors.blue,
+                            Icons.group, // Icon for total students
                           ),
                           _buildSummaryCard(
                             'Present Today',
@@ -546,6 +558,7 @@ class _AttendanceQuickActionsPageState
                                     'N/A')
                                 : 'N/A',
                             Colors.green,
+                            Icons.check_circle, // Icon for present today
                           ),
                         ],
                       ),

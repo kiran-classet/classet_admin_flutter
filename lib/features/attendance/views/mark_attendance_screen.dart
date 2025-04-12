@@ -622,9 +622,27 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
               style: TextStyle(fontWeight: FontWeight.normal),
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.save_rounded),
-                onPressed: _showAttendancePreview,
+              Container(
+                margin:
+                    const EdgeInsets.only(right: 16), // Add margin for spacing
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(
+                      255, 5, 149, 251), // Light background color
+                  shape: BoxShape.circle, // Circular shape
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.save_rounded,
+                      color: Color.fromARGB(255, 237, 240, 242)),
+                  onPressed: _showAttendancePreview,
+                  tooltip: 'Save Attendance',
+                ),
               ),
             ],
           ),
