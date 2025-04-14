@@ -1,7 +1,7 @@
 import 'package:classet_admin/core/utils/my_app_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:classet_admin/core/navigation/app_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import your app router
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       title: 'Classet Admin',
       theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
-      routerConfig: appRouter, // Connect GoRouter here
+      routerConfig: appRouter,
     );
   }
 }

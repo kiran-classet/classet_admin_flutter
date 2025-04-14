@@ -1,3 +1,4 @@
+import 'package:classet_admin/features/approvals/views/student_status_change_approval_screen.dart';
 import 'package:classet_admin/features/dashboard/views/home_screen.dart';
 import 'package:classet_admin/core/navigation/main_screen.dart';
 import 'package:classet_admin/features/settings/views/settings_screen.dart';
@@ -46,6 +47,10 @@ final GoRouter appRouter = GoRouter(
       path: '/login',
       builder: (context, state) =>
           LoginScreen(), // MainScreen handles navigation
+    ),
+    GoRoute(
+      path: '/studentStatusChangeApproval',
+      builder: (context, state) => const StudentStatusChangeApprovalScreen(),
     ),
   ],
 );

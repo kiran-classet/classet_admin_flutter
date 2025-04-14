@@ -1,4 +1,6 @@
+import 'package:classet_admin/features/approvals/views/student_status_change_approval_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ApprovalScreen extends StatelessWidget {
   const ApprovalScreen({super.key});
@@ -9,49 +11,49 @@ class ApprovalScreen extends StatelessWidget {
       {
         'label': 'Student Status Change',
         'icon': Icons.person,
-        'route': '/studentStatusChange',
+        'route': '/studentStatusChangeApproval',
         'color': const Color(0xFF009688),
       },
       {
         'label': 'Student Transfers',
         'icon': Icons.transfer_within_a_station,
-        'route': '/studentTransfers',
+        'route': '/studentTransfersApproval',
         'color': const Color(0xFF9C27B0),
       },
       {
         'label': 'Student Admission Category Change',
         'icon': Icons.category,
-        'route': '/admissionCategoryChange',
+        'route': '/admissionCategoryChangeApproval',
         'color': const Color(0xFFFF9800),
       },
       {
         'label': 'Fee Concession',
         'icon': Icons.discount,
-        'route': '/feeConcession',
+        'route': '/feeConcessionApproval',
         'color': const Color(0xFF4CAF50),
       },
       {
         'label': 'Fee Refund',
         'icon': Icons.attach_money,
-        'route': '/feeRefund',
+        'route': '/feeRefundApproval',
         'color': const Color(0xFF2196F3),
       },
       {
         'label': 'Fee Unassign',
         'icon': Icons.remove_circle_outline,
-        'route': '/feeUnassign',
+        'route': '/feeUnassignApproval',
         'color': const Color(0xFFF44336),
       },
       {
         'label': 'Assign Transport',
         'icon': Icons.directions_bus,
-        'route': '/assignTransport',
+        'route': '/assignTransportApproval',
         'color': const Color(0xFF795548),
       },
       {
         'label': 'Transport Routes',
         'icon': Icons.map,
-        'route': '/transportRoutes',
+        'route': '/transportRoutesApproval',
         'color': const Color(0xFF607D8B),
       },
     ];
@@ -108,7 +110,18 @@ class ApprovalScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: InkWell(
-        onTap: () => Navigator.pushNamed(context, route),
+        onTap: () {
+          if (route == '/studentStatusChangeApproval') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const StudentStatusChangeApprovalScreen(),
+              ),
+            );
+          } else {
+            context.go(route);
+          }
+        },
         borderRadius: BorderRadius.circular(20),
         child: Container(
           decoration: BoxDecoration(
