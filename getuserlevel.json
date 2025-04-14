@@ -1,0 +1,52 @@
+Get user approval level details :
+get : http://192.168.1.12:4000/v1/data/settings-approvals/userAssignedBoards?approvalType=studentStatusChange
+responce :
+{
+    "status": true,
+    "data": {
+        "data": [
+            {
+                "_id": "67ac371d55540e71761c8c46",
+                "branchId": "5527df8c-57e4-4dd9-be2f-3f8b0b05b29a"
+            },
+            {
+                "_id": "67efc5490cfb9a68bb2ad908",
+                "branchId": "340c286f-5df1-471a-be93-5f5a6649f9ce"
+            }
+        ],
+        "adminUserAssignedLevelDetails": [
+            {
+                "_id": "5527df8c-57e4-4dd9-be2f-3f8b0b05b29a",
+                "levels": [
+                    {
+                        "level": 1,
+                        "users": [
+                            {
+                                "userName": "zaaadminuser",
+                                "userId": "2163bd2a-c091-70bb-a060-07b0e4ce8970",
+                                "status": true,
+                                "level": 1
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "_id": "340c286f-5df1-471a-be93-5f5a6649f9ce",
+                "levels": [
+                    {
+                        "level": 1,
+                        "users": [
+                            {
+                                "userName": "zaaadminuser",
+                                "userId": "2163bd2a-c091-70bb-a060-07b0e4ce8970",
+                                "status": true,
+                                "level": 1
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

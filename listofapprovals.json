@@ -1,0 +1,186 @@
+List of approvals : 
+http://192.168.1.12:4000/v1/data/statusChange/get/all?academicYear=676b941d2827d6817ae41df9
+post : 
+{
+    "sectionId": "4f16afca-cbaf-4104-b2bb-cc2db3ce70b2",
+    "isUserNameSearch": false,
+    "username": "",
+    "assignedHeirarchy": {
+        "branchIds": [
+            "5527df8c-57e4-4dd9-be2f-3f8b0b05b29a",
+            "340c286f-5df1-471a-be93-5f5a6649f9ce"
+        ],
+        "adminLevels": [
+            {
+                "_id": "5527df8c-57e4-4dd9-be2f-3f8b0b05b29a",
+                "levels": [
+                    {
+                        "level": 1,
+                        "users": [
+                            {
+                                "userName": "zaaadminuser",
+                                "userId": "2163bd2a-c091-70bb-a060-07b0e4ce8970",
+                                "status": true,
+                                "level": 1
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "_id": "340c286f-5df1-471a-be93-5f5a6649f9ce",
+                "levels": [
+                    {
+                        "level": 1,
+                        "users": [
+                            {
+                                "userName": "zaaadminuser",
+                                "userId": "2163bd2a-c091-70bb-a060-07b0e4ce8970",
+                                "status": true,
+                                "level": 1
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+
+responce :
+{
+    "status": true,
+    "data": [
+        {
+            "_id": "67fcaf8cf803c1bcd99f7e84",
+            "user_id": "c123cdaa-70a1-7091-8d0f-0584e18b253e",
+            "status": "InActive",
+            "account_id": "98236b5c-03f9-43cc-945d-e8b1d9b11166",
+            "isBaseAccount": true,
+            "user_info": {
+                "boardId": "20a4ba9b-4d1f-4477-bf20-9f1f68f93964",
+                "custom:board": "CBSE",
+                "custom:boardId": "20a4ba9b-4d1f-4477-bf20-9f1f68f93964",
+                "groupId": "a3114690-9dbe-450e-be78-4a9467b09025",
+                "custom:group": "NO_GROUP",
+                "custom:groupId": "a3114690-9dbe-450e-be78-4a9467b09025",
+                "classId": "23947e2a-e1a8-4196-8ee8-5f31fb8a8936",
+                "custom:grade": "Grade 1",
+                "custom:gradeId": "23947e2a-e1a8-4196-8ee8-5f31fb8a8936",
+                "createDateTime": 1743488749450,
+                "family_name": "",
+                "given_name": "alexmanthro",
+                "phone_number": "+913243222333",
+                "profilePicStorageKey": "",
+                "branchId": "5527df8c-57e4-4dd9-be2f-3f8b0b05b29a",
+                "branchName": "Madhapur ",
+                "academicYear": "676b941d2827d6817ae41df9",
+                "gender": "Male",
+                "admissionDate": "2025-04-01T06:25:49.450Z",
+                "aadharNo": "",
+                "dateOfBirth": "2010-05-06T00:00:00.000Z",
+                "enrollmentId": "25MIS00021",
+                "sectionId": "4f16afca-cbaf-4104-b2bb-cc2db3ce70b2",
+                "sectionName": "Section1",
+                "isBaseAccount": true,
+                "username": "zaa25MIS00021",
+                "status": "InActive",
+                "categoryName": "Day Scholars",
+                "admissionCategory": "67e4df1d7777e5878cb10f2a",
+                "firstName": "alex",
+                "lastName": "manthro",
+                "contactPersonName": "adD",
+                "parentContactNo": "3232323232",
+                "email": "cdssas@g.vo",
+                "emailVerified": true,
+                "studentStatusChange": "LIVE",
+                "idCardBanner": {
+                    "fileName": "1735015307633download.png",
+                    "storageBucket": "classet-profiles-old",
+                    "storageKey": "uploads/17350988881721735015307633download.png",
+                    "storageLocation": "https://classet-profiles-old.s3.ap-south-1.amazonaws.com/uploads/17350988881721735015307633download.png"
+                },
+                "idCardQrCode": "text",
+                "idCardSignature": {
+                    "fileName": "1735015327633download.jpeg",
+                    "storageBucket": "classet-profiles-old",
+                    "storageKey": "uploads/17350988921721735015327633download.jpeg",
+                    "storageLocation": "https://classet-profiles-old.s3.ap-south-1.amazonaws.com/uploads/17350988921721735015327633download.jpeg"
+                },
+                "idCardWatermark": {
+                    "fileName": "1735015327633download.jpeg",
+                    "storageBucket": "classet-profiles-old",
+                    "storageKey": "uploads/17350988951721735015327633download.jpeg",
+                    "storageLocation": "https://classet-profiles-old.s3.ap-south-1.amazonaws.com/uploads/17350988951721735015327633download.jpeg"
+                },
+                "qrtext": "",
+                "qrurl": ""
+            },
+            "orgId": "676b844671028648990c1505",
+            "boardId": "20a4ba9b-4d1f-4477-bf20-9f1f68f93964",
+            "custom:board": "CBSE",
+            "custom:boardId": "20a4ba9b-4d1f-4477-bf20-9f1f68f93964",
+            "groupId": "a3114690-9dbe-450e-be78-4a9467b09025",
+            "custom:group": "NO_GROUP",
+            "custom:groupId": "a3114690-9dbe-450e-be78-4a9467b09025",
+            "classId": "23947e2a-e1a8-4196-8ee8-5f31fb8a8936",
+            "custom:grade": "Grade 1",
+            "custom:gradeId": "23947e2a-e1a8-4196-8ee8-5f31fb8a8936",
+            "createDateTime": 1743488749450,
+            "family_name": "",
+            "given_name": "alexmanthro",
+            "phone_number": "+913243222333",
+            "profilePicStorageKey": "",
+            "branchId": "5527df8c-57e4-4dd9-be2f-3f8b0b05b29a",
+            "branchName": "Madhapur ",
+            "academicYear": "676b941d2827d6817ae41df9",
+            "gender": "Male",
+            "admissionDate": "2025-04-01T06:25:49.450Z",
+            "aadharNo": "",
+            "dateOfBirth": "2010-05-06T00:00:00.000Z",
+            "enrollmentId": "25MIS00021",
+            "sectionId": "4f16afca-cbaf-4104-b2bb-cc2db3ce70b2",
+            "sectionName": "Section1",
+            "username": "zaa25MIS00021",
+            "categoryName": "Day Scholars",
+            "admissionCategory": "67e4df1d7777e5878cb10f2a",
+            "firstName": "alex",
+            "lastName": "manthro",
+            "contactPersonName": "adD",
+            "parentContactNo": "3232323232",
+            "email": "cdssas@g.vo",
+            "emailVerified": true,
+            "studentStatusChange": "LIVE",
+            "idCardBanner": {
+                "fileName": "1735015307633download.png",
+                "storageBucket": "classet-profiles-old",
+                "storageKey": "uploads/17350988881721735015307633download.png",
+                "storageLocation": "https://classet-profiles-old.s3.ap-south-1.amazonaws.com/uploads/17350988881721735015307633download.png"
+            },
+            "idCardQrCode": "text",
+            "idCardSignature": {
+                "fileName": "1735015327633download.jpeg",
+                "storageBucket": "classet-profiles-old",
+                "storageKey": "uploads/17350988921721735015327633download.jpeg",
+                "storageLocation": "https://classet-profiles-old.s3.ap-south-1.amazonaws.com/uploads/17350988921721735015327633download.jpeg"
+            },
+            "idCardWatermark": {
+                "fileName": "1735015327633download.jpeg",
+                "storageBucket": "classet-profiles-old",
+                "storageKey": "uploads/17350988951721735015327633download.jpeg",
+                "storageLocation": "https://classet-profiles-old.s3.ap-south-1.amazonaws.com/uploads/17350988951721735015327633download.jpeg"
+            },
+            "qrtext": "",
+            "qrurl": "",
+            "statusChangeRemarks": "activate",
+            "statusChangeRequest": "PENDING",
+            "requestRaisedBy": "2163bd2a-c091-70bb-a060-07b0e4ce8970",
+            "requestRaisedByName": "zaaadminuser",
+            "createdAt": "2025-04-14T06:47:40.361Z",
+            "updatedAt": "2025-04-14T06:47:40.361Z",
+            "__v": 0
+        }
+    ],
+    "totalRecords": 1
+}
