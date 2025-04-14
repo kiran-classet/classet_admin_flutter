@@ -39,6 +39,7 @@ class _StudentStatusChangeApprovalScreenState
           _userAssignedDetails = response['data']; // Save response in state
         });
         print('User Assigned Details: $_userAssignedDetails');
+        _fetchPendingApprovals(); // Fetch pending approvals after user assigned details
       } else {
         setState(() {
           _isLoading = false; // Hide loader
@@ -64,6 +65,30 @@ class _StudentStatusChangeApprovalScreenState
     final filterState = ref.read(filterStateProvider);
     final sectionId =
         filterState.section.isNotEmpty ? filterState.section[0] : null;
+    final branchIds =
+        _userAssignedDetails!['data'].map((e) => e['branchId']).toList();
+    final selectedBranch = filterState.branch;
+
+    if (selectedBranch == null) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No branch selected in filters')),
+      );
+      return;
+    }
+    final isValidBranch = branchIds.contains(selectedBranch);
+    if (!isValidBranch) {
+      setState(() {
+        _isLoading = false; // Hide loader
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('You Dont have access to selcted branch in filters')),
+      );
+      return;
+    }
 
     if (sectionId == null) {
       setState(() {
@@ -77,8 +102,7 @@ class _StudentStatusChangeApprovalScreenState
 
     final assignedHeirarchy =
         _userAssignedDetails!['adminUserAssignedLevelDetails'];
-    final branchIds =
-        _userAssignedDetails!['data'].map((e) => e['branchId']).toList();
+
     final adminLevels = assignedHeirarchy;
 
     final payload = {
