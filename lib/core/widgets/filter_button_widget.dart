@@ -20,32 +20,7 @@ class FilterButtonWidget extends ConsumerWidget {
     this.openBottomSheet = false,
   });
 
-  void init(BuildContext context, WidgetRef ref) {
-    // if (openBottomSheet) {
-    //   final adminUserState = ref.watch(adminUserProvider);
-    //   final userDetails = adminUserState.userDetails;
-
-    //   // Delay state modification
-    //   Future.microtask(() {
-    //     ref.read(filterStateProvider.notifier).state = FilterState(
-    //       branch: ref.read(filterStateProvider).branch,
-    //       board: ref.read(filterStateProvider).board,
-    //       grade: ref.read(filterStateProvider).grade,
-    //       section: [],
-    //     );
-    //   });
-
-    //   if (userDetails != null) {
-    //     WidgetsBinding.instance.addPostFrameCallback((_) {
-    //       _showFilterBottomSheet(context, ref, userDetails);
-    //     });
-    //   } else {
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       const SnackBar(content: Text('User filters not available')),
-    //     );
-    //   }
-    // }
-  }
+  void init(BuildContext context, WidgetRef ref) {}
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
