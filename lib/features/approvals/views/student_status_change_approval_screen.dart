@@ -18,6 +18,8 @@ class _StudentStatusChangeApprovalScreenState
   Map<String, dynamic>? _userAssignedDetails; // State to store API response
   List<dynamic> _approvals = []; // State to store approvals list
   bool _isLoading = false; // State to manage loader visibility
+  final Map<int, bool> _expandedCards =
+      {}; // Track expanded state for each card
 
   @override
   void initState() {
@@ -192,89 +194,238 @@ class _StudentStatusChangeApprovalScreenState
     }
   }
 
-  Widget _buildApprovalCard(Map<String, dynamic> approval) {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    approval['given_name'] ?? 'Unknown',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    'ID: ${approval['username']?.substring(3) ?? 'N/A'}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildInfoRow(
-                Icons.business, 'Branch', approval['branchName'] ?? 'N/A'),
-            _buildInfoRow(
-                Icons.business, 'Board', approval['custom:board'] ?? 'N/A'),
-            _buildInfoRow(
-                Icons.business, 'Grade', approval['custom:grade'] ?? 'N/A'),
-            _buildInfoRow(
-                Icons.class_, 'Section', approval['sectionName'] ?? 'N/A'),
-            _buildInfoRow(Icons.phone, 'Parent Contact',
-                approval['parentContactNo'] ?? 'N/A'),
-            _buildInfoRow(Icons.comment, 'Remarks',
-                approval['statusChangeRemarks'] ?? 'N/A'),
-            _buildInfoRow(Icons.person, 'Requested By',
-                approval['requestRaisedByName']?.substring(3) ?? 'N/A'),
-            _buildInfoRow(
-                Icons.calendar_today,
-                'Request Date',
-                DateTime.parse(approval['createdAt'])
-                    .toLocal()
-                    .toString()
-                    .split('.')[0]),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                _buildActionButton(
-                  onPressed: () => _updateApprovalStatus(approval, "APROVE"),
-                  icon: Icons.check_circle,
-                  label: 'Approve',
-                  color: Colors.green,
-                ),
-                const SizedBox(width: 12),
-                _buildActionButton(
-                  onPressed: () => _updateApprovalStatus(approval, "REJECT"),
-                  icon: Icons.cancel,
-                  label: 'Reject',
-                  color: Colors.red,
-                ),
-              ],
-            ),
+  Widget _buildHeaderSection(Map<String, dynamic> approval, int index) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.blue.shade700,
+            const Color.fromARGB(255, 51, 83, 107)
           ],
         ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  approval['given_name'] ?? 'Unknown',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'ID: ${approval['username']?.substring(3) ?? 'N/A'}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.access_time, size: 16, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Pending',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                _expandedCards[index] ?? false
+                    ? Icons.expand_less
+                    : Icons.expand_more,
+                color: Colors.white,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildApprovalCard(Map<String, dynamic> approval, int index) {
+    return Card(
+      elevation: 8,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.white, Colors.grey.shade50],
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _expandedCards[index] = !(_expandedCards[index] ?? false);
+                  });
+                },
+                child: _buildHeaderSection(approval, index),
+              ),
+              if (!(_expandedCards[index] ?? false))
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: _buildActionSection(
+                      approval), // Show buttons in collapsed state
+                ),
+              if (_expandedCards[index] ?? false)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDetailsSection(approval),
+                      const Divider(height: 24),
+                      _buildActionSection(approval),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionSection(Map<String, dynamic> approval) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        _buildActionButton(
+          onPressed: () => _updateApprovalStatus(approval, "APROVE"),
+          icon: Icons.check_circle,
+          label: 'Approve',
+          color: Colors.green.shade600,
+        ),
+        const SizedBox(width: 12),
+        _buildActionButton(
+          onPressed: () => _updateApprovalStatus(approval, "REJECT"),
+          icon: Icons.cancel,
+          label: 'Reject',
+          color: Colors.red.shade600,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailsSection(Map<String, dynamic> approval) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade200,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildDetailRow(
+              Icons.business, 'Branch', approval['branchName'] ?? 'N/A'),
+          _buildDetailRow(
+              Icons.school, 'Board', approval['custom:board'] ?? 'N/A'),
+          _buildDetailRow(
+              Icons.grade, 'Grade', approval['custom:grade'] ?? 'N/A'),
+          _buildDetailRow(
+              Icons.class_, 'Section', approval['sectionName'] ?? 'N/A'),
+          _buildDetailRow(Icons.phone, 'Parent Contact',
+              approval['parentContactNo'] ?? 'N/A'),
+          _buildDetailRow(Icons.comment, 'Remarks',
+              approval['statusChangeRemarks'] ?? 'N/A'),
+          _buildDetailRow(Icons.person, 'Requested By',
+              approval['requestRaisedByName']?.substring(3) ?? 'N/A'),
+          _buildDetailRow(
+            Icons.calendar_today,
+            'Request Date',
+            DateTime.parse(approval['createdAt'])
+                .toLocal()
+                .toString()
+                .split('.')[0],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 20, color: Colors.blue.shade700),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -362,7 +513,7 @@ class _StudentStatusChangeApprovalScreenState
                       padding: const EdgeInsets.only(top: 8, bottom: 80),
                       itemCount: _approvals.length,
                       itemBuilder: (context, index) =>
-                          _buildApprovalCard(_approvals[index]),
+                          _buildApprovalCard(_approvals[index], index),
                     ),
       floatingActionButton: Container(
         decoration: BoxDecoration(
