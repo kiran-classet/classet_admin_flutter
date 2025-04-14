@@ -7,51 +7,69 @@ class ApprovalScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final actions = [
       {
-        'label': 'Fee Concession',
-        'icon': Icons.discount, // Changed icon
-        'route': '/feeConcession'
-      },
-      {
-        'label': 'Fee Refund',
-        'icon': Icons.attach_money,
-        'route': '/feeRefund'
-      },
-      {
-        'label': 'Fee Unassign',
-        'icon': Icons.remove_circle_outline, // Changed icon
-        'route': '/feeUnassign'
+        'label': 'Student Status Change',
+        'icon': Icons.person,
+        'route': '/studentStatusChange',
+        'color': const Color(0xFF009688),
       },
       {
         'label': 'Student Transfers',
         'icon': Icons.transfer_within_a_station,
-        'route': '/studentTransfers'
-      },
-      {
-        'label': 'Student Status Change',
-        'icon': Icons.person,
-        'route': '/studentStatusChange'
+        'route': '/studentTransfers',
+        'color': const Color(0xFF9C27B0),
       },
       {
         'label': 'Student Admission Category Change',
         'icon': Icons.category,
-        'route': '/admissionCategoryChange'
+        'route': '/admissionCategoryChange',
+        'color': const Color(0xFFFF9800),
+      },
+      {
+        'label': 'Fee Concession',
+        'icon': Icons.discount,
+        'route': '/feeConcession',
+        'color': const Color(0xFF4CAF50),
+      },
+      {
+        'label': 'Fee Refund',
+        'icon': Icons.attach_money,
+        'route': '/feeRefund',
+        'color': const Color(0xFF2196F3),
+      },
+      {
+        'label': 'Fee Unassign',
+        'icon': Icons.remove_circle_outline,
+        'route': '/feeUnassign',
+        'color': const Color(0xFFF44336),
       },
       {
         'label': 'Assign Transport',
         'icon': Icons.directions_bus,
-        'route': '/assignTransport'
+        'route': '/assignTransport',
+        'color': const Color(0xFF795548),
       },
       {
         'label': 'Transport Routes',
         'icon': Icons.map,
-        'route': '/transportRoutes'
+        'route': '/transportRoutes',
+        'color': const Color(0xFF607D8B),
       },
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Approvals'),
+        title: const Text(
+          'Approvals',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 2,
       ),
+      backgroundColor: const Color(0xFFF5F5F5),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: GridView.builder(
@@ -59,6 +77,7 @@ class ApprovalScreen extends StatelessWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
+            childAspectRatio: 1.1,
           ),
           itemCount: actions.length,
           itemBuilder: (context, index) {
@@ -68,6 +87,7 @@ class ApprovalScreen extends StatelessWidget {
               action['label'] as String,
               action['icon'] as IconData,
               action['route'] as String,
+              action['color'] as Color,
             );
           },
         ),
@@ -76,27 +96,61 @@ class ApprovalScreen extends StatelessWidget {
   }
 
   Widget _buildActionCard(
-      BuildContext context, String label, IconData icon, String route) {
-    return InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, route);
-      },
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 40, color: Theme.of(context).primaryColor),
-              const SizedBox(height: 16),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+    BuildContext context,
+    String label,
+    IconData icon,
+    String route,
+    Color color,
+  ) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: InkWell(
+        onTap: () => Navigator.pushNamed(context, route),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              colors: [
+                color.withOpacity(0.8),
+                color,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
               ),
             ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 40,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
