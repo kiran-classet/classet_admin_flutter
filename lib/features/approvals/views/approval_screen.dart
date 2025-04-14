@@ -1,3 +1,4 @@
+import 'package:classet_admin/features/approvals/views/student_admission_cat_change.dart';
 import 'package:classet_admin/features/approvals/views/student_status_change_approval_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -116,6 +117,15 @@ class ApprovalScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => const StudentStatusChangeApprovalScreen(),
+              ),
+            );
+          }
+          if (route == '/admissionCategoryChangeApproval') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    const StudentAdmissionChangeApprovalScreen(),
               ),
             );
           } else {

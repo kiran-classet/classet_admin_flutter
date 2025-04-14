@@ -5,16 +5,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:classet_admin/core/widgets/filter_button_widget.dart';
 import 'package:classet_admin/core/services/api_service.dart';
 
-class StudentStatusChangeApprovalScreen extends ConsumerStatefulWidget {
-  const StudentStatusChangeApprovalScreen({super.key});
+class StudentAdmissionChangeApprovalScreen extends ConsumerStatefulWidget {
+  const StudentAdmissionChangeApprovalScreen({super.key});
 
   @override
-  ConsumerState<StudentStatusChangeApprovalScreen> createState() =>
-      _StudentStatusChangeApprovalScreenState();
+  ConsumerState<StudentAdmissionChangeApprovalScreen> createState() =>
+      _StudentAdmissionChangeApprovalScreenState();
 }
 
-class _StudentStatusChangeApprovalScreenState
-    extends ConsumerState<StudentStatusChangeApprovalScreen> {
+class _StudentAdmissionChangeApprovalScreenState
+    extends ConsumerState<StudentAdmissionChangeApprovalScreen> {
   Map<String, dynamic>? _userAssignedDetails; // State to store API response
   List<dynamic> _approvals = []; // State to store approvals list
   bool _isLoading = false; // State to manage loader visibility
@@ -192,177 +192,92 @@ class _StudentStatusChangeApprovalScreenState
     }
   }
 
-  Widget _buildApprovalCard(Map<String, dynamic> approval) {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    approval['given_name'] ?? 'Unknown',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    'ID: ${approval['username']?.substring(3) ?? 'N/A'}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildInfoRow(
-                Icons.business, 'Branch', approval['branchName'] ?? 'N/A'),
-            _buildInfoRow(
-                Icons.business, 'Board', approval['custom:board'] ?? 'N/A'),
-            _buildInfoRow(
-                Icons.business, 'Grade', approval['custom:grade'] ?? 'N/A'),
-            _buildInfoRow(
-                Icons.class_, 'Section', approval['sectionName'] ?? 'N/A'),
-            _buildInfoRow(Icons.phone, 'Parent Contact',
-                approval['parentContactNo'] ?? 'N/A'),
-            _buildInfoRow(Icons.comment, 'Remarks',
-                approval['statusChangeRemarks'] ?? 'N/A'),
-            _buildInfoRow(Icons.person, 'Requested By',
-                approval['requestRaisedByName']?.substring(3) ?? 'N/A'),
-            _buildInfoRow(
-                Icons.calendar_today,
-                'Request Date',
-                DateTime.parse(approval['createdAt'])
-                    .toLocal()
-                    .toString()
-                    .split('.')[0]),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                _buildActionButton(
-                  onPressed: () => _updateApprovalStatus(approval, "APROVE"),
-                  icon: Icons.check_circle,
-                  label: 'Approve',
-                  color: Colors.green,
-                ),
-                const SizedBox(width: 12),
-                _buildActionButton(
-                  onPressed: () => _updateApprovalStatus(approval, "REJECT"),
-                  icon: Icons.cancel,
-                  label: 'Reject',
-                  color: Colors.red,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: Colors.grey[600]),
-          const SizedBox(width: 8),
-          Text(
-            '$label: ',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButton({
-    required VoidCallback onPressed,
-    required IconData icon,
-    required String label,
-    required Color color,
-  }) {
-    return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, color: Colors.white, size: 18),
-      label: Text(label),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Student Status Change'),
-        elevation: 2,
+        title: const Text('Admission Category Change'),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator()) // Show loader
           : _userAssignedDetails == null
               ? const Center(child: CircularProgressIndicator())
               : _approvals.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.check_circle_outline,
-                              size: 64, color: Colors.grey[400]),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No pending approvals',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey[600],
+                  ? const Center(child: Text('No pending approvals'))
+                  : ListView.builder(
+                      itemCount: _approvals.length,
+                      itemBuilder: (context, index) {
+                        final approval = _approvals[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  approval['given_name'] ?? 'Unknown',
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'username: ${approval['username']?.substring(3) ?? 'N/A'}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  'Branch: ${approval['branchName'] ?? 'N/A'}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  'Section: ${approval['sectionName'] ?? 'N/A'}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  'Parent Contact: ${approval['parentContactNo'] ?? 'N/A'}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  'Remarks: ${approval['statusChangeRemarks'] ?? 'N/A'}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  'Requested By: ${approval['requestRaisedByName']?.substring(3) ?? 'N/A'}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  'Request Date: ${DateTime.parse(approval['createdAt']).toLocal()}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.check,
+                                          color: Colors.green),
+                                      onPressed: () {
+                                        _updateApprovalStatus(
+                                            approval, "APROVE");
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.close,
+                                          color: Colors.red),
+                                      onPressed: () {
+                                        _updateApprovalStatus(
+                                            approval, "REJECT");
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.only(top: 8, bottom: 80),
-                      itemCount: _approvals.length,
-                      itemBuilder: (context, index) =>
-                          _buildApprovalCard(_approvals[index]),
+                        );
+                      },
                     ),
       floatingActionButton: Container(
         decoration: BoxDecoration(
