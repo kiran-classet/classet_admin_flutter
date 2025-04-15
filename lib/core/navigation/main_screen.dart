@@ -94,82 +94,163 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       userPhoto = userInfo?['studentPhoto']?['storageLocation'] ?? '';
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            if (userPhoto.isNotEmpty)
-              // CircleAvatar(
-              //   radius: 16,
-              //   backgroundImage: NetworkImage(userPhoto),
-              // ),
-              // if (userPhoto.isNotEmpty) const SizedBox(width: 8),
-              Text(
-                'Classet',
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return WillPopScope(
+      onWillPop: () async {
+        final shouldExit = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false, // Prevents dismissing by tapping outside
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            title: const Text(
+              'Exit App',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF076EFF), // Using your app's blue color
               ),
-          ],
-        ),
-        actions: [
-          // Notification Icon with Badge
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.notifications_outlined,
-                  size: 30, // Increased icon size
-                ),
-                onPressed: _handleNotificationTap,
+            ),
+            content: const Text(
+              'Are you sure you want to exit the app?',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
               ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 14,
-                    minHeight: 14,
-                  ),
-                  child: const Text(
-                    '1', // Replace with your actual notification count
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
+            ),
+            elevation: 8,
+            backgroundColor: Colors.white,
+            actions: [
+              Container(
+                margin: const EdgeInsets.only(bottom: 8, right: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: const BorderSide(color: Color(0xFF076EFF)),
+                        ),
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Color(0xFF076EFF),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF076EFF),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 2,
+                      ),
+                      child: const Text(
+                        'Exit',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(width: 8), // Add some spacing between icons
-        ],
-      ),
-      drawer: CustomDrawer(
-        selectedIndex: _selectedDrawerIndex,
-        onItemTapped: _onDrawerItemTapped,
-        userName: userName,
-        userPhoto: userPhoto,
-      ),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        physics: const NeverScrollableScrollPhysics(),
-        children: _bottomNavScreens,
-      ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onBottomNavTapped,
+        );
+        return shouldExit ?? false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Row(
+            children: [
+              if (userPhoto.isNotEmpty)
+                // CircleAvatar(
+                //   radius: 16,
+                //   backgroundImage: NetworkImage(userPhoto),
+                // ),
+                // if (userPhoto.isNotEmpty) const SizedBox(width: 8),
+                Text(
+                  'Classet',
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+            ],
+          ),
+          actions: [
+            // Notification Icon with Badge
+            Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.notifications_outlined,
+                    size: 30, // Increased icon size
+                  ),
+                  onPressed: _handleNotificationTap,
+                ),
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 14,
+                      minHeight: 14,
+                    ),
+                    child: const Text(
+                      '1', // Replace with your actual notification count
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 8), // Add some spacing between icons
+          ],
+        ),
+        drawer: CustomDrawer(
+          selectedIndex: _selectedDrawerIndex,
+          onItemTapped: _onDrawerItemTapped,
+          userName: userName,
+          userPhoto: userPhoto,
+        ),
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          physics: const NeverScrollableScrollPhysics(),
+          children: _bottomNavScreens,
+        ),
+        bottomNavigationBar: CustomBottomNavigationBar(
+          selectedIndex: _selectedIndex,
+          onItemTapped: _onBottomNavTapped,
+        ),
       ),
     );
   }
