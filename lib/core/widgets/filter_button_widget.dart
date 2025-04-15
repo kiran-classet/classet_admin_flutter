@@ -74,7 +74,7 @@ class FilterButtonWidget extends ConsumerWidget {
       tooltip: 'Filter',
       backgroundColor: Colors.blue[600],
       foregroundColor: Colors.white,
-      child: const Icon(Icons.filter_list),
+      child: const Icon(Icons.filter_alt),
     );
   }
 

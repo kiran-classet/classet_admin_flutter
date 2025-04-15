@@ -21,11 +21,31 @@ class _StudentStatusChangeApprovalScreenState
   bool _isLoading = false; // State to manage loader visibility
   final Map<int, bool> _expandedCards =
       {}; // Track expanded state for each card
+  String _searchQuery = ""; // State to store search query
+  List<dynamic> _filteredApprovals = []; // State to store filtered approvals
 
   @override
   void initState() {
     super.initState();
     _fetchUserAssignedDetails();
+  }
+
+  void _filterApprovals(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (query.isEmpty) {
+        _filteredApprovals = _approvals;
+      } else {
+        _filteredApprovals = _approvals.where((approval) {
+          final username = approval['username']?.toLowerCase() ?? '';
+          final id = approval['username']?.substring(3).toLowerCase() ?? '';
+          final givenName = approval['given_name']?.toLowerCase() ?? '';
+          return username.contains(query.toLowerCase()) ||
+              id.contains(query.toLowerCase()) ||
+              givenName.contains(query.toLowerCase());
+        }).toList();
+      }
+    });
   }
 
   Future<void> _fetchUserAssignedDetails() async {
@@ -131,6 +151,7 @@ class _StudentStatusChangeApprovalScreenState
         setState(() {
           _isLoading = false; // Hide loader
           _approvals = response['data']; // Save approvals in state
+          _filteredApprovals = _approvals; // Initialize filtered list
         });
       } else {
         print('Failed to fetch pending approvals: ${response['message']}');
@@ -636,6 +657,40 @@ class _StudentStatusChangeApprovalScreenState
             color: Colors.white,
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    onChanged: _filterApprovals,
+                    decoration: InputDecoration(
+                      hintText: 'Search by username or ID',
+                      prefixIcon:
+                          Icon(Icons.search, color: Colors.grey.shade600),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                FilterButtonWidget(
+                  openBottomSheet: true,
+                  showSections: true,
+                  onFilterApplied: _fetchPendingApprovals,
+                  isSingleSectionsSelection: true,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: _fetchUserAssignedDetails,
@@ -644,32 +699,14 @@ class _StudentStatusChangeApprovalScreenState
             ? _buildLoadingIndicator()
             : _userAssignedDetails == null
                 ? _buildLoadingIndicator()
-                : _approvals.isEmpty
+                : _filteredApprovals.isEmpty
                     ? _buildEmptyState()
                     : ListView.builder(
                         padding: const EdgeInsets.only(top: 8, bottom: 80),
-                        itemCount: _approvals.length,
-                        itemBuilder: (context, index) =>
-                            _buildApprovalCard(_approvals[index], index),
+                        itemCount: _filteredApprovals.length,
+                        itemBuilder: (context, index) => _buildApprovalCard(
+                            _filteredApprovals[index], index),
                       ),
-      ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: FilterButtonWidget(
-          openBottomSheet: true,
-          showSections: true,
-          onFilterApplied: _fetchPendingApprovals,
-          isSingleSectionsSelection: true,
-        ),
       ),
     );
   }
