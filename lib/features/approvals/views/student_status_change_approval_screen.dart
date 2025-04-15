@@ -430,35 +430,6 @@ class _StudentStatusChangeApprovalScreenState
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: Colors.grey[600]),
-          const SizedBox(width: 8),
-          Text(
-            '$label: ',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildActionButton({
     required VoidCallback onPressed,
     required IconData icon,
@@ -485,36 +456,38 @@ class _StudentStatusChangeApprovalScreenState
     return Scaffold(
       appBar: AppBar(
         title: const Text('Student Status Change'),
-        elevation: 2,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _userAssignedDetails == null
-              ? const Center(child: CircularProgressIndicator())
-              : _approvals.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.check_circle_outline,
-                              size: 64, color: Colors.grey[400]),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No pending approvals',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey[600],
+      body: RefreshIndicator(
+        onRefresh: _fetchUserAssignedDetails, // Pull-to-refresh functionality
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _userAssignedDetails == null
+                ? const Center(child: CircularProgressIndicator())
+                : _approvals.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.check_circle_outline,
+                                size: 64, color: Colors.grey[400]),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No pending approvals',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey[600],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.only(top: 8, bottom: 80),
+                        itemCount: _approvals.length,
+                        itemBuilder: (context, index) =>
+                            _buildApprovalCard(_approvals[index], index),
                       ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.only(top: 8, bottom: 80),
-                      itemCount: _approvals.length,
-                      itemBuilder: (context, index) =>
-                          _buildApprovalCard(_approvals[index], index),
-                    ),
+      ),
       floatingActionButton: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),

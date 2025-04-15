@@ -1,5 +1,6 @@
 import 'package:classet_admin/features/approvals/views/student_admission_cat_change.dart';
 import 'package:classet_admin/features/approvals/views/student_status_change_approval_screen.dart';
+import 'package:classet_admin/features/dashboard/views/attendance_quick_actions_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -128,8 +129,6 @@ class ApprovalScreen extends StatelessWidget {
                     const StudentAdmissionChangeApprovalScreen(),
               ),
             );
-          } else {
-            context.go(route);
           }
         },
         borderRadius: BorderRadius.circular(20),

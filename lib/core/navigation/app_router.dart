@@ -48,10 +48,6 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) =>
           LoginScreen(), // MainScreen handles navigation
     ),
-    GoRoute(
-      path: '/studentStatusChangeApproval',
-      builder: (context, state) => const StudentStatusChangeApprovalScreen(),
-    ),
   ],
 );
 
