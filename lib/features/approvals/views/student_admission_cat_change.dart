@@ -82,7 +82,7 @@ class _StudentAdmissionChangeApprovalScreenState
     if (_userAssignedDetails == null) return;
 
     setState(() {
-      _isLoading = false; // Hide loader
+      _isLoading = true; // Hide loader
       _approvals = []; // Save approvals in state
       _filteredApprovals = []; // Initialize filtered list
     });
