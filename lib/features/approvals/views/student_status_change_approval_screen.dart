@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:classet_admin/core/widgets/filter_button_widget.dart';
 import 'package:classet_admin/core/services/api_service.dart';
+import 'package:url_launcher/url_launcher_string.dart'; // Add this import for string-based methods
 
 class StudentStatusChangeApprovalScreen extends ConsumerStatefulWidget {
   const StudentStatusChangeApprovalScreen({super.key});
@@ -461,25 +462,41 @@ class _StudentStatusChangeApprovalScreenState
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
+            child: GestureDetector(
+              onTap: () async {
+                if (label == 'Parent Contact' && value != 'N/A') {
+                  final String phoneUri = 'tel:$value';
+                  if (await canLaunchUrlString(phoneUri)) {
+                    // Use canLaunchUrlString
+                    await launchUrlString(phoneUri); // Use launchUrlString
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Unable to make a call')),
+                    );
+                  }
+                }
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.blue, // Highlight clickable text
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
