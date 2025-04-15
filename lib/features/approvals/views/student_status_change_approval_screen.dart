@@ -194,6 +194,55 @@ class _StudentStatusChangeApprovalScreenState
     }
   }
 
+  Future<void> _showConfirmationDialog({
+    required String title,
+    required String content,
+    required VoidCallback onConfirm,
+  }) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.blue.shade900,
+          ),
+        ),
+        content: Text(
+          content,
+          style: TextStyle(fontSize: 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.grey.shade600),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue.shade700,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text('Confirm'),
+          ),
+        ],
+      ),
+    );
+    if (result == true) {
+      onConfirm();
+    }
+  }
+
   Widget _buildHeaderSection(Map<String, dynamic> approval, int index) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -437,7 +486,14 @@ class _StudentStatusChangeApprovalScreenState
     required Color color,
   }) {
     return ElevatedButton.icon(
-      onPressed: onPressed,
+      onPressed: () {
+        final action = label.toLowerCase();
+        _showConfirmationDialog(
+          title: 'Confirm $label',
+          content: 'Are you sure you want to $action this approval?',
+          onConfirm: onPressed,
+        );
+      },
       icon: Icon(icon, color: Colors.white, size: 18),
       label: Text(label),
       style: ElevatedButton.styleFrom(
@@ -451,44 +507,119 @@ class _StudentStatusChangeApprovalScreenState
     );
   }
 
+  Widget _buildEmptyState() {
+    return ListView(
+      children: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height - kToolbarHeight,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TweenAnimationBuilder(
+                  tween: Tween<double>(begin: 0, end: 1),
+                  duration: Duration(milliseconds: 800),
+                  builder: (context, double value, child) {
+                    return Transform.scale(
+                      scale: value,
+                      child: Icon(
+                        Icons.check_circle_outline,
+                        size: 80,
+                        color: Colors.blue.shade200,
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'No pending approvals',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Pull to refresh when new approvals arrive',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade700),
+            strokeWidth: 3,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Loading...',
+            style: TextStyle(
+              color: Colors.blue.shade700,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Student Status Change'),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                const Color.fromARGB(255, 243, 244, 245),
+                const Color.fromARGB(255, 104, 155, 232),
+              ],
+            ),
+          ),
+        ),
+        elevation: 0,
+        title: Text(
+          'Student Status Change',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: _fetchUserAssignedDetails,
+            color: Colors.white,
+          ),
+        ],
       ),
       body: RefreshIndicator(
-        onRefresh: _fetchUserAssignedDetails, // Pull-to-refresh functionality
+        onRefresh: _fetchUserAssignedDetails,
+        color: Colors.blue.shade700,
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? _buildLoadingIndicator()
             : _userAssignedDetails == null
-                ? const Center(child: CircularProgressIndicator())
+                ? _buildLoadingIndicator()
                 : _approvals.isEmpty
-                    ? ListView(
-                        children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height -
-                                kToolbarHeight,
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.check_circle_outline,
-                                      size: 64, color: Colors.grey[400]),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'No pending approvals',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
+                    ? _buildEmptyState()
                     : ListView.builder(
                         padding: const EdgeInsets.only(top: 8, bottom: 80),
                         itemCount: _approvals.length,

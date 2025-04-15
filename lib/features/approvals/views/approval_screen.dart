@@ -26,7 +26,7 @@ class ApprovalScreen extends StatelessWidget {
         'label': 'Student Admission Category Change',
         'icon': Icons.category,
         'route': '/admissionCategoryChangeApproval',
-        'color': const Color(0xFFFF9800),
+        'color': const Color.fromARGB(255, 235, 85, 222),
       },
       {
         'label': 'Fee Concession',
@@ -168,7 +168,7 @@ class ApprovalScreen extends StatelessWidget {
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
-                    fontSize: 14,
+                    fontSize: 16,
                   ),
                 ),
               ],
