@@ -464,22 +464,30 @@ class _StudentStatusChangeApprovalScreenState
             : _userAssignedDetails == null
                 ? const Center(child: CircularProgressIndicator())
                 : _approvals.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.check_circle_outline,
-                                size: 64, color: Colors.grey[400]),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No pending approvals',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey[600],
+                    ? ListView(
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height -
+                                kToolbarHeight,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.check_circle_outline,
+                                      size: 64, color: Colors.grey[400]),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'No pending approvals',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       )
                     : ListView.builder(
                         padding: const EdgeInsets.only(top: 8, bottom: 80),
