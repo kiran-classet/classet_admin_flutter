@@ -146,13 +146,13 @@ class _StudentAdmissionChangeApprovalScreenState
     try {
       final apiService = ApiService();
       final response = await apiService.post(
-        'statusChange/get/all?academicYear=$academicYear',
+        'statusChange/get/all/admissionrequests?academicYear=$academicYear',
         payload,
       );
       if (response['status'] == true) {
         setState(() {
           _isLoading = false; // Hide loader
-          _approvals = response['data']; // Save approvals in state
+          _approvals = response['data']['data']; // Save approvals in state
           _filteredApprovals = _approvals; // Initialize filtered list
         });
       } else {
@@ -174,9 +174,6 @@ class _StudentAdmissionChangeApprovalScreenState
     setState(() {
       _isLoading = true; // Show loader
     });
-    print(
-        'User Assigned Details: ${_userAssignedDetails!['adminUserAssignedLevelDetails']}');
-    print('Approval Data Branch ID: ${approvalData['branchId']}');
 
     final filterData = _userAssignedDetails!['adminUserAssignedLevelDetails']
         .where((element) => element['_id'] == approvalData['branchId'])
@@ -185,14 +182,14 @@ class _StudentAdmissionChangeApprovalScreenState
     final payload = {
       ...approvalData,
       "approveStatus": approveStatus,
-      "statusChangeRemarks": approvalData['statusChangeRemarks'] ?? "",
+      "admissionChangeRequest": 'DONE',
       "handledBy": approvalData['handledBy'] ?? [],
       "levelAndBranchDetails": filterData,
     };
     try {
       final apiService = ApiService();
       final response = await apiService.post(
-        'statusChange/update',
+        'statusChange/admission/update',
         payload,
       );
       if (response['status'] == true) {
@@ -453,6 +450,12 @@ class _StudentAdmissionChangeApprovalScreenState
               Icons.class_, 'Section', approval['sectionName'] ?? 'N/A'),
           _buildDetailRow(Icons.phone, 'Parent Contact',
               approval['parentContactNo'] ?? 'N/A'),
+          _buildDetailRow(Icons.category, 'Current Admission Category',
+              approval['categoryName'] ?? 'N/A'),
+          _buildDetailRow(
+              Icons.category_outlined,
+              'Requested Admission Category',
+              approval['requestedAdmissionName'] ?? 'N/A'),
           _buildDetailRow(Icons.comment, 'Remarks',
               approval['statusChangeRemarks'] ?? 'N/A'),
           _buildDetailRow(Icons.person, 'Requested By',
@@ -645,7 +648,7 @@ class _StudentAdmissionChangeApprovalScreenState
         ),
         elevation: 0,
         title: Text(
-          'Student Status Change',
+          'Student Admission Change',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -669,7 +672,7 @@ class _StudentAdmissionChangeApprovalScreenState
                   child: TextField(
                     onChanged: _filterApprovals,
                     decoration: InputDecoration(
-                      hintText: 'Search by username or ID',
+                      hintText: 'Search by Name or ID',
                       prefixIcon:
                           Icon(Icons.search, color: Colors.grey.shade600),
                       filled: true,

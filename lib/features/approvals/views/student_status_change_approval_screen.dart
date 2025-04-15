@@ -669,7 +669,7 @@ class _StudentStatusChangeApprovalScreenState
                   child: TextField(
                     onChanged: _filterApprovals,
                     decoration: InputDecoration(
-                      hintText: 'Search by username or ID',
+                      hintText: 'Search by Name or ID',
                       prefixIcon:
                           Icon(Icons.search, color: Colors.grey.shade600),
                       filled: true,
