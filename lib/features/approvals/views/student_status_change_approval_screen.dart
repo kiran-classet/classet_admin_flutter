@@ -82,7 +82,9 @@ class _StudentStatusChangeApprovalScreenState
     if (_userAssignedDetails == null) return;
 
     setState(() {
-      _isLoading = true; // Show loader
+      _isLoading = false; // Hide loader
+      _approvals = []; // Save approvals in state
+      _filteredApprovals = []; // Initialize filtered list
     });
 
     final filterState = ref.read(filterStateProvider);
