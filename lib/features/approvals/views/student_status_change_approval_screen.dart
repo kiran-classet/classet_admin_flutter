@@ -346,7 +346,15 @@ class _StudentStatusChangeApprovalScreenState
                     _expandedCards[index] = !(_expandedCards[index] ?? false);
                   });
                 },
-                child: _buildHeaderSection(approval, index),
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      _expandedCards[index] = !(_expandedCards[index] ?? false);
+                    });
+                  },
+                  splashColor: Colors.blue.shade100,
+                  child: _buildHeaderSection(approval, index),
+                ),
               ),
               if (!(_expandedCards[index] ?? false))
                 Padding(
@@ -503,6 +511,7 @@ class _StudentStatusChangeApprovalScreenState
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
+        elevation: 2, // Add elevation for better feedback
       ),
     );
   }
