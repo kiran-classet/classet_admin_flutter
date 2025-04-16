@@ -352,7 +352,7 @@ class _StudentStatusChangeApprovalScreenState
   Widget _buildApprovalCard(Map<String, dynamic> approval, int index) {
     return Card(
       elevation: 8,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 9, vertical: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: Colors.grey.shade200),
@@ -365,8 +365,8 @@ class _StudentStatusChangeApprovalScreenState
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                const Color.fromARGB(255, 192, 189, 189),
-                Colors.grey.shade50
+                const Color.fromARGB(255, 212, 215, 249),
+                const Color.fromARGB(255, 251, 244, 244)
               ],
             ),
           ),
