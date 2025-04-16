@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:classet_admin/core/widgets/filter_button_widget.dart';
 import 'package:classet_admin/core/services/api_service.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:url_launcher/url_launcher_string.dart'; // Add this import for string-based methods
 import 'package:shimmer/shimmer.dart'; // Add this import for shimmer effect
 
@@ -25,10 +26,25 @@ class _StudentStatusChangeApprovalScreenState
   String _searchQuery = ""; // State to store search query
   List<dynamic> _filteredApprovals = []; // State to store filtered approvals
 
+  // Add these variables
+  final GlobalKey _swipeShowcaseKey = GlobalKey();
+  bool _isShowcaseDisplayed = false;
+
   @override
   void initState() {
     super.initState();
     _fetchUserAssignedDetails();
+    // Add this to show the showcase after the build is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _displayShowcase();
+    });
+  }
+
+  void _displayShowcase() {
+    if (!_isShowcaseDisplayed && mounted) {
+      _isShowcaseDisplayed = true;
+      ShowCaseWidget.of(context).startShowCase([_swipeShowcaseKey]);
+    }
   }
 
   void _filterApprovals(String query) {
@@ -347,122 +363,250 @@ class _StudentStatusChangeApprovalScreenState
   }
 
   Widget _buildApprovalCard(Map<String, dynamic> approval, int index) {
-    return Dismissible(
-      key: Key(approval['id'].toString()), // Unique key for each card
-      direction: DismissDirection.horizontal, // Allow horizontal swipes
-      confirmDismiss: (direction) async {
-        String action =
-            direction == DismissDirection.startToEnd ? "Approve" : "Reject";
-        return await _showConfirmationDialog(
-          title: 'Confirm $action',
-          content: 'Are you sure you want to $action this approval?',
-        );
-      },
-      onDismissed: (direction) {
-        if (direction == DismissDirection.startToEnd) {
-          // Swiped right (Approve)
-          _updateApprovalStatus(approval, "APPROVE");
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Approval Approved')),
-          );
-        } else if (direction == DismissDirection.endToStart) {
-          // Swiped left (Reject)
-          _updateApprovalStatus(approval, "REJECT");
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Approval Rejected')),
-          );
-        }
-      },
-      background: Container(
-        color: Colors.green.shade600,
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 8),
-            Text('Approve', style: TextStyle(color: Colors.white)),
-          ],
-        ),
-      ),
-      secondaryBackground: Container(
-        color: Colors.red.shade600,
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text('Reject', style: TextStyle(color: Colors.white)),
-            const SizedBox(width: 8),
-            Icon(Icons.cancel, color: Colors.white),
-          ],
-        ),
-      ),
-      child: Card(
-        elevation: 8,
-        margin: const EdgeInsets.symmetric(horizontal: 9, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.grey.shade200),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color.fromARGB(255, 212, 215, 249),
-                  const Color.fromARGB(255, 251, 244, 244)
+    if (index == 0) {
+      return Showcase(
+          key: _swipeShowcaseKey,
+          description: 'Swipe right to approve or left to reject',
+          targetShapeBorder: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Dismissible(
+            key: Key(approval['id'].toString()), // Unique key for each card
+            direction: DismissDirection.horizontal, // Allow horizontal swipes
+            confirmDismiss: (direction) async {
+              String action = direction == DismissDirection.startToEnd
+                  ? "Approve"
+                  : "Reject";
+              return await _showConfirmationDialog(
+                title: 'Confirm $action',
+                content: 'Are you sure you want to $action this approval?',
+              );
+            },
+            onDismissed: (direction) {
+              if (direction == DismissDirection.startToEnd) {
+                // Swiped right (Approve)
+                _updateApprovalStatus(approval, "APPROVE");
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Approval Approved')),
+                );
+              } else if (direction == DismissDirection.endToStart) {
+                // Swiped left (Reject)
+                _updateApprovalStatus(approval, "REJECT");
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Approval Rejected')),
+                );
+              }
+            },
+            background: Container(
+              color: Colors.green.shade600,
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text('Approve', style: TextStyle(color: Colors.white)),
                 ],
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _expandedCards[index] = !(_expandedCards[index] ?? false);
-                    });
-                  },
-                  child: InkWell(
+            secondaryBackground: Container(
+              color: Colors.red.shade600,
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text('Reject', style: TextStyle(color: Colors.white)),
+                  const SizedBox(width: 8),
+                  Icon(Icons.cancel, color: Colors.white),
+                ],
+              ),
+            ),
+            child: Card(
+              elevation: 8,
+              margin: const EdgeInsets.symmetric(horizontal: 9, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.grey.shade200),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color.fromARGB(255, 212, 215, 249),
+                        const Color.fromARGB(255, 251, 244, 244)
+                      ],
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _expandedCards[index] =
+                                !(_expandedCards[index] ?? false);
+                          });
+                        },
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              _expandedCards[index] =
+                                  !(_expandedCards[index] ?? false);
+                            });
+                          },
+                          splashColor: Colors.blue.shade100,
+                          child: _buildHeaderSection(approval, index),
+                        ),
+                      ),
+                      if (!(_expandedCards[index] ?? false))
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: _buildActionSection(
+                              approval), // Show buttons in collapsed state
+                        ),
+                      if (_expandedCards[index] ?? false)
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildDetailsSection(approval),
+                              const Divider(height: 24),
+                              _buildActionSection(approval),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ));
+    } else {
+      return Dismissible(
+        key: Key(approval['id'].toString()), // Unique key for each card
+        direction: DismissDirection.horizontal, // Allow horizontal swipes
+        confirmDismiss: (direction) async {
+          String action =
+              direction == DismissDirection.startToEnd ? "Approve" : "Reject";
+          return await _showConfirmationDialog(
+            title: 'Confirm $action',
+            content: 'Are you sure you want to $action this approval?',
+          );
+        },
+        onDismissed: (direction) {
+          if (direction == DismissDirection.startToEnd) {
+            // Swiped right (Approve)
+            _updateApprovalStatus(approval, "APPROVE");
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Approval Approved')),
+            );
+          } else if (direction == DismissDirection.endToStart) {
+            // Swiped left (Reject)
+            _updateApprovalStatus(approval, "REJECT");
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Approval Rejected')),
+            );
+          }
+        },
+        background: Container(
+          color: Colors.green.shade600,
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 8),
+              Text('Approve', style: TextStyle(color: Colors.white)),
+            ],
+          ),
+        ),
+        secondaryBackground: Container(
+          color: Colors.red.shade600,
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text('Reject', style: TextStyle(color: Colors.white)),
+              const SizedBox(width: 8),
+              Icon(Icons.cancel, color: Colors.white),
+            ],
+          ),
+        ),
+        child: Card(
+          elevation: 8,
+          margin: const EdgeInsets.symmetric(horizontal: 9, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: Colors.grey.shade200),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color.fromARGB(255, 212, 215, 249),
+                    const Color.fromARGB(255, 251, 244, 244)
+                  ],
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
                     onTap: () {
                       setState(() {
                         _expandedCards[index] =
                             !(_expandedCards[index] ?? false);
                       });
                     },
-                    splashColor: Colors.blue.shade100,
-                    child: _buildHeaderSection(approval, index),
-                  ),
-                ),
-                if (!(_expandedCards[index] ?? false))
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: _buildActionSection(
-                        approval), // Show buttons in collapsed state
-                  ),
-                if (_expandedCards[index] ?? false)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildDetailsSection(approval),
-                        const Divider(height: 24),
-                        _buildActionSection(approval),
-                      ],
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _expandedCards[index] =
+                              !(_expandedCards[index] ?? false);
+                        });
+                      },
+                      splashColor: Colors.blue.shade100,
+                      child: _buildHeaderSection(approval, index),
                     ),
                   ),
-              ],
+                  if (!(_expandedCards[index] ?? false))
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      child: _buildActionSection(
+                          approval), // Show buttons in collapsed state
+                    ),
+                  if (_expandedCards[index] ?? false)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildDetailsSection(approval),
+                          const Divider(height: 24),
+                          _buildActionSection(approval),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget _buildActionSection(Map<String, dynamic> approval) {

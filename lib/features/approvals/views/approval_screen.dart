@@ -24,7 +24,7 @@ class ApprovalScreen extends StatelessWidget {
         'color': const Color(0xFF9C27B0),
       },
       {
-        'label': 'Student Admission Category Change',
+        'label': 'Admission Category Change',
         'icon': Icons.category,
         'route': '/admissionCategoryChangeApproval',
         'color': const Color.fromARGB(255, 235, 85, 222),
