@@ -67,11 +67,16 @@ class _StudentAdmissionChangeApprovalScreenState
       } else {
         setState(() {
           _isLoading = false; // Hide loader
+          _userAssignedDetails = {};
         });
         print('Failed to fetch user assigned details: ${response['message']}');
       }
     } catch (e) {
       print('Error fetching user assigned details: $e');
+      setState(() {
+        _isLoading = false; // Hide loader
+        _userAssignedDetails = {};
+      });
     } finally {
       setState(() {
         _isLoading = false; // Hide loader

@@ -67,11 +67,16 @@ class _StudentStatusChangeApprovalScreenState
       } else {
         setState(() {
           _isLoading = false; // Hide loader
+          _userAssignedDetails = {};
         });
         print('Failed to fetch user assigned details: ${response['message']}');
       }
     } catch (e) {
       print('Error fetching user assigned details: $e');
+      setState(() {
+        _isLoading = false; // Hide loader
+        _userAssignedDetails = {};
+      });
     } finally {
       setState(() {
         _isLoading = false; // Hide loader
@@ -359,7 +364,10 @@ class _StudentStatusChangeApprovalScreenState
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.white, Colors.grey.shade50],
+              colors: [
+                const Color.fromARGB(255, 192, 189, 189),
+                Colors.grey.shade50
+              ],
             ),
           ),
           child: Column(
