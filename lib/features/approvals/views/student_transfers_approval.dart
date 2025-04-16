@@ -7,16 +7,16 @@ import 'package:classet_admin/core/services/api_service.dart';
 import 'package:url_launcher/url_launcher_string.dart'; // Add this import for string-based methods
 import 'package:shimmer/shimmer.dart'; // Add this import for shimmer effect
 
-class StudentStatusChangeApprovalScreen extends ConsumerStatefulWidget {
-  const StudentStatusChangeApprovalScreen({super.key});
+class StudentTransfersApprovalScreen extends ConsumerStatefulWidget {
+  const StudentTransfersApprovalScreen({super.key});
 
   @override
-  ConsumerState<StudentStatusChangeApprovalScreen> createState() =>
-      _StudentStatusChangeApprovalScreenState();
+  ConsumerState<StudentTransfersApprovalScreen> createState() =>
+      _StudentTransfersApprovalScreenState();
 }
 
-class _StudentStatusChangeApprovalScreenState
-    extends ConsumerState<StudentStatusChangeApprovalScreen> {
+class _StudentTransfersApprovalScreenState
+    extends ConsumerState<StudentTransfersApprovalScreen> {
   Map<String, dynamic>? _userAssignedDetails; // State to store API response
   List<dynamic> _approvals = []; // State to store approvals list
   bool _isLoading = false; // State to manage loader visibility
@@ -38,9 +38,9 @@ class _StudentStatusChangeApprovalScreenState
         _filteredApprovals = _approvals;
       } else {
         _filteredApprovals = _approvals.where((approval) {
-          final username = approval['username']?.toLowerCase() ?? '';
-          final id = approval['username']?.substring(3).toLowerCase() ?? '';
-          final givenName = approval['given_name']?.toLowerCase() ?? '';
+          final username = approval['name']?.toLowerCase() ?? '';
+          final id = approval['name']?.substring(3).toLowerCase() ?? '';
+          final givenName = approval['name']?.toLowerCase() ?? '';
           return username.contains(query.toLowerCase()) ||
               id.contains(query.toLowerCase()) ||
               givenName.contains(query.toLowerCase());
@@ -56,7 +56,7 @@ class _StudentStatusChangeApprovalScreenState
     try {
       final apiService = ApiService();
       final response = await apiService.get(
-          'settings-approvals/userAssignedBoards?approvalType=studentStatusChange');
+          'settings-approvals/userAssignedBoards?approvalType=studentTransfer');
       if (response['status'] == true) {
         setState(() {
           _isLoading = false; // Hide loader
@@ -143,7 +143,8 @@ class _StudentStatusChangeApprovalScreenState
       "assignedHeirarchy": {
         "branchIds": branchIds,
         "adminLevels": adminLevels,
-      }
+      },
+      "branchIds": branchIds,
     };
     final adminUserState = ref.watch(adminUserProvider);
     final userDetails = adminUserState.userDetails;
@@ -152,13 +153,13 @@ class _StudentStatusChangeApprovalScreenState
     try {
       final apiService = ApiService();
       final response = await apiService.post(
-        'statusChange/get/all?academicYear=$academicYear',
+        'transfers/get/all?academicYear=$academicYear',
         payload,
       );
       if (response['status'] == true) {
         setState(() {
           _isLoading = false; // Hide loader
-          _approvals = response['data']; // Save approvals in state
+          _approvals = response['data']['data']; // Save approvals in state
           _filteredApprovals = _approvals; // Initialize filtered list
         });
       } else {
@@ -180,25 +181,20 @@ class _StudentStatusChangeApprovalScreenState
     setState(() {
       _isLoading = true; // Show loader
     });
-    print(
-        'User Assigned Details: ${_userAssignedDetails!['adminUserAssignedLevelDetails']}');
-    print('Approval Data Branch ID: ${approvalData['branchId']}');
-
     final filterData = _userAssignedDetails!['adminUserAssignedLevelDetails']
-        .where((element) => element['_id'] == approvalData['branchId'])
+        .where((element) => element['_id'] == approvalData['fmbranchId'])
         .toList();
 
     final payload = {
       ...approvalData,
-      "approveStatus": approveStatus,
-      "statusChangeRemarks": approvalData['statusChangeRemarks'] ?? "",
+      "toTransferStatus": approveStatus,
       "handledBy": approvalData['handledBy'] ?? [],
       "levelAndBranchDetails": filterData,
     };
     try {
       final apiService = ApiService();
       final response = await apiService.post(
-        'statusChange/update',
+        'transfers/update',
         payload,
       );
       if (response['status'] == true) {
@@ -282,8 +278,12 @@ class _StudentStatusChangeApprovalScreenState
           end: Alignment.bottomRight,
           colors: [
             Colors.blue.shade700,
-            const Color.fromARGB(255, 51, 83, 107)
+            const Color.fromARGB(255, 51, 83, 107),
           ],
+        ),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
         ),
       ),
       child: Row(
@@ -294,7 +294,7 @@ class _StudentStatusChangeApprovalScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  approval['given_name'] ?? 'Unknown',
+                  approval['name']?.substring(3) ?? 'Unknown',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -303,16 +303,31 @@ class _StudentStatusChangeApprovalScreenState
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'ID: ${approval['username']?.substring(3) ?? 'N/A'}',
+                  '${approval['transferType'] ?? 'N/A'} Transfer',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.white.withOpacity(0.9),
                   ),
                 ),
+                const SizedBox(height: 4),
+                Text(
+                  'From: ${approval['fmbranchName'] ?? 'N/A'} - ${approval['fmsectionName'] ?? 'N/A'}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withOpacity(0.8),
+                  ),
+                ),
+                Text(
+                  'To: ${approval['tobranchName'] ?? 'N/A'} - ${approval['tosectionName'] ?? 'N/A'}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withOpacity(0.8),
+                  ),
+                ),
               ],
             ),
           ),
-          Row(
+          Column(
             children: [
               Container(
                 padding:
@@ -326,8 +341,8 @@ class _StudentStatusChangeApprovalScreenState
                     Icon(Icons.access_time, size: 16, color: Colors.white),
                     const SizedBox(width: 4),
                     Text(
-                      'Pending',
-                      style: TextStyle(
+                      approval['status'] ?? 'Pending',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w500,
                       ),
@@ -335,7 +350,7 @@ class _StudentStatusChangeApprovalScreenState
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(height: 8),
               Icon(
                 _expandedCards[index] ?? false
                     ? Icons.expand_less
@@ -453,17 +468,15 @@ class _StudentStatusChangeApprovalScreenState
       child: Column(
         children: [
           _buildDetailRow(
-              Icons.business, 'Branch', approval['branchName'] ?? 'N/A'),
+              Icons.business, 'Branch', approval['fmbranchName'] ?? 'N/A'),
           _buildDetailRow(
-              Icons.school, 'Board', approval['custom:board'] ?? 'N/A'),
+              Icons.school, 'Board', approval['fmboradName'] ?? 'N/A'),
           _buildDetailRow(
-              Icons.grade, 'Grade', approval['custom:grade'] ?? 'N/A'),
+              Icons.grade, 'Grade', approval['fmclassName'] ?? 'N/A'),
           _buildDetailRow(
-              Icons.class_, 'Section', approval['sectionName'] ?? 'N/A'),
-          _buildDetailRow(Icons.phone, 'Parent Contact',
-              approval['parentContactNo'] ?? 'N/A'),
-          _buildDetailRow(Icons.comment, 'Remarks',
-              approval['statusChangeRemarks'] ?? 'N/A'),
+              Icons.class_, 'Section', approval['fmsectionName'] ?? 'N/A'),
+          _buildDetailRow(
+              Icons.phone, 'Parent Contact', approval['phoneNumber'] ?? 'N/A'),
           _buildDetailRow(Icons.person, 'Requested By',
               approval['requestRaisedByName']?.substring(3) ?? 'N/A'),
           _buildDetailRow(
@@ -719,7 +732,7 @@ class _StudentStatusChangeApprovalScreenState
         ),
         elevation: 0,
         title: Text(
-          'Student Status Change',
+          'Student Transfers',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -737,19 +750,26 @@ class _StudentStatusChangeApprovalScreenState
           preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TextField(
-              onChanged: _filterApprovals,
-              decoration: InputDecoration(
-                hintText: 'Search by Name or ID',
-                prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    onChanged: _filterApprovals,
+                    decoration: InputDecoration(
+                      hintText: 'Search by ID',
+                      prefixIcon:
+                          Icon(Icons.search, color: Colors.grey.shade600),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),

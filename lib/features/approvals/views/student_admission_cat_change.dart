@@ -306,6 +306,35 @@ class _StudentAdmissionChangeApprovalScreenState
                     color: Colors.white.withOpacity(0.9),
                   ),
                 ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      '${approval['categoryName'] ?? 'N/A'}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons
+                          .arrow_circle_right_sharp, // Icon representing the transition
+                      size: 20,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${approval['requestedAdmissionName'] ?? 'N/A'}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -414,7 +443,7 @@ class _StudentAdmissionChangeApprovalScreenState
 
   Widget _buildActionSection(Map<String, dynamic> approval) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _buildActionButton(
           onPressed: () => _updateApprovalStatus(approval, "APROVE"),
@@ -759,13 +788,6 @@ class _StudentAdmissionChangeApprovalScreenState
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                FilterButtonWidget(
-                  openBottomSheet: true,
-                  showSections: true,
-                  onFilterApplied: _fetchPendingApprovals,
-                  isSingleSectionsSelection: true,
-                ),
               ],
             ),
           ),
@@ -786,6 +808,12 @@ class _StudentAdmissionChangeApprovalScreenState
                         itemBuilder: (context, index) => _buildApprovalCard(
                             _filteredApprovals[index], index),
                       ),
+      ),
+      floatingActionButton: FilterButtonWidget(
+        openBottomSheet: true,
+        showSections: true,
+        onFilterApplied: _fetchPendingApprovals,
+        isSingleSectionsSelection: true,
       ),
     );
   }
