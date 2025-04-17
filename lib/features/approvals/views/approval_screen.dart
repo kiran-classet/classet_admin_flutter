@@ -5,8 +5,16 @@ import 'package:classet_admin/features/dashboard/views/attendance_quick_actions_
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class ApprovalScreen extends StatelessWidget {
+class ApprovalScreen extends StatefulWidget {
   const ApprovalScreen({super.key});
+
+  @override
+  State<ApprovalScreen> createState() => _ApprovalScreenState();
+}
+
+class _ApprovalScreenState extends State<ApprovalScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +69,12 @@ class ApprovalScreen extends StatelessWidget {
       },
     ];
 
+    final filteredActions = actions
+        .where((action) => (action['label'] as String)
+            .toLowerCase()
+            .contains(_searchQuery.toLowerCase()))
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -75,27 +89,51 @@ class ApprovalScreen extends StatelessWidget {
         elevation: 2,
       ),
       backgroundColor: const Color(0xFFF5F5F5),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 1,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 15,
-            childAspectRatio: 5,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Search Approvals...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+            ),
           ),
-          itemCount: actions.length,
-          itemBuilder: (context, index) {
-            final action = actions[index];
-            return _buildActionCard(
-              context,
-              action['label'] as String,
-              action['icon'] as IconData,
-              action['route'] as String,
-              action['color'] as Color,
-            );
-          },
-        ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 1,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 15,
+                  childAspectRatio: 5,
+                ),
+                itemCount: filteredActions.length,
+                itemBuilder: (context, index) {
+                  final action = filteredActions[index];
+                  return _buildActionCard(
+                    context,
+                    action['label'] as String,
+                    action['icon'] as IconData,
+                    action['route'] as String,
+                    action['color'] as Color,
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
