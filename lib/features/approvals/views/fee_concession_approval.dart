@@ -720,11 +720,13 @@ class _FeeConcessionApprovalScreenState
             },
           ),
         ),
-        if (_allApprovalsActedUpon(approvals))
+        if (approvals.isNotEmpty)
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
-              onPressed: () => _showConfirmationDialog(context, approvals),
+              onPressed: _allApprovalsActedUpon(approvals)
+                  ? () => _showConfirmationDialog(context, approvals)
+                  : null, // Disable the button if the condition is not met
               style: ElevatedButton.styleFrom(
                 padding:
                     const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
@@ -732,6 +734,9 @@ class _FeeConcessionApprovalScreenState
                   borderRadius: BorderRadius.circular(30),
                 ),
                 elevation: 2,
+                backgroundColor: _allApprovalsActedUpon(approvals)
+                    ? const Color.fromARGB(255, 247, 247, 248)
+                    : Colors.grey, // Change color based on state
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
