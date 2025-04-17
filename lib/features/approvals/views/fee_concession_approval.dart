@@ -169,7 +169,6 @@ class _FeeConcessionApprovalScreenState
         .every((approval) => _approvalStatuses.containsKey(approval['_id']));
   }
 
-  // Show confirmation dialog
   Future<void> _showConfirmationDialog(
       BuildContext context, List<dynamic> approvals) async {
     final approvedCount = approvals
@@ -189,34 +188,207 @@ class _FeeConcessionApprovalScreenState
 
     return showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Save'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                  'Approved: $approvedCount approvals (Total Concession: $totalApprovedConcession)'),
-              Text(
-                  'Rejected: $rejectedCount approvals (Total Concession: $totalRejectedConcession)'),
-            ],
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  spreadRadius: 5,
+                  blurRadius: 15,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _saveApprovalStatuses();
-              },
-              child: const Text('Confirm'),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.save_outlined,
+                        color: Colors.blue.shade700,
+                        size: 28,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Confirm Save',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Approved Section
+                _buildStatusSection(
+                  icon: Icons.check_circle_outline,
+                  title: 'Approved',
+                  count: approvedCount,
+                  amount: totalApprovedConcession,
+                  color: Colors.green,
+                ),
+                const SizedBox(height: 16),
+
+                // Rejected Section
+                _buildStatusSection(
+                  icon: Icons.cancel_outlined,
+                  title: 'Rejected',
+                  count: rejectedCount,
+                  amount: totalRejectedConcession,
+                  color: Colors.red,
+                ),
+                const SizedBox(height: 24),
+
+                // Divider
+                Divider(color: Colors.grey.shade200, thickness: 1),
+                const SizedBox(height: 20),
+
+                // Action Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // Cancel Button
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+
+                    // Confirm Button
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _saveApprovalStatuses();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        // primary: Colors.blue.shade700,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.check, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Confirm',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildStatusSection({
+    required IconData icon,
+    required String title,
+    required int count,
+    required int amount,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '$count approvals',
+                      style: TextStyle(
+                        color: color.withOpacity(0.8),
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      'Total: ₹$amount',
+                      style: TextStyle(
+                        color: color.withOpacity(0.8),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -556,10 +728,19 @@ class _FeeConcessionApprovalScreenState
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
+                // primary: Colors.blue.shade700,
+                elevation: 2,
               ),
-              child: const Text(
-                'Save',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.save, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Save Changes',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ],
               ),
             ),
           ),
