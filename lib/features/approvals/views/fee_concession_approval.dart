@@ -817,21 +817,15 @@ class _FeeConcessionApprovalScreenState
               )
             : null,
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await _fetchUserAssignedDetails();
-        },
-        child: Column(
-          children: [
-            Expanded(
-              child: _selectedUserId == null
-                  ? _buildUserList() // Show shimmer or user list
-                  : _buildApprovalList(
-                      _selectedUserId!), // Show shimmer or approval list
-            ),
-          ],
-        ),
-      ),
+      body: _selectedUserId == null
+          ? RefreshIndicator(
+              onRefresh: () async {
+                await _fetchUsersAndApprovals(); // Refresh user list
+              },
+              child: _buildUserList(), // Show shimmer or user list
+            )
+          : _buildApprovalList(
+              _selectedUserId!), // Show approval list without pull-to-refresh
       floatingActionButton: _selectedUserId == null
           ? FilterButtonWidget(
               openBottomSheet: true,
