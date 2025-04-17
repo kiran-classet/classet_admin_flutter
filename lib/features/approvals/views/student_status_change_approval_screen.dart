@@ -916,7 +916,7 @@ class _StudentStatusChangeApprovalScreenState
         ),
         elevation: 0,
         title: Text(
-          'Student Status Change',
+          'Status Change',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,

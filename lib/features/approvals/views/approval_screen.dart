@@ -15,49 +15,49 @@ class ApprovalScreen extends StatelessWidget {
         'label': 'Student Status Change',
         'icon': Icons.person,
         'route': '/studentStatusChangeApproval',
-        'color': const Color(0xFF009688),
+        'color': const Color(0xFF00BCD4), // Vibrant Cyan
       },
       {
         'label': 'Student Transfers',
         'icon': Icons.transfer_within_a_station,
         'route': '/studentTransfersApproval',
-        'color': const Color(0xFF9C27B0),
+        'color': const Color(0xFFFF5722), // Vibrant Orange
       },
       {
         'label': 'Admission Category Change',
         'icon': Icons.category,
         'route': '/admissionCategoryChangeApproval',
-        'color': const Color.fromARGB(255, 235, 85, 222),
+        'color': const Color(0xFFFFC107), // Vibrant Amber
       },
       {
         'label': 'Fee Concession',
         'icon': Icons.discount,
         'route': '/feeConcessionApproval',
-        'color': const Color(0xFF4CAF50),
+        'color': const Color(0xFFFF4081), // Vibrant Pink
       },
       {
         'label': 'Fee Refund',
         'icon': Icons.attach_money,
         'route': '/feeRefundApproval',
-        'color': const Color(0xFF2196F3),
+        'color': const Color(0xFF3F51B5), // Vibrant Indigo
       },
       {
         'label': 'Fee Unassign',
         'icon': Icons.remove_circle_outline,
         'route': '/feeUnassignApproval',
-        'color': const Color(0xFFF44336),
+        'color': const Color(0xFFFF5252), // Vibrant Red
       },
       {
         'label': 'Assign Transport',
         'icon': Icons.directions_bus,
         'route': '/assignTransportApproval',
-        'color': const Color(0xFF795548),
+        'color': const Color(0xFF8BC34A), // Vibrant Green
       },
       {
         'label': 'Transport Routes',
         'icon': Icons.map,
         'route': '/transportRoutesApproval',
-        'color': const Color(0xFF607D8B),
+        'color': const Color(0xFF673AB7), // Vibrant Deep Purple
       },
     ];
 
@@ -79,10 +79,10 @@ class ApprovalScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+            crossAxisCount: 1,
             crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.1,
+            mainAxisSpacing: 15,
+            childAspectRatio: 5,
           ),
           itemCount: actions.length,
           itemBuilder: (context, index) {
@@ -162,22 +162,22 @@ class ApprovalScreen extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Row(
               children: [
                 Icon(
                   icon,
                   size: 40,
                   color: Colors.white,
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ],
