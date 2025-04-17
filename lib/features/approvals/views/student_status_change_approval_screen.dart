@@ -7,6 +7,7 @@ import 'package:classet_admin/core/services/api_service.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:url_launcher/url_launcher_string.dart'; // Add this import for string-based methods
 import 'package:shimmer/shimmer.dart'; // Add this import for shimmer effect
+import 'package:shared_preferences/shared_preferences.dart'; // Add this import for persistent storage
 
 class StudentStatusChangeApprovalScreen extends ConsumerStatefulWidget {
   const StudentStatusChangeApprovalScreen({super.key});
@@ -34,16 +35,20 @@ class _StudentStatusChangeApprovalScreenState
   void initState() {
     super.initState();
     _fetchUserAssignedDetails();
-    // Add this to show the showcase after the build is complete
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _displayShowcase();
+    // Check showcase display status
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _checkAndDisplayShowcase();
     });
   }
 
-  void _displayShowcase() {
-    if (!_isShowcaseDisplayed && mounted) {
+  Future<void> _checkAndDisplayShowcase() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isShowcaseDisplayed = prefs.getBool('isShowcaseDisplayed') ?? false;
+
+    if (!isShowcaseDisplayed && mounted) {
       _isShowcaseDisplayed = true;
       ShowCaseWidget.of(context).startShowCase([_swipeShowcaseKey]);
+      await prefs.setBool('isShowcaseDisplayed', true); // Mark as displayed
     }
   }
 
