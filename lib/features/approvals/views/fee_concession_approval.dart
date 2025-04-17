@@ -1,7 +1,12 @@
+import 'package:classet_admin/core/providers/filter_provider.dart';
+import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:classet_admin/core/widgets/filter_button_widget.dart';
 import 'package:classet_admin/core/services/api_service.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FeeConcessionApprovalScreen extends ConsumerStatefulWidget {
@@ -22,11 +27,12 @@ class _FeeConcessionApprovalScreenState
   String? _selectedUserId;
   final TextEditingController _searchController = TextEditingController();
   final Map<String, String> _approvalStatuses = {}; // Track approval statuses
+  Map<String, dynamic>? _userAssignedDetails; // State to store API response
 
   @override
   void initState() {
     super.initState();
-    _fetchUsersAndApprovals();
+    _fetchUserAssignedDetails();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _checkAndDisplayShowcase();
     });
@@ -42,6 +48,40 @@ class _FeeConcessionApprovalScreenState
       ShowCaseWidget.of(context).startShowCase([_swipeShowcaseKey]);
       await prefs.setBool(
           'isSwipeShowcaseDisplayed', true); // Mark as displayed
+    }
+  }
+
+  Future<void> _fetchUserAssignedDetails() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final apiService = ApiService();
+      final response = await apiService.get(
+          'settings-approvals/userAssignedBoards?approvalType=feeConcession');
+      if (response['status'] == true) {
+        setState(() {
+          _isLoading = false; // Hide loader
+          _userAssignedDetails = response['data']; // Save response in state
+        });
+        _fetchUsersAndApprovals(); // Fetch pending approvals after user assigned details
+      } else {
+        setState(() {
+          _isLoading = false; // Hide loader
+          _userAssignedDetails = {};
+        });
+        print('Failed to fetch user assigned details: ${response['message']}');
+      }
+    } catch (e) {
+      print('Error fetching user assigned details: $e');
+      setState(() {
+        _isLoading = false; // Hide loader
+        _userAssignedDetails = {};
+      });
+    } finally {
+      setState(() {
+        _isLoading = false; // Hide loader
+      });
     }
   }
 
@@ -393,6 +433,34 @@ class _FeeConcessionApprovalScreenState
   }
 
   Widget _buildUserList() {
+    if (_isLoading) {
+      return ListView.builder(
+        padding: const EdgeInsets.only(top: 8, bottom: 80),
+        itemCount: 10, // Placeholder count for shimmer effect
+        itemBuilder: (context, index) {
+          return Card(
+            elevation: 8,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.shade200),
+            ),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: Container(
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.only(top: 8, bottom: 80),
       itemCount: _filteredUsers.length,
@@ -451,6 +519,34 @@ class _FeeConcessionApprovalScreenState
     final user = _usersWithApprovals.firstWhere((u) => u['_id'] == userId);
     final approvals = user['concessionsRaised'];
 
+    if (_isLoading) {
+      return ListView.builder(
+        padding: const EdgeInsets.only(top: 8, bottom: 80),
+        itemCount: 10, // Placeholder count for shimmer effect
+        itemBuilder: (context, index) {
+          return Card(
+            elevation: 8,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.shade200),
+            ),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
     return Column(
       children: [
         Expanded(
@@ -461,263 +557,117 @@ class _FeeConcessionApprovalScreenState
               final approval = approvals[index];
               final approvalId = approval['_id'];
 
-              return index == 0
-                  ? Showcase(
-                      key: _swipeShowcaseKey,
-                      description: 'Swipe right to approve or left to reject',
-                      child: Dismissible(
-                        key: Key(approvalId),
-                        direction: DismissDirection.horizontal,
-                        confirmDismiss: (direction) async {
-                          // Update the approval status based on the swipe direction
-                          setState(() {
-                            if (direction == DismissDirection.startToEnd) {
-                              _approvalStatuses[approvalId] = 'approved';
-                            } else if (direction ==
-                                DismissDirection.endToStart) {
-                              _approvalStatuses[approvalId] = 'rejected';
-                            }
-                          });
-
-                          // ScaffoldMessenger.of(context).showSnackBar(
-                          //   SnackBar(
-                          //     content: Text(
-                          //       direction == DismissDirection.startToEnd
-                          //           ? 'Approved'
-                          //           : 'Rejected',
-                          //     ),
-                          //     duration: const Duration(seconds: 2),
-                          //   ),
-                          // );
-
-                          return false;
-                        },
-                        background: Container(
-                          color: Colors.green,
-                          alignment: Alignment.centerLeft,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: const Icon(Icons.check_circle,
-                              color: Colors.white),
+              return Dismissible(
+                key: Key(approvalId),
+                direction: DismissDirection.horizontal,
+                confirmDismiss: (direction) async {
+                  setState(() {
+                    if (direction == DismissDirection.startToEnd) {
+                      _approvalStatuses[approvalId] = 'approved';
+                    } else if (direction == DismissDirection.endToStart) {
+                      _approvalStatuses[approvalId] = 'rejected';
+                    }
+                  });
+                  return false;
+                },
+                background: Container(
+                  color: Colors.green,
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.check_circle, color: Colors.white),
+                ),
+                secondaryBackground: Container(
+                  color: Colors.red,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.cancel, color: Colors.white),
+                ),
+                child: Card(
+                  elevation: 8,
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(color: Colors.grey.shade200),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            const Color.fromARGB(255, 212, 215, 249),
+                            const Color.fromARGB(255, 251, 244, 244)
+                          ],
                         ),
-                        secondaryBackground: Container(
-                          color: Colors.red,
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: const Icon(Icons.cancel, color: Colors.white),
-                        ),
-                        child: Card(
-                          elevation: 8,
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: Colors.grey.shade200),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    const Color.fromARGB(255, 212, 215, 249),
-                                    const Color.fromARGB(255, 251, 244, 244)
-                                  ],
-                                ),
-                              ),
-                              child: ListTile(
-                                title: Text(
-                                  'Fee Type: ${approval['feeType']}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                        'Due Amount: ${approval['dueAmount']}'),
-                                    Text(
-                                        'Concession Type: ${approval['concessionType']}'),
-                                    Text(
-                                        'Current Concession: ${approval['currentConAmt']}'),
-                                  ],
-                                ),
-                                trailing: _approvalStatuses[approvalId] == null
-                                    ? Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
-                                            icon: const Icon(Icons.check_circle,
-                                                color: Colors.green),
-                                            onPressed: () {
-                                              setState(() {
-                                                _approvalStatuses[approvalId] =
-                                                    'approved';
-                                              });
-                                            },
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(Icons.cancel,
-                                                color: Colors.red),
-                                            onPressed: () {
-                                              setState(() {
-                                                _approvalStatuses[approvalId] =
-                                                    'rejected';
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      )
-                                    : Text(
-                                        _approvalStatuses[approvalId] ==
-                                                'approved'
-                                            ? 'Approved'
-                                            : 'Rejected',
-                                        style: TextStyle(
-                                          color:
-                                              _approvalStatuses[approvalId] ==
-                                                      'approved'
-                                                  ? Colors.green
-                                                  : Colors.red,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                              ),
-                            ),
+                      ),
+                      child: ListTile(
+                        title: Text(
+                          'Fee Type: ${approval['feeType']}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
                         ),
-                      ),
-                    )
-                  : Dismissible(
-                      key: Key(approvalId),
-                      direction: DismissDirection.horizontal,
-                      confirmDismiss: (direction) async {
-                        // Update the approval status based on the swipe direction
-                        setState(() {
-                          if (direction == DismissDirection.startToEnd) {
-                            _approvalStatuses[approvalId] = 'approved';
-                          } else if (direction == DismissDirection.endToStart) {
-                            _approvalStatuses[approvalId] = 'rejected';
-                          }
-                        });
-
-                        // ScaffoldMessenger.of(context).showSnackBar(
-                        //   SnackBar(
-                        //     content: Text(
-                        //       direction == DismissDirection.startToEnd
-                        //           ? 'Approved'
-                        //           : 'Rejected',
-                        //     ),
-                        //     duration: const Duration(seconds: 2),
-                        //   ),
-                        // );
-
-                        return false;
-                      },
-                      background: Container(
-                        color: Colors.green,
-                        alignment: Alignment.centerLeft,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child:
-                            const Icon(Icons.check_circle, color: Colors.white),
-                      ),
-                      secondaryBackground: Container(
-                        color: Colors.red,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: const Icon(Icons.cancel, color: Colors.white),
-                      ),
-                      child: Card(
-                        elevation: 8,
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(color: Colors.grey.shade200),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Due Amount: ${approval['dueAmount']}'),
+                            Text(
+                                'Concession Type: ${approval['concessionType']}'),
+                            Text(
+                                'Current Concession: ${approval['currentConAmt']}'),
+                          ],
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  const Color.fromARGB(255, 212, 215, 249),
-                                  const Color.fromARGB(255, 251, 244, 244)
-                                ],
-                              ),
-                            ),
-                            child: ListTile(
-                              title: Text(
-                                'Fee Type: ${approval['feeType']}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                        trailing: _approvalStatuses[approvalId] == null
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text('Due Amount: ${approval['dueAmount']}'),
-                                  Text(
-                                      'Concession Type: ${approval['concessionType']}'),
-                                  Text(
-                                      'Current Concession: ${approval['currentConAmt']}'),
+                                  IconButton(
+                                    icon: const Icon(Icons.check_circle,
+                                        color: Colors.green),
+                                    onPressed: () {
+                                      setState(() {
+                                        _approvalStatuses[approvalId] =
+                                            'approved';
+                                      });
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.cancel,
+                                        color: Colors.red),
+                                    onPressed: () {
+                                      setState(() {
+                                        _approvalStatuses[approvalId] =
+                                            'rejected';
+                                      });
+                                    },
+                                  ),
                                 ],
+                              )
+                            : Text(
+                                _approvalStatuses[approvalId] == 'approved'
+                                    ? 'Approved'
+                                    : 'Rejected',
+                                style: TextStyle(
+                                  color: _approvalStatuses[approvalId] ==
+                                          'approved'
+                                      ? Colors.green
+                                      : Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              trailing: _approvalStatuses[approvalId] == null
-                                  ? Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(Icons.check_circle,
-                                              color: Colors.green),
-                                          onPressed: () {
-                                            setState(() {
-                                              _approvalStatuses[approvalId] =
-                                                  'approved';
-                                            });
-                                          },
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(Icons.cancel,
-                                              color: Colors.red),
-                                          onPressed: () {
-                                            setState(() {
-                                              _approvalStatuses[approvalId] =
-                                                  'rejected';
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    )
-                                  : Text(
-                                      _approvalStatuses[approvalId] ==
-                                              'approved'
-                                          ? 'Approved'
-                                          : 'Rejected',
-                                      style: TextStyle(
-                                        color: _approvalStatuses[approvalId] ==
-                                                'approved'
-                                            ? Colors.green
-                                            : Colors.red,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        ),
                       ),
-                    );
+                    ),
+                  ),
+                ),
+              );
             },
           ),
         ),
-        if (_allApprovalsActedUpon(
-            approvals)) // Show Save button only if all approvals are acted upon
+        if (_allApprovalsActedUpon(approvals))
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
@@ -728,7 +678,6 @@ class _FeeConcessionApprovalScreenState
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
-                // primary: Colors.blue.shade700,
                 elevation: 2,
               ),
               child: Row(
@@ -775,6 +724,35 @@ class _FeeConcessionApprovalScreenState
             letterSpacing: 0.5,
           ),
         ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60.0),
+          child: Column(
+            children: [
+              if (_selectedUserId ==
+                  null) // Show search bar only when no user is selected
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: _filterUsers,
+                    decoration: InputDecoration(
+                      hintText: 'Search by Name or Branch',
+                      prefixIcon:
+                          Icon(Icons.search, color: Colors.grey.shade600),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
         leading: _selectedUserId != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -786,37 +764,29 @@ class _FeeConcessionApprovalScreenState
               )
             : null,
       ),
-      body: Column(
-        children: [
-          if (_selectedUserId ==
-              null) // Show search bar only when no user is selected
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: TextField(
-                controller: _searchController,
-                onChanged: _filterUsers,
-                decoration: InputDecoration(
-                  hintText: 'Search by Name or Branch',
-                  prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await _fetchUserAssignedDetails();
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: _selectedUserId == null
+                  ? _buildUserList() // Show shimmer or user list
+                  : _buildApprovalList(
+                      _selectedUserId!), // Show shimmer or approval list
             ),
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _selectedUserId == null
-                    ? _buildUserList()
-                    : _buildApprovalList(_selectedUserId!),
-          ),
-        ],
+          ],
+        ),
       ),
+      floatingActionButton: _selectedUserId == null
+          ? FilterButtonWidget(
+              openBottomSheet: true,
+              showSections: true,
+              onFilterApplied: _fetchUsersAndApprovals,
+              isSingleSectionsSelection: true,
+            )
+          : null, // Remove floating action button when showing approvals
     );
   }
 }
