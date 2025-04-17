@@ -86,43 +86,96 @@ class _FeeConcessionApprovalScreenState
   }
 
   Future<void> _fetchUsersAndApprovals() async {
+    if (_userAssignedDetails == null) return;
     setState(() {
       _isLoading = true;
+      _usersWithApprovals = [];
+      _filteredUsers = [];
     });
+    final filterState = ref.read(filterStateProvider);
+    final sectionId =
+        filterState.section.isNotEmpty ? filterState.section[0] : null;
+    final branchIds =
+        _userAssignedDetails!['data'].map((e) => e['branchId']).toList();
+    final selectedBranch = filterState.branch;
+    final selectedBoard = filterState.board;
+    final selectedGrade = filterState.grade;
+    if (selectedBranch == null) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No branch selected in filters')),
+      );
+      return;
+    }
+
+    if (selectedBranch == null) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No branch selected in filters')),
+      );
+      return;
+    }
+    final isValidBranch = branchIds.contains(selectedBranch);
+    if (!isValidBranch) {
+      setState(() {
+        _isLoading = false; // Hide loader
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('You Dont have access to selcted branch in filters')),
+      );
+      return;
+    }
+
+    if (sectionId == null) {
+      setState(() {
+        _isLoading = false; // Hide loader
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No section selected in filters')),
+      );
+      return;
+    }
+
+    final assignedHeirarchy =
+        _userAssignedDetails!['adminUserAssignedLevelDetails'];
+    final adminLevels = assignedHeirarchy;
+    final adminUserState = ref.watch(adminUserProvider);
+    final userDetails = adminUserState.userDetails;
+    final academicYear =
+        userDetails?['data']['user_info']['selectedAcademicYear'];
+
+    if (academicYear == null) {
+      setState(() {
+        _isLoading = false; // Hide loader
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No academic year selected in filters')),
+      );
+      return;
+    }
+    final payload = {
+      "branchId": [selectedBranch],
+      "boardId": [selectedBoard],
+      "gradeId": [selectedGrade],
+      "sectionId": sectionId,
+      "academicYear": academicYear,
+      "username": "",
+      "enrollmentNo": "",
+      "assignedHeirarchy": {
+        "branchIds": branchIds,
+        "adminLevels": adminLevels,
+      }
+    };
     try {
       final apiService = ApiService();
       final response = await apiService.post(
         'concession-approval/get-concession-approvals?limit=10&page=1',
-        {
-          "branchId": ["03788c5e-41a6-44be-a7e9-76f58bf61690"],
-          "boardId": ["8ae27b15-a7c9-4c38-8220-a892cd7ae748"],
-          "gradeId": ["a513e79f-f5b5-485f-9ff3-072a69bbe795"],
-          "sectionId": "c8e11add-1285-4b7a-b1e0-fc41604b5de7",
-          "academicYear": "675d109451233718e9b76dee",
-          "username": "",
-          "enrollmentNo": "",
-          "assignedHeirarchy": {
-            "branchIds": ["03788c5e-41a6-44be-a7e9-76f58bf61690"],
-            "adminLevels": [
-              {
-                "_id": "03788c5e-41a6-44be-a7e9-76f58bf61690",
-                "levels": [
-                  {
-                    "level": 1,
-                    "users": [
-                      {
-                        "userName": "aaudeliveryuser",
-                        "userId": "c1431d4a-f0a1-70da-283a-c431ac4dac82",
-                        "status": true,
-                        "level": 1
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        },
+        payload,
       );
       if (response['status'] == true) {
         setState(() {
