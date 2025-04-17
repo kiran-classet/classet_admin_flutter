@@ -201,9 +201,6 @@ class _StudentStatusChangeApprovalScreenState
     setState(() {
       _isLoading = true; // Show loader
     });
-    print(
-        'User Assigned Details: ${_userAssignedDetails!['adminUserAssignedLevelDetails']}');
-    print('Approval Data Branch ID: ${approvalData['branchId']}');
 
     final filterData = _userAssignedDetails!['adminUserAssignedLevelDetails']
         .where((element) => element['_id'] == approvalData['branchId'])

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:classet_admin/core/providers/filter_provider.dart';
 import 'package:classet_admin/features/auth/providers/admin_user_provider.dart';
 import 'package:flutter/material.dart';
@@ -223,18 +225,36 @@ class _FeeConcessionApprovalScreenState
     });
 
     try {
-      final apiService = ApiService();
-      final payload = _approvalStatuses.entries
-          .map((entry) => {
-                "approvalId": entry.key,
-                "status": entry.value,
-              })
+      final selectedUser =
+          _usersWithApprovals.firstWhere((u) => u['_id'] == _selectedUserId);
+      final filterData = _userAssignedDetails!['adminUserAssignedLevelDetails']
+          .where((element) => element['_id'] == selectedUser['branchId'])
           .toList();
 
-      final response = await apiService.post(
-        'concession-approval/update-approval-status',
-        {"approvals": payload},
-      );
+      final concessionRaised = selectedUser['concessionsRaised'];
+
+      for (var concession in concessionRaised) {
+        final approvalId = concession['_id'];
+        if (_approvalStatuses.containsKey(approvalId)) {
+          concession['isConcessionApproved'] =
+              _approvalStatuses[approvalId] == 'approved';
+        } else {
+          concession['isConcessionApproved'] = false;
+        }
+      }
+      final payload = {
+        "_id": _selectedUserId,
+        "user_id": selectedUser['user_id'],
+        "isClosed": true,
+        "remarks": "",
+        "concessionsRaised": concessionRaised,
+        "branchId": selectedUser['branchId'],
+        "handledBy": selectedUser['handledBy'] ?? [],
+        "levelAndBranchDetails": filterData,
+      };
+      final apiService = ApiService();
+      final response = await apiService.put(
+          'concession-approval/update-concession-approvals', payload);
 
       if (response['status'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -243,12 +263,17 @@ class _FeeConcessionApprovalScreenState
         );
         setState(() {
           _approvalStatuses.clear();
+          _selectedUserId = null; // Navigate back to the user list screen
         });
+        await _fetchUsersAndApprovals();
       } else {
         print('Failed to save statuses: ${response['message']}');
       }
     } catch (e) {
       print('Error saving statuses: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to save approvals.')),
+      );
     } finally {
       setState(() {
         _isLoading = false;
@@ -258,8 +283,16 @@ class _FeeConcessionApprovalScreenState
 
   // Add this helper method to check if all approvals are acted upon
   bool _allApprovalsActedUpon(List<dynamic> approvals) {
-    return approvals
-        .every((approval) => _approvalStatuses.containsKey(approval['_id']));
+    final missingApprovals = approvals
+        .where((approval) => !_approvalStatuses.containsKey(approval['_id']))
+        .toList();
+
+    if (missingApprovals.isNotEmpty) {
+      print(
+          'Missing approvals: ${missingApprovals.map((a) => a['_id']).toList()}');
+    }
+
+    return missingApprovals.isEmpty;
   }
 
   Future<void> _showConfirmationDialog(
@@ -272,12 +305,16 @@ class _FeeConcessionApprovalScreenState
         .length;
     final totalApprovedConcession = approvals
         .where((approval) => _approvalStatuses[approval['_id']] == 'approved')
-        .fold(0,
-            (sum, approval) => sum + ((approval['currentConAmt'] ?? 0) as int));
+        .fold<num>(0, (sum, approval) {
+      final currentConAmt = approval['currentConAmt'];
+      return sum + (currentConAmt is num ? currentConAmt : 0);
+    });
     final totalRejectedConcession = approvals
         .where((approval) => _approvalStatuses[approval['_id']] == 'rejected')
-        .fold(0,
-            (sum, approval) => sum + ((approval['currentConAmt'] ?? 0) as int));
+        .fold<num>(0, (sum, approval) {
+      final currentConAmt = approval['currentConAmt'];
+      return sum + (currentConAmt is num ? currentConAmt : 0);
+    });
 
     return showDialog<void>(
       context: context,
@@ -339,7 +376,7 @@ class _FeeConcessionApprovalScreenState
                   icon: Icons.check_circle_outline,
                   title: 'Approved',
                   count: approvedCount,
-                  amount: totalApprovedConcession,
+                  amount: totalApprovedConcession.toInt(),
                   color: Colors.green,
                 ),
                 const SizedBox(height: 16),
@@ -349,7 +386,7 @@ class _FeeConcessionApprovalScreenState
                   icon: Icons.cancel_outlined,
                   title: 'Rejected',
                   count: rejectedCount,
-                  amount: totalRejectedConcession,
+                  amount: totalRejectedConcession.toInt(),
                   color: Colors.red,
                 ),
                 const SizedBox(height: 24),
@@ -389,7 +426,6 @@ class _FeeConcessionApprovalScreenState
                         _saveApprovalStatuses();
                       },
                       style: ElevatedButton.styleFrom(
-                        // primary: Colors.blue.shade700,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 12,
@@ -485,6 +521,54 @@ class _FeeConcessionApprovalScreenState
     );
   }
 
+  Widget _buildEmptyState() {
+    return ListView(
+      children: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height - kToolbarHeight,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TweenAnimationBuilder(
+                  tween: Tween<double>(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 800),
+                  builder: (context, double value, child) {
+                    return Transform.scale(
+                      scale: value,
+                      child: Icon(
+                        Icons.check_circle_outline,
+                        size: 80,
+                        color: Colors.blue.shade200,
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'No pending approvals',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Pull to refresh when new approvals arrive',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildUserList() {
     if (_isLoading) {
       return ListView.builder(
@@ -512,6 +596,10 @@ class _FeeConcessionApprovalScreenState
           );
         },
       );
+    }
+
+    if (_filteredUsers.isEmpty) {
+      return _buildEmptyState(); // Show empty state when no users are found
     }
 
     return ListView.builder(
@@ -710,6 +798,7 @@ class _FeeConcessionApprovalScreenState
                                       ? Colors.green
                                       : Colors.red,
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 14,
                                 ),
                               ),
                       ),
