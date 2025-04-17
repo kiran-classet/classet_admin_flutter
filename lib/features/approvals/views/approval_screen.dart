@@ -1,3 +1,4 @@
+import 'package:classet_admin/features/approvals/views/fee_concession_approval.dart';
 import 'package:classet_admin/features/approvals/views/student_admission_cat_change.dart';
 import 'package:classet_admin/features/approvals/views/student_status_change_approval_screen.dart';
 import 'package:classet_admin/features/approvals/views/student_transfers_approval.dart';
@@ -174,6 +175,14 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) => const StudentTransfersApprovalScreen(),
+              ),
+            );
+          }
+          if (route == '/feeConcessionApproval') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const FeeConcessionApprovalScreen(),
               ),
             );
           }
